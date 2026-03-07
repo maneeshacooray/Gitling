@@ -30,7 +30,8 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
             if (mException == null) {
                 BasicFunctions.showError(BasicFunctions.getActiveActivity(), mErrorRes, getErrorTitleRes());
             } else {
-                BasicFunctions.showException(BasicFunctions.getActiveActivity(), mException, mErrorRes, getErrorTitleRes());
+                BasicFunctions.showException(BasicFunctions.getActiveActivity(), mException, mErrorRes,
+                        getErrorTitleRes());
             }
         }
         if (isSuccess && mSuccessMsg != 0) {
@@ -56,9 +57,9 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         String password = mRepo.getPassword();
 
         if (username != null && password != null && !username.trim().isEmpty()
-            && !password.trim().isEmpty()) {
+                && !password.trim().isEmpty()) {
             UsernamePasswordCredentialsProvider auth = new UsernamePasswordCredentialsProvider(
-                username, password);
+                    username, password);
             command.setCredentialsProvider(auth);
         } else {
             Timber.d("no CredentialsProvider when no username/password provided");
@@ -122,6 +123,10 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         @Override
         public boolean isCancelled() {
             return isTaskCanceled();
+        }
+
+        @Override
+        public void showDuration(boolean enabled) {
         }
 
         private void setProgress() {

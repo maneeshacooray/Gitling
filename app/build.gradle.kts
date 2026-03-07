@@ -67,6 +67,7 @@ android {
     packaging {
         resources {
             excludes += setOf("META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE")
+            excludes += "META-INF/versions/**/OSGI-INF/MANIFEST.MF"
         }
     }
 }
@@ -121,13 +122,14 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("com.github.mwiede:jsch:0.2.0")
-    implementation("commons-io:commons-io:2.21.0")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:3.7.1.201504261725-r")
+    implementation("com.github.mwiede:jsch:0.2.22")
+    implementation("commons-io:commons-io:2.18.0")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:6.10.0.202406032230-r")
     implementation("com.nostra13.universalimageloader:universal-image-loader:1.9.5")
     implementation("com.scottyab:secure-preferences-lib:0.1.7")
     implementation("org.conscrypt:conscrypt-android:2.5.3")
-    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 
     val acraVersion = "5.13.1"
     implementation("ch.acra:acra-mail:$acraVersion")

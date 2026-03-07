@@ -116,6 +116,11 @@ public class MGitHttpConnection implements HttpConnection {
         return wrappedUrlConnection.getHeaderFields();
     }
 
+    @Override
+    public List<String> getHeaderFields(String name) {
+        return wrappedUrlConnection.getHeaderFields().get(name);
+    }
+
     public void setRequestProperty(String key, String value) {
         wrappedUrlConnection.setRequestProperty(key, value);
     }
@@ -195,8 +200,7 @@ public class MGitHttpConnection implements HttpConnection {
         SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
         ctx.init(km, tm, random);
         SSLSocketFactory factory = ctx.getSocketFactory();
-        if(! (factory instanceof MGitSSLSocketFactory))
-        {
+        if (!(factory instanceof MGitSSLSocketFactory)) {
             factory = new MGitSSLSocketFactory(factory);
         }
         ((HttpsURLConnection) wrappedUrlConnection).setSSLSocketFactory(factory);

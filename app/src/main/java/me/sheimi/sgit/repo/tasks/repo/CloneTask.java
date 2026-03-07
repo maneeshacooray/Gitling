@@ -83,8 +83,7 @@ public class CloneTask extends RepoRemoteOpTask {
         } catch (GitAPIException e) {
             setException(e, R.string.error_clone_failed);
             return false;
-        }
-        catch (JGitInternalException e) {
+        } catch (JGitInternalException e) {
             // not supported when unsupported git remotehttp://asdgfkas URI
             if (e.getCause() instanceof NotSupportedException) {
                 setError(R.string.error_invalid_remote);
@@ -110,7 +109,8 @@ public class CloneTask extends RepoRemoteOpTask {
 
     @Override
     public RepoRemoteOpTask getNewTask() {
-        // need to call create repo again as when clone fails due auth error, the repo initially created gets deleted
+        // need to call create repo again as when clone fails due auth error, the repo
+        // initially created gets deleted
         String userName = mRepo.getUsername();
         String password = mRepo.getPassword();
         mRepo = Repo.createRepo(mRepo.getLocalPath(), mRepo.getRemoteURL(), mCloneStatusName);
@@ -177,6 +177,10 @@ public class CloneTask extends RepoRemoteOpTask {
         @Override
         public boolean isCancelled() {
             return isTaskCanceled();
+        }
+
+        @Override
+        public void showDuration(boolean enabled) {
         }
 
     }
