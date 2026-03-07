@@ -63,7 +63,7 @@ public class CommitsFragment extends BaseFragment implements
         return fragment;
     }
 
-    public void setFilter(String query){
+    public void setFilter(String query) {
         mCommitsListAdapter.setFilter(query);
     }
 
@@ -107,10 +107,10 @@ public class CommitsFragment extends BaseFragment implements
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapterView,
                             View view, int position, long l) {
-			if (mActionMode == null) {
+                        if (mActionMode == null) {
                             enterDiffActionMode();
                         }
-			chooseItem(position);
+                        chooseItem(position);
                         return true;
                     }
                 });
@@ -172,7 +172,7 @@ public class CommitsFragment extends BaseFragment implements
     }
 
     private void showDiff(ActionMode actionMode, String oldCommit, String newCommit,
-                          boolean showDescription) {
+            boolean showDescription) {
         Intent intent = new Intent(getRawActivity(),
                 CommitDiffActivity.class);
         if (oldCommit != null) {
@@ -189,61 +189,56 @@ public class CommitsFragment extends BaseFragment implements
 
     @Override
     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.action_mode_diff:
-                Integer[] items = mChosenItem.toArray(new Integer[0]);
-                if (items.length == 0) {
-                    showToastMessage(R.string.alert_no_items_selected);
-                    return true;
-                }
-                int item1,
-                        item2;
-                item1 = items[0];
-                if (items.length == 1) {
-                    item2 = item1 + 1;
-                    if (item2 == mCommitsListAdapter.getCount()) {
-                        showToastMessage(R.string.alert_no_older_commits);
-                        return true;
-                    }
-                } else {
-                    item2 = items[1];
-                }
-
-                int smaller = Math.min(item1, item2);
-                int larger = Math.max(item1, item2);
-                String oldCommit = mCommitsListAdapter.getItem(larger)
-                        .getName();
-                String newCommit = mCommitsListAdapter.getItem(smaller)
-                        .getName();
-                showDiff(actionMode, oldCommit, newCommit, false);
-                return true;
-            case R.id.action_mode_copy_commit: {
-                if (mChosenItem.size() != 1) {
-                    showToastMessage(R.string.alert_you_must_choose_one_commit_to_copy);
-                    return true;
-                }
-                int item = mChosenItem.iterator().next();
-                String commit = mCommitsListAdapter.getItem(item).getName();
-                ClipData clip = ClipData.newPlainText("commit_to_copy", commit);
-                mClipboard.setPrimaryClip(clip);
-                showToastMessage(R.string.msg_commit_str_has_copied);
-                actionMode.finish();
+        int id = menuItem.getItemId();
+        if (id == R.id.action_mode_diff) {
+            Integer[] items = mChosenItem.toArray(new Integer[0]);
+            if (items.length == 0) {
+                showToastMessage(R.string.alert_no_items_selected);
                 return true;
             }
-            case R.id.action_mode_checkout: {
-                int item = mChosenItem.iterator().next();
-                String commit = mCommitsListAdapter.getItem(item).getName();
-                Bundle pathArg = new Bundle();
-                pathArg.putString(CheckoutDialog.BASE_COMMIT, commit);
-                pathArg.putSerializable(Repo.TAG, mRepo);
-                actionMode.finish();
-                CheckoutDialog ckd = new CheckoutDialog();
-                ckd.setArguments(pathArg);
-                ckd.show(getFragmentManager(), "rename-dialog");
-
-                break;
+            int item1,
+                    item2;
+            item1 = items[0];
+            if (items.length == 1) {
+                item2 = item1 + 1;
+                if (item2 == mCommitsListAdapter.getCount()) {
+                    showToastMessage(R.string.alert_no_older_commits);
+                    return true;
+                }
+            } else {
+                item2 = items[1];
             }
 
+            int smaller = Math.min(item1, item2);
+            int larger = Math.max(item1, item2);
+            String oldCommit = mCommitsListAdapter.getItem(larger)
+                    .getName();
+            String newCommit = mCommitsListAdapter.getItem(smaller)
+                    .getName();
+            showDiff(actionMode, oldCommit, newCommit, false);
+            return true;
+        } else if (id == R.id.action_mode_copy_commit) {
+            if (mChosenItem.size() != 1) {
+                showToastMessage(R.string.alert_you_must_choose_one_commit_to_copy);
+                return true;
+            }
+            int item = mChosenItem.iterator().next();
+            String commit = mCommitsListAdapter.getItem(item).getName();
+            ClipData clip = ClipData.newPlainText("commit_to_copy", commit);
+            mClipboard.setPrimaryClip(clip);
+            showToastMessage(R.string.msg_commit_str_has_copied);
+            actionMode.finish();
+            return true;
+        } else if (id == R.id.action_mode_checkout) {
+            int item = mChosenItem.iterator().next();
+            String commit = mCommitsListAdapter.getItem(item).getName();
+            Bundle pathArg = new Bundle();
+            pathArg.putString(CheckoutDialog.BASE_COMMIT, commit);
+            pathArg.putSerializable(Repo.TAG, mRepo);
+            actionMode.finish();
+            CheckoutDialog ckd = new CheckoutDialog();
+            ckd.setArguments(pathArg);
+            ckd.show(getFragmentManager(), "rename-dialog");
         }
         return false;
     }

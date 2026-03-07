@@ -3,9 +3,9 @@ package com.manichord.mgit.dialogs
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import androidx.annotation.StringRes
 import android.widget.Button
-import kotlinx.android.synthetic.main.dialog_error.view.*
+import android.widget.TextView
+import androidx.annotation.StringRes
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.R
@@ -32,7 +32,9 @@ class ErrorDialog : SheimiDialogFragment() {
             }
             else -> ""
         }
-        layout.error_message.setText(getString(mErrorRes) + "\n" + details)
+        // Use findViewById instead of the removed kotlin-android-extensions synthetic import
+        layout.findViewById<TextView>(R.id.error_message)
+            .setText(getString(mErrorRes) + "\n" + details)
 
         builder.setView(layout)
 
@@ -52,7 +54,7 @@ class ErrorDialog : SheimiDialogFragment() {
             if (BuildConfig.DEBUG) {
                 // when debugging just log the exception
                 if (mThrowable != null) {
-                    Timber.e(mThrowable);
+                    Timber.e(mThrowable)
                 } else {
                     Timber.e(if (mErrorRes != 0) getString(mErrorRes) else "")
                 }

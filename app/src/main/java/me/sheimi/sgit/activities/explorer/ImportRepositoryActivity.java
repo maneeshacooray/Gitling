@@ -43,31 +43,31 @@ public class ImportRepositoryActivity extends FileExplorerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_create_external:
-                File dotGit = new File(getCurrentDir(), Repo.DOT_GIT_DIR);
-                if (dotGit.exists()) {
-                    showToastMessage(R.string.alert_is_already_a_git_repo);
-                    return true;
-                }
-                showMessageDialog(R.string.dialog_create_external_title,
-                        R.string.dialog_create_external_msg,
-                        R.string.dialog_create_external_positive_label,
-                        new OnClickListener() {
+        int id = item.getItemId();
+        if (id == R.id.action_create_external) {
+            File dotGit = new File(getCurrentDir(), Repo.DOT_GIT_DIR);
+            if (dotGit.exists()) {
+                showToastMessage(R.string.alert_is_already_a_git_repo);
+                return true;
+            }
+            showMessageDialog(R.string.dialog_create_external_title,
+                    R.string.dialog_create_external_msg,
+                    R.string.dialog_create_external_positive_label,
+                    new OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int which) {
-                                createExternalGitRepo();
-                            }
-                        });
-                return true;
-            case R.id.action_import_external:
-                Intent intent = new Intent();
-                intent.putExtra(RESULT_PATH, getCurrentDir().getAbsolutePath());
-                setResult(Activity.RESULT_OK, intent);
-                finish();
-                return true;
+                        @Override
+                        public void onClick(DialogInterface dialog,
+                                int which) {
+                            createExternalGitRepo();
+                        }
+                    });
+            return true;
+        } else if (id == R.id.action_import_external) {
+            Intent intent = new Intent();
+            intent.putExtra(RESULT_PATH, getCurrentDir().getAbsolutePath());
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

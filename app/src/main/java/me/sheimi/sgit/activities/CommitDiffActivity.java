@@ -82,7 +82,7 @@ public class CommitDiffActivity extends SheimiFragmentActivity {
         webSettings.setJavaScriptEnabled(true);
         mDiffContent.setWebChromeClient(new WebChromeClient() {
             public void onConsoleMessage(String message, int lineNumber,
-                                         String sourceID) {
+                    String sourceID) {
                 Log.d("MyApplication", message + " -- From line " + lineNumber
                         + " of " + sourceID);
             }
@@ -111,7 +111,7 @@ public class CommitDiffActivity extends SheimiFragmentActivity {
         shareIntent.setData(futurePathName);
         shareIntent.setType("text/x-patch");
 
-        shareActionProvider.setOnShareTargetSelectedListener(new ShareActionProvider.OnShareTargetSelectedListener () {
+        shareActionProvider.setOnShareTargetSelectedListener(new ShareActionProvider.OnShareTargetSelectedListener() {
             public boolean onShareTargetSelected(ShareActionProvider source, Intent intent) {
                 try {
                     File diff = sharedDiffPathName();
@@ -139,7 +139,7 @@ public class CommitDiffActivity extends SheimiFragmentActivity {
     }
 
     private void saveDiff(OutputStream fos) throws IOException {
-	    /* FIXME: LOCK!!! */
+        /* FIXME: LOCK!!! */
         if (mCommit != null) {
             String message;
             fos.write(formatCommitInfo().getBytes());
@@ -177,17 +177,17 @@ public class CommitDiffActivity extends SheimiFragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_save_diff:
-                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                        .setType("text/x-patch")
-                        .putExtra(Intent.EXTRA_TITLE, Repo.getCommitDisplayName(mNewCommit) + ".diff");
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        } else if (id == R.id.action_save_diff) {
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .setType("text/x-patch")
+                    .putExtra(Intent.EXTRA_TITLE, Repo.getCommitDisplayName(mNewCommit) + ".diff");
 
-                startActivityForResult(intent, REQUEST_SAVE_DIFF);
-                return true;
+            startActivityForResult(intent, REQUEST_SAVE_DIFF);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -246,16 +246,16 @@ public class CommitDiffActivity extends SheimiFragmentActivity {
             String oldCommit = mOldCommit != null ? mOldCommit : (mNewCommit + "^");
             CommitDiffTask diffTask = new CommitDiffTask(mRepo, oldCommit,
                     mNewCommit, new CommitDiffResult() {
-                @Override
-                public void pushResult(List<DiffEntry> diffEntries,
-                                       List<String> diffStrs, RevCommit commit) {
-                    mDiffEntries = diffEntries;
-                    mDiffStrs = diffStrs;
-                    mCommit = commit;
-                    mLoading.setVisibility(View.GONE);
-                    mDiffContent.loadUrl(CodeGuesser.wrapUrlScript("notifyEntriesReady();"));
-                }
-            }, mShowDescription);
+                        @Override
+                        public void pushResult(List<DiffEntry> diffEntries,
+                                List<String> diffStrs, RevCommit commit) {
+                            mDiffEntries = diffEntries;
+                            mDiffStrs = diffStrs;
+                            mCommit = commit;
+                            mLoading.setVisibility(View.GONE);
+                            mDiffContent.loadUrl(CodeGuesser.wrapUrlScript("notifyEntriesReady();"));
+                        }
+                    }, mShowDescription);
             diffTask.executeTask();
         }
 

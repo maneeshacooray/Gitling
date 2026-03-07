@@ -14,8 +14,6 @@ import me.sheimi.sgit.database.models.Repo;
 
 public class ExploreRootDirActivity extends FileExplorerActivity {
 
-
-
     @Override
     protected File getRootFolder() {
         return Environment.getExternalStorageDirectory();
@@ -61,11 +59,11 @@ public class ExploreRootDirActivity extends FileExplorerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_select_root:
-                Repo.setLocalRepoRoot(this, getCurrentDir());
-                finish();
-                return true;
+        int id = item.getItemId();
+        if (id == R.id.action_select_root) {
+            Repo.setLocalRepoRoot(this, getCurrentDir());
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
