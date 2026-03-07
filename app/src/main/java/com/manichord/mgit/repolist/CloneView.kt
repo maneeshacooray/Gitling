@@ -5,6 +5,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -12,6 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.net.Uri
 import com.manichord.mgit.clone.CloneViewModel
 import me.sheimi.sgit.R
 
@@ -87,6 +90,31 @@ fun CloneView(
             ),
             singleLine = true,
             shape = MaterialTheme.shapes.medium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // New Folder Picker Section
+        val folderPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()
+        ) { uri: Uri? ->
+            uri?.let { viewModel.cloneLocation.value = it.toString() }
+        }
+
+        val cloneLocation by viewModel.cloneLocation.observeAsState("")
+
+        OutlinedTextField(
+            value = cloneLocation,
+            onValueChange = { viewModel.cloneLocation.value = it },
+            label = { Text("Clone Location") },
+            placeholder = { Text("Default storage") },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(onClick = { folderPickerLauncher.launch(null) }) {
+                    Icon(Icons.Default.FolderOpen, contentDescription = "Browse")
+                }
+            },
+            shape = MaterialTheme.shapes.medium,
+            readOnly = true // User should use the browse button
         )
         Spacer(modifier = Modifier.height(16.dp))
 

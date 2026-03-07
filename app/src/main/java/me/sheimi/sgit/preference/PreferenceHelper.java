@@ -29,7 +29,8 @@ public class PreferenceHelper {
     }
 
     /**
-     * Returns the root directory on device storage in which new local repos will be stored
+     * Returns the root directory on device storage in which new local repos will be
+     * stored
      *
      * @return null if the custom repo location user preference is *not* set
      */
@@ -44,20 +45,50 @@ public class PreferenceHelper {
 
     public void setRepoRoot(String repoRootPath) {
         edit(mContext.getString(R.string.pref_key_repo_root_location), repoRootPath);
-        Timber.d("set root:"+repoRootPath);
+        Timber.d("set root:" + repoRootPath);
     }
 
     public void setPrivacyAccepted() {
         edit(PRIVACY_ACCEPTED_KEY, PRIVACY_ACCEPTED_VERSION);
-        Timber.d("Privacy policy accepted version:"+PRIVACY_ACCEPTED_VERSION);
+        Timber.d("Privacy policy accepted version:" + PRIVACY_ACCEPTED_VERSION);
     }
 
+    public boolean useEnglish() {
+        return getBoolean(mContext.getString(R.string.pref_key_use_english));
+    }
+
+    public void setUseEnglish(boolean use) {
+        edit(mContext.getString(R.string.pref_key_use_english), use);
+    }
+
+    public String getUserName() {
+        return getString(mContext.getString(R.string.pref_key_git_user_name));
+    }
+
+    public void setUserName(String name) {
+        edit(mContext.getString(R.string.pref_key_git_user_name), name);
+    }
+
+    public String getUserEmail() {
+        return getString(mContext.getString(R.string.pref_key_git_user_email));
+    }
+
+    public void setUserEmail(String email) {
+        edit(mContext.getString(R.string.pref_key_git_user_email), email);
+    }
+
+    public boolean useGravatar() {
+        return getBoolean(mContext.getString(R.string.pref_key_use_gravatar));
+    }
+
+    public void setUseGravatar(boolean use) {
+        edit(mContext.getString(R.string.pref_key_use_gravatar), use);
+    }
 
     protected SharedPreferences getSharedPrefs() {
         return mContext.getSharedPreferences(
-            mContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                mContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
-
 
     private void edit(String name, String value) {
         SharedPreferences.Editor editor = getSharedPrefs().edit();
@@ -66,13 +97,13 @@ public class PreferenceHelper {
     }
 
     private void edit(String name, int value) {
-        SharedPreferences.Editor editor =  getSharedPrefs().edit();
+        SharedPreferences.Editor editor = getSharedPrefs().edit();
         editor.putInt(name, value);
         editor.apply();
     }
 
     private void edit(String name, boolean value) {
-        SharedPreferences.Editor editor =  getSharedPrefs().edit();
+        SharedPreferences.Editor editor = getSharedPrefs().edit();
         editor.putBoolean(name, value);
         editor.apply();
     }
@@ -82,11 +113,11 @@ public class PreferenceHelper {
     }
 
     private int getInt(String name) {
-        return  getSharedPrefs().getInt(name, DEFAULT_INT);
+        return getSharedPrefs().getInt(name, DEFAULT_INT);
     }
 
     private boolean getBoolean(String name) {
-        return  getSharedPrefs().getBoolean(name, DEFAULT_BOOLEAN);
+        return getSharedPrefs().getBoolean(name, DEFAULT_BOOLEAN);
     }
 
     public boolean isPrivacyAccepted() {

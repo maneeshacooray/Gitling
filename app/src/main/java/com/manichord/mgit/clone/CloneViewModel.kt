@@ -19,6 +19,7 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     val localRepoName : MutableLiveData<String> = MutableLiveData()
+    val cloneLocation : MutableLiveData<String> = MutableLiveData()
     var cloneRecursively : Boolean = false
     val initLocal : MutableLiveData<Boolean> = MutableLiveData()
 
@@ -30,6 +31,8 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
     init {
         visible.value = false
         initLocal.value = false
+        val prefsHelper = (application as MGitApplication).prefenceHelper!!
+        cloneLocation.value = prefsHelper.repoRoot?.absolutePath ?: ""
     }
 
     fun show(show : Boolean) {
@@ -38,14 +41,18 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun cloneRepo() {
-        // FIXME: createRepo should not use user visible strings, instead will need to be refactored
-        // to set an observable state
         if (initLocal.value as Boolean) {
             Timber.d("INIT LOCAL %s", localRepoName.value)
             initLocalRepo()
         } else {
             Timber.d("CLONE REPO %s %s [%b]", localRepoName.value, remoteUrl, cloneRecursively)
-            val repo = Repo.createRepo(localRepoName.value, remoteUrl, "")
+            // Use custom location if provided
+            val location = cloneLocation.value ?: ""
+            val repo = if (location.isNotEmpty()) {
+                Repo.createRepo(Repo.EXTERNAL_PREFIX + location + "/" + localRepoName.value, remoteUrl, "")
+            } else {
+                Repo.createRepo(localRepoName.value, remoteUrl, "")
+            }
             val task = CloneTask(repo, cloneRecursively, "", null)
             task.executeTask()
             remoteUrl = ""

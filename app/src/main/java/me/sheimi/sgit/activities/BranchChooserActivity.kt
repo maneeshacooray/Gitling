@@ -18,6 +18,14 @@ import android.widget.Toast
 
 class BranchChooserActivity : SheimiFragmentActivity() {
 
+    override fun setTheme() {
+        if (me.sheimi.android.utils.BasicFunctions.isDarkTheme()) {
+            setTheme(R.style.DarkAppTheme_NoActionBar)
+        } else {
+            setTheme(R.style.AppTheme_NoActionBar)
+        }
+    }
+
     private val viewModel: BranchChooserViewModel by viewModels()
     private var mRepo: Repo? = null
 

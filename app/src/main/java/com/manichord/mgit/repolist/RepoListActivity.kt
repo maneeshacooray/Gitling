@@ -29,6 +29,14 @@ import java.net.URL
 
 class RepoListActivity : SheimiFragmentActivity() {
 
+    override fun setTheme() {
+        if (me.sheimi.android.utils.BasicFunctions.isDarkTheme()) {
+            setTheme(R.style.DarkAppTheme_NoActionBar)
+        } else {
+            setTheme(R.style.AppTheme_NoActionBar)
+        }
+    }
+
     private lateinit var mRepoListAdapter: RepoListAdapter
     private lateinit var cloneViewModel: CloneViewModel
     private lateinit var viewModel: RepoListViewModel

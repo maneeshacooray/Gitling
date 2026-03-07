@@ -104,7 +104,7 @@ public class SheimiFragmentActivity extends AppCompatActivity {
             case MGIT_PERMISSIONS_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                 } else {
                     // permission denied
@@ -119,31 +119,33 @@ public class SheimiFragmentActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (PermissionsHelper.Companion.canReadStorage(context) != true) {
                 showMessageDialog(
-                    R.string.dialog_access_all_files_title,
-                    getString(R.string.dialog_access_all_files_msg),
-                    R.string.label_ok,
-                    R.string.label_cancel,
-                    (dialogInterface, i) -> {
-                        try {
-                            Uri uri = Uri.fromParts("package", getPackageName(), null);
-                            Intent permissionAllowIntent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
-                            startActivity(permissionAllowIntent);
-                        } catch (ActivityNotFoundException e) {
-                            Log.e("SheimiFragmentActivity", "could not start activity to request all files permission");
-                            showMessageDialog(R.string.dialog_error_title, getString(R.string.error_couldnt_display_all_files_permission));
-                        }
-                    },
-                    (dialogInterface, i) -> {
-                        // can't go on without all files permission
-                        finish();
-                    }
-                );
+                        R.string.dialog_access_all_files_title,
+                        getString(R.string.dialog_access_all_files_msg),
+                        R.string.label_ok,
+                        R.string.label_cancel,
+                        (dialogInterface, i) -> {
+                            try {
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                Intent permissionAllowIntent = new Intent(
+                                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                                startActivity(permissionAllowIntent);
+                            } catch (ActivityNotFoundException e) {
+                                Log.e("SheimiFragmentActivity",
+                                        "could not start activity to request all files permission");
+                                showMessageDialog(R.string.dialog_error_title,
+                                        getString(R.string.error_couldnt_display_all_files_permission));
+                            }
+                        },
+                        (dialogInterface, i) -> {
+                            // can't go on without all files permission
+                            finish();
+                        });
 
             }
         } else {
             if (ContextCompat.checkSelfPermission(this, legacyPermission) != PackageManager.PERMISSION_GRANTED) {
                 // Permission is not granted, so request it from user
-                ActivityCompat.requestPermissions(this, new String[]{legacyPermission}, MGIT_PERMISSIONS_REQUEST);
+                ActivityCompat.requestPermissions(this, new String[] { legacyPermission }, MGIT_PERMISSIONS_REQUEST);
             }
         }
     }
@@ -154,7 +156,7 @@ public class SheimiFragmentActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Toast.makeText(SheimiFragmentActivity.this, msg,
-                    Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -164,41 +166,41 @@ public class SheimiFragmentActivity extends AppCompatActivity {
     }
 
     public void showMessageDialog(int title, int msg, int positiveBtn,
-                                  DialogInterface.OnClickListener positiveListener) {
+            DialogInterface.OnClickListener positiveListener) {
         showMessageDialog(title, getString(msg), positiveBtn,
-            R.string.label_cancel, positiveListener,
-            new DummyDialogListener());
+                R.string.label_cancel, positiveListener,
+                new DummyDialogListener());
     }
 
     public void showMessageDialog(int title, String msg, int positiveBtn,
-                                  DialogInterface.OnClickListener positiveListener) {
+            DialogInterface.OnClickListener positiveListener) {
         showMessageDialog(title, msg, positiveBtn, R.string.label_cancel,
-            positiveListener, new DummyDialogListener());
+                positiveListener, new DummyDialogListener());
     }
 
     public void showMessageDialog(int title, String msg, int positiveBtn,
-                                  int negativeBtn, DialogInterface.OnClickListener positiveListener,
-                                  DialogInterface.OnClickListener negativeListener) {
+            int negativeBtn, DialogInterface.OnClickListener positiveListener,
+            DialogInterface.OnClickListener negativeListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title).setMessage(msg)
-            .setPositiveButton(positiveBtn, positiveListener)
-            .setNegativeButton(negativeBtn, negativeListener).show();
+                .setPositiveButton(positiveBtn, positiveListener)
+                .setNegativeButton(negativeBtn, negativeListener).show();
     }
 
     public void showMessageDialog(int title, String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title).setMessage(msg)
-            .setPositiveButton(R.string.label_ok, new DummyDialogListener()).show();
+                .setPositiveButton(R.string.label_ok, new DummyDialogListener()).show();
     }
 
     public void showOptionsDialog(int title, final int option_names,
-                                  final onOptionDialogClicked[] option_listeners) {
+            final onOptionDialogClicked[] option_listeners) {
         CharSequence[] options_values = getResources().getStringArray(option_names);
         showOptionsDialog(title, options_values, option_listeners);
     }
 
     public void showOptionsDialog(int title, CharSequence[] option_values,
-                                  final onOptionDialogClicked[] option_listeners) {
+            final onOptionDialogClicked[] option_listeners) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
         builder.setItems(option_values, new DialogInterface.OnClickListener() {
@@ -210,38 +212,39 @@ public class SheimiFragmentActivity extends AppCompatActivity {
     }
 
     public void showEditTextDialog(int title, int hint, int positiveBtn,
-                                   final OnEditTextDialogClicked positiveListener) {
+            final OnEditTextDialogClicked positiveListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.dialog_edit_text, null);
         final EditText editText = (EditText) layout.findViewById(R.id.editText);
         editText.setHint(hint);
         builder.setTitle(title)
-            .setView(layout)
-            .setPositiveButton(positiveBtn,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(
-                        DialogInterface dialogInterface, int i) {
-                        String text = editText.getText().toString();
-                        if (text == null || text.trim().isEmpty()) {
-                            showToastMessage(R.string.alert_you_should_input_something);
-                            return;
-                        }
-                        positiveListener.onClicked(text);
-                    }
-                })
-            .setNegativeButton(R.string.label_cancel,
-                new DummyDialogListener()).show();
+                .setView(layout)
+                .setPositiveButton(positiveBtn,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(
+                                    DialogInterface dialogInterface, int i) {
+                                String text = editText.getText().toString();
+                                if (text == null || text.trim().isEmpty()) {
+                                    showToastMessage(R.string.alert_you_should_input_something);
+                                    return;
+                                }
+                                positiveListener.onClicked(text);
+                            }
+                        })
+                .setNegativeButton(R.string.label_cancel,
+                        new DummyDialogListener())
+                .show();
     }
 
     public void promptForPassword(OnPasswordEntered onPasswordEntered,
-                                  int errorId) {
+            int errorId) {
         promptForPassword(onPasswordEntered, errorId);
     }
 
     public void promptForPassword(final OnPasswordEntered onPasswordEntered,
-                                  final String errorInfo) {
+            final String errorInfo) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -251,38 +254,41 @@ public class SheimiFragmentActivity extends AppCompatActivity {
     }
 
     private void promptForPasswordInner(
-        final OnPasswordEntered onPasswordEntered, String errorInfo) {
+            final OnPasswordEntered onPasswordEntered, String errorInfo) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.dialog_prompt_for_password,
-            null);
+                null);
         final EditText username = (EditText) layout.findViewById(R.id.username);
         final EditText password = (EditText) layout.findViewById(R.id.password);
         final CheckBox checkBox = (CheckBox) layout
-            .findViewById(R.id.savePassword);
+                .findViewById(R.id.savePassword);
         if (errorInfo == null) {
             errorInfo = getString(R.string.dialog_prompt_for_password_title);
         }
         builder.setTitle(errorInfo)
-            .setView(layout)
-            .setPositiveButton(R.string.label_done,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        onPasswordEntered.onClicked(username.getText()
-                            .toString(), password.getText()
-                            .toString(), checkBox.isChecked());
+                .setView(layout)
+                .setPositiveButton(R.string.label_done,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                onPasswordEntered.onClicked(username.getText()
+                                        .toString(),
+                                        password.getText()
+                                                .toString(),
+                                        checkBox.isChecked());
 
-                    }
-                })
-            .setNegativeButton(R.string.label_cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(
-                        DialogInterface dialogInterface, int i) {
-                        onPasswordEntered.onCanceled();
-                    }
-                }).show();
+                            }
+                        })
+                .setNegativeButton(R.string.label_cancel,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(
+                                    DialogInterface dialogInterface, int i) {
+                                onPasswordEntered.onCanceled();
+                            }
+                        })
+                .show();
     }
 
     public static interface onOptionDialogClicked {
@@ -294,7 +300,8 @@ public class SheimiFragmentActivity extends AppCompatActivity {
     }
 
     /**
-     * Callback interface to receive credentials entered via UI by the user after being prompted
+     * Callback interface to receive credentials entered via UI by the user after
+     * being prompted
      * in the UI in order to connect to a remote repo
      */
     public static interface OnPasswordEntered {
@@ -329,11 +336,19 @@ public class SheimiFragmentActivity extends AppCompatActivity {
     }
 
     public void forwardTransition() {
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        if (Build.VERSION.SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, R.anim.fade_in, R.anim.fade_out);
+        } else {
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        }
     }
 
     public void backTransition() {
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+        if (Build.VERSION.SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, R.anim.fade_in, R.anim.fade_out);
+        } else {
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        }
     }
 
     /* Switch Activity Animation End */
@@ -345,18 +360,19 @@ public class SheimiFragmentActivity extends AppCompatActivity {
 
     private void setupImageLoader() {
         DisplayImageOptions mDisplayOptions = new DisplayImageOptions.Builder()
-            .cacheInMemory(true)
-            .cacheOnDisk(true)
-            .showImageForEmptyUri(VectorDrawableCompat.create(getResources(), R.drawable.ic_default_author, getTheme()))
-            .showImageOnFail(VectorDrawableCompat.create(getResources(), R.drawable.ic_default_author, getTheme()))
-            .build();
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .showImageForEmptyUri(
+                        VectorDrawableCompat.create(getResources(), R.drawable.ic_default_author, getTheme()))
+                .showImageOnFail(VectorDrawableCompat.create(getResources(), R.drawable.ic_default_author, getTheme()))
+                .build();
         File cacheDir = StorageUtils.getCacheDirectory(this);
         ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(this)
-            .defaultDisplayImageOptions(mDisplayOptions)
-            .diskCache(new UnlimitedDiskCache(cacheDir))
-            .diskCacheSize(SIZE)
-            .imageDownloader(new AvatarDownloader(this))
-            .build();
+                .defaultDisplayImageOptions(mDisplayOptions)
+                .diskCache(new UnlimitedDiskCache(cacheDir))
+                .diskCacheSize(SIZE)
+                .imageDownloader(new AvatarDownloader(this))
+                .build();
 
         mImageLoader = ImageLoader.getInstance();
         mImageLoader.init(configuration);

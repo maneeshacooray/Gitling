@@ -27,6 +27,14 @@ import me.sheimi.sgit.repo.tasks.SheimiAsyncTask.AsyncTaskCallback
 
 class RepoDetailActivity : SheimiFragmentActivity() {
 
+    override fun setTheme() {
+        if (me.sheimi.android.utils.BasicFunctions.isDarkTheme()) {
+            setTheme(R.style.DarkAppTheme_NoActionBar)
+        } else {
+            setTheme(R.style.AppTheme_NoActionBar)
+        }
+    }
+
     private val viewModel: RepoDetailViewModel by viewModels()
     private var mRepo: Repo? = null
     private var mRepoDelegate: RepoOperationDelegate? = null
