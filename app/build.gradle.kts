@@ -82,16 +82,16 @@ configurations.all {
 
 dependencies {
     // Desugaring for Java 8+ APIs on older Android
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("androidx.fragment:fragment:1.8.3")
     implementation("androidx.annotation:annotation:1.9.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.vectordrawable:vectordrawable:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     // Compose BOM — manages all compose versions consistently
     val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
@@ -122,14 +122,14 @@ dependencies {
 
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.github.mwiede:jsch:0.2.0")
-    implementation("commons-io:commons-io:2.15.1")
+    implementation("commons-io:commons-io:2.21.0")
     implementation("org.eclipse.jgit:org.eclipse.jgit:3.7.1.201504261725-r")
     implementation("com.nostra13.universalimageloader:universal-image-loader:1.9.5")
     implementation("com.scottyab:secure-preferences-lib:0.1.7")
-    implementation("org.conscrypt:conscrypt-android:2.5.2")
+    implementation("org.conscrypt:conscrypt-android:2.5.3")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 
-    val acraVersion = "5.11.0"
+    val acraVersion = "5.13.1"
     implementation("ch.acra:acra-mail:$acraVersion")
     implementation("ch.acra:acra-dialog:$acraVersion")
 
