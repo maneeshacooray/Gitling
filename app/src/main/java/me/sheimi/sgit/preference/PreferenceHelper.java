@@ -77,22 +77,6 @@ public class PreferenceHelper {
         edit(mContext.getString(R.string.pref_key_git_user_email), email);
     }
 
-    public String getGitHubOAuthClientId() {
-        return getString(mContext.getString(R.string.pref_key_github_client_id));
-    }
-
-    public void setGitHubOAuthClientId(String clientId) {
-        edit(mContext.getString(R.string.pref_key_github_client_id), clientId);
-    }
-
-    public String getGitHubOAuthClientSecret() {
-        return getString(mContext.getString(R.string.pref_key_github_client_secret));
-    }
-
-    public void setGitHubOAuthClientSecret(String clientSecret) {
-        edit(mContext.getString(R.string.pref_key_github_client_secret), clientSecret);
-    }
-
     public boolean useGravatar() {
         return getBoolean(mContext.getString(R.string.pref_key_use_gravatar));
     }

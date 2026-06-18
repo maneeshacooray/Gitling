@@ -33,13 +33,6 @@
                 <data android:host="@string/bitbucket.com" />
                 <data android:host="@string/notabug.org" />
             </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="mgit" android:host="github-auth" />
-            </intent-filter>
         </activity>
         <activity android:name=".activities.RepoDetailActivity" android:label="@string/title_activity_repo_detail" android:parentActivityName="com.manichord.mgit.repolist.RepoListActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.manichord.mgit.repolist.RepoListActivity" />

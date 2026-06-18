@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.manichord.mgit.clone.CloneViewModel
@@ -75,20 +74,6 @@ class RepoListActivity : SheimiFragmentActivity() {
 
     private fun handleIntent(intent: Intent?) {
         val uri = intent?.data ?: return
-
-        // Handle GitHub Auth Callback
-        if (uri.scheme == "mgit" && uri.host == "github-auth") {
-            (application as MGitApplication).githubAuthManager?.handleAuthCallback(uri) { success ->
-                runOnUiThread {
-                    if (success) {
-                        Toast.makeText(this, "GitHub account connected!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "GitHub connection failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            return
-        }
 
         try {
             val remoteRepoUrl = URL(uri.scheme, uri.host, uri.port ?: -1, uri.path)

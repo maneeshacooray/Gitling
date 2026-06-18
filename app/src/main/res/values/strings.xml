@@ -164,10 +164,6 @@
     <string name="preference_git_user_name">User Name</string>
     <string name="pref_key_git_user_email" translatable="false">user.email</string>
     <string name="preference_git_user_email">User Email</string>
-    <string name="pref_key_github_client_id" translatable="false">github_oauth_client_id</string>
-    <string name="preference_github_client_id">GitHub OAuth Client ID</string>
-    <string name="pref_key_github_client_secret" translatable="false">github_oauth_client_secret</string>
-    <string name="preference_github_client_secret">GitHub OAuth Client Secret</string>
     <string name="pref_category_title_about">About</string>
     <string name="preference_send_feedback">Feedback</string>
     <string name="preference_send_feedback_summary">Submit feedback by creating a new issue on GitHub</string>

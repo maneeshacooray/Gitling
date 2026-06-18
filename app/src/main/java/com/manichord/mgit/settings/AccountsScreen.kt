@@ -31,6 +31,8 @@ fun AccountsScreen(
     onBackClick: () -> Unit
 ) {
     val accounts by viewModel.accounts.observeAsState(emptyList())
+    val authInProgress by viewModel.githubAuthInProgress.observeAsState(false)
+    val authMessage by viewModel.githubAuthMessage.observeAsState(null)
     var showAddDialog by remember { mutableStateOf(false) }
     var accountToDelete by remember { mutableStateOf<Account?>(null) }
 
@@ -56,6 +58,15 @@ fun AccountsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            if (authInProgress || authMessage != null) {
+                item {
+                    GitHubAuthStatusBanner(
+                        inProgress = authInProgress,
+                        message = authMessage,
+                        onDismiss = { viewModel.dismissGitHubAuthMessage() }
+                    )
+                }
+            }
             if (accounts.isEmpty()) {
                 item {
                     EmptyAccountsState(
@@ -129,6 +140,39 @@ fun AccountsScreen(
                 showAddDialog = false
             }
         )
+    }
+}
+
+@Composable
+private fun GitHubAuthStatusBanner(
+    inProgress: Boolean,
+    message: String?,
+    onDismiss: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (inProgress) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(12.dp))
+                }
+                Text(
+                    text = message ?: "Waiting for you to approve in the browser…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            if (!inProgress && message != null) {
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
+                    Text("Dismiss")
+                }
+            }
+        }
     }
 }
 

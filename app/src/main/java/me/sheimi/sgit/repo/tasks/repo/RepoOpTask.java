@@ -5,8 +5,10 @@ import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.util.Locale;
 
+import com.manichord.mgit.models.Account;
 import me.sheimi.android.activities.SheimiFragmentActivity.OnPasswordEntered;
 import me.sheimi.android.utils.BasicFunctions;
+import me.sheimi.sgit.MGitApplication;
 import me.sheimi.sgit.R;
 import me.sheimi.sgit.database.models.Repo;
 import me.sheimi.sgit.repo.tasks.SheimiAsyncTask;
@@ -55,6 +57,16 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
     protected void setCredentials(TransportCommand command) {
         String username = mRepo.getUsername();
         String password = mRepo.getPassword();
+
+        if (username == null || password == null || username.trim().isEmpty()
+                || password.trim().isEmpty()) {
+            Account account = MGitApplication.getContext().getAccountManager() == null ? null
+                    : MGitApplication.getContext().getAccountManager().findAccountForRemoteUrl(mRepo.getRemoteURL());
+            if (account != null) {
+                username = account.getUsername();
+                password = account.getToken();
+            }
+        }
 
         if (username != null && password != null && !username.trim().isEmpty()
                 && !password.trim().isEmpty()) {

@@ -46,6 +46,24 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
         saveAccounts(accounts)
     }
 
+    /** Best-effort match of a git remote URL to a connected account, by host -> AccountType. */
+    fun findAccountForRemoteUrl(remoteUrl: String?): Account? {
+        if (remoteUrl.isNullOrBlank()) return null
+        val host = try {
+            java.net.URI(remoteUrl).host
+        } catch (e: Exception) {
+            null
+        } ?: return null
+
+        val type = when {
+            host.endsWith("github.com") -> AccountType.GITHUB
+            host.endsWith("gitlab.com") -> AccountType.GITLAB
+            host.endsWith("bitbucket.org") -> AccountType.BITBUCKET
+            else -> return null
+        }
+        return getAccounts().firstOrNull { it.type == type }
+    }
+
     fun updateAccount(updatedAccount: Account) {
         val accounts = getAccounts().map {
             if (it.id == updatedAccount.id) updatedAccount else it

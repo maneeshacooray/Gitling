@@ -29,8 +29,6 @@ fun SettingsScreen(
     val useEnglish by viewModel.useEnglish.observeAsState(false)
     val gitUserName by viewModel.gitUserName.observeAsState("")
     val gitUserEmail by viewModel.gitUserEmail.observeAsState("")
-    val gitHubClientId by viewModel.gitHubClientId.observeAsState("")
-    val gitHubClientSecret by viewModel.gitHubClientSecret.observeAsState("")
     val useGravatar by viewModel.useGravatar.observeAsState(true)
 
     Scaffold(
@@ -90,37 +88,6 @@ fun SettingsScreen(
                 value = gitUserEmail,
                 onValueChange = { viewModel.setGitUserEmail(it) },
                 icon = Icons.Default.Email
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-            SettingsCategory(title = "GitHub OAuth (Advanced)")
-
-            ListItem(
-                headlineContent = {},
-                supportingContent = {
-                    Text(
-                        "Only needed if you use \"Connect with GitHub\" in Managed Accounts. " +
-                            "Register an OAuth app at github.com/settings/developers with " +
-                            "callback URL: mgit://github-auth",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                leadingContent = { Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
-            )
-
-            SettingsEditTextItem(
-                title = stringResource(R.string.preference_github_client_id),
-                value = gitHubClientId,
-                onValueChange = { viewModel.setGitHubClientId(it) },
-                icon = Icons.Default.Code
-            )
-
-            SettingsEditTextItem(
-                title = stringResource(R.string.preference_github_client_secret),
-                value = gitHubClientSecret,
-                onValueChange = { viewModel.setGitHubClientSecret(it) },
-                icon = Icons.Default.Key
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
