@@ -20,7 +20,7 @@ This is a continuation of [the SGit project](https://github.com/sheimi/SGit).
 [![Translate - with Stringlate](https://img.shields.io/badge/translate%20with-stringlate-green.svg)](https://lonamiwebs.github.io/stringlate/translate?git=https%3A%2F%2Fgithub.com%2Fmaks%2FMGit)
 
 * If you encounter any issues (bugs, crashes, etc.) and want to help improve this project, please open an issue on [GitHub](https://github.com/maks/MGit/issues/new) describing: what the issues are; and how they were caused, to allow for re-creation and fixing of bugs.
-* This app requires minimum of for Android v5.0
+* This app requires minimum of Android v6.0
 
 ### Editing Files
 

@@ -1,18 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)  // Kotlin 2.0+: Compose compiler is bundled with Kotlin
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "me.sheimi.sgit"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.manichord.mgit"
-        minSdk = 21
-        targetSdk = 35
+        minSdk = 23
+        targetSdk = 37
         versionCode = 41
         versionName = "1.6.2"
 
@@ -40,10 +39,6 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
         viewBinding = true
@@ -51,10 +46,7 @@ android {
         buildConfig = true
     }
 
-    composeCompiler {
-        enableStrongSkippingMode = true
-    }
-
+    // Strong skipping is enabled by default since Kotlin 2.0.20; no composeCompiler block needed.
     // composeOptions.kotlinCompilerExtensionVersion is NOT used with Kotlin 2.0+.
     // The Compose compiler is bundled with Kotlin via the kotlin.plugin.compose plugin above.
 

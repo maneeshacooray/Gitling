@@ -1,7 +1,8 @@
 [versions]
-agp = "8.8.2"
-kotlin = "2.1.10"
+agp = "9.2.0"
+kotlin = "2.3.10"
 compose-bom = "2025.02.00"
+material3 = "1.5.0-alpha22"
 androidx-fragment = "1.8.5"
 androidx-activity = "1.10.1"
 androidx-lifecycle = "2.8.7"
@@ -47,7 +48,7 @@ androidx-compose-ui-core = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
