@@ -10,13 +10,11 @@ import androidx.compose.runtime.*
 import com.manichord.mgit.settings.SettingsScreen
 import com.manichord.mgit.settings.SettingsViewModel
 import com.manichord.mgit.ui.theme.AppTheme
+import com.manichord.mgit.util.resolvePrimaryVolumePath
 import me.sheimi.android.activities.SheimiFragmentActivity
-import me.sheimi.android.utils.BasicFunctions
 import me.sheimi.android.utils.Profile
-import me.sheimi.android.utils.FsUtils
 import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
-import java.io.File
 
 class UserSettingsActivity : SheimiFragmentActivity() {
 
@@ -32,16 +30,12 @@ class UserSettingsActivity : SheimiFragmentActivity() {
 
     private val folderPickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
         uri?.let {
-            // In a real app, we might want to persevere this URI or convert to file path
-            // MGit currently relies on File paths.
-            // For now, we'll try to get a path or inform the user.
-            // On modern Android, getting a File path from a Tree Uri is non-trivial without MANAGE_EXTERNAL_STORAGE.
-            // But MGit already has some path logic.
-            val path = it.path // This is often not a real file path
-            // For MGit's legacy logic, we might need a more robust way to get the path.
-            // I'll use a placeholder or try to resolve it.
-            // Given the existing FsUtils, let's see if there's a helper.
-            viewModel.setRepoRoot(it.toString())
+            val path = resolvePrimaryVolumePath(it)
+            if (path != null) {
+                viewModel.setRepoRoot(path)
+            } else {
+                showToastMessage("That location isn't supported -- please pick a folder on internal storage.")
+            }
         }
     }
 
