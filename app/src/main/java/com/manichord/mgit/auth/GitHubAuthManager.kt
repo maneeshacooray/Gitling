@@ -144,17 +144,25 @@ class GitHubAuthManager(private val context: Context, private val accountManager
      * Returns null while still pending (keep polling), "" if denied/expired, or the access token on success.
      */
     private fun pollForToken(deviceCode: String): String? {
-        val conn = (URL(TOKEN_URL).openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            setRequestProperty("Accept", "application/json")
-            setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-            doOutput = true
-        }
-        val body = "client_id=${encode(CLIENT_ID)}&device_code=${encode(deviceCode)}&grant_type=${encode(GRANT_TYPE)}"
-        OutputStreamWriter(conn.outputStream).use { it.write(body) }
+        // A single poll failing to a transient network blip (DNS hiccup, brief connectivity
+        // loss, etc.) must not abort the whole device flow -- treat it like "still pending"
+        // and let the next poll in the loop try again within the device_code's expiry window.
+        val json = try {
+            val conn = (URL(TOKEN_URL).openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+                doOutput = true
+            }
+            val body = "client_id=${encode(CLIENT_ID)}&device_code=${encode(deviceCode)}&grant_type=${encode(GRANT_TYPE)}"
+            OutputStreamWriter(conn.outputStream).use { it.write(body) }
 
-        val stream = if (conn.responseCode == 200) conn.inputStream else conn.errorStream
-        val json = JSONObject(readBody(stream))
+            val stream = if (conn.responseCode == 200) conn.inputStream else conn.errorStream
+            JSONObject(readBody(stream))
+        } catch (e: java.io.IOException) {
+            Timber.w(e, "Transient error polling for GitHub token, will retry")
+            return null
+        }
 
         val accessToken = json.optString("access_token")
         if (accessToken.isNotBlank()) return accessToken
