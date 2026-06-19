@@ -100,16 +100,31 @@ class RepoDetailActivity : SheimiFragmentActivity() {
     @Composable
     private fun FragmentContainer(fragment: Fragment) {
         AndroidView(
+            // Only build the (empty, unattached) container here. Running the fragment
+            // transaction synchronously inside factory crashes ("No view found for id ...")
+            // because this FrameLayout isn't attached to the window yet at this point, so
+            // FragmentManager can't resolve its id. Do the transaction in `update` instead,
+            // which Compose runs after the view is attached.
             factory = { context ->
-                FrameLayout(context).apply {
-                id = View.generateViewId()
-                    // Attach fragment if not already attached
-                    supportFragmentManager.beginTransaction()
-                        .replace(id, fragment)
-                        .commitNow()
-                }
+                FrameLayout(context).apply { id = View.generateViewId() }
             },
-            update = { /* No-op */ }
+            update = { view ->
+                if (supportFragmentManager.findFragmentById(view.id) !== fragment) {
+                    // Compose's Pager subcomposes pages for measurement/prefetch, which can
+                    // invoke this update more than once for the same shared fragment
+                    // instance against a different container id each time. FragmentManager
+                    // would still have it tied to a previous, now-discarded container --
+                    // detach it first so re-adding here is always safe.
+                    if (fragment.isAdded) {
+                        supportFragmentManager.beginTransaction()
+                            .remove(fragment)
+                            .commitNowAllowingStateLoss()
+                    }
+                    supportFragmentManager.beginTransaction()
+                        .replace(view.id, fragment)
+                        .commitNowAllowingStateLoss()
+                }
+            }
         )
     }
 
