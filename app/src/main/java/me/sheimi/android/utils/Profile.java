@@ -2,6 +2,7 @@ package me.sheimi.android.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 
 import me.sheimi.sgit.R;
@@ -55,8 +56,21 @@ public class Profile {
     }
 
     public static synchronized int getTheme(Context context) {
-        // silly, but Android framework want strings as value array for ListPreference
-        return Integer.parseInt(getProfileSharedPreference(context).getString(context.getString(R.string.pref_key_use_theme_id), "0"));
+        String themePrefKey = context.getString(R.string.pref_key_use_theme_id);
+        SharedPreferences prefs = getProfileSharedPreference(context);
+        if (prefs.contains(themePrefKey)) {
+            // silly, but Android framework want strings as value array for ListPreference
+            return Integer.parseInt(prefs.getString(themePrefKey, "0"));
+        }
+        // No explicit preference set -- the Settings screen no longer exposes a theme
+        // picker (dropped during the Compose migration), so every install was otherwise
+        // permanently stuck on "0" (light) here regardless of system dark mode, while the
+        // Compose chrome around these legacy Fragment-hosted screens already follows
+        // system dark mode via isSystemInDarkTheme(). That mismatch is what made commit
+        // messages etc. render in hardcoded-light (black) text on a now-dark background.
+        // Default to following the system setting instead so both halves agree.
+        int nightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightMode == Configuration.UI_MODE_NIGHT_YES ? 1 : 0;
     }
 
     public static int getThemeResource(Context context) {
