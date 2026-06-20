@@ -10,10 +10,12 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.manichord.mgit.ui.components.EmptyStateView
 import com.manichord.mgit.ui.components.RepoCard
+import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,7 +31,7 @@ fun RepoListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("MGit", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = onSearchClick) {
                         Icon(Icons.Default.Search, contentDescription = "Search")

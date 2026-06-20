@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">MGit</string>
+    <string name="app_name" translatable="false">Gitling</string>
     <string name="default_text">Default Text</string>
     <string name="title_clone_repo">Clone Repository</string>
     <string name="preference_file_key" translatable="false">com.manichord.mgit</string>
@@ -118,7 +118,7 @@
     <string name="dialog_open_remote">Open remote url</string>
     <string name="dialog_open_remote_title">Choose app to open %s remote</string>
     <string name="dialog_open_remote_no_app_available">No Apps available to open the url</string>
-    <string name="dialog_permission_not_granted">MGit requires that you grant it write access to be able to write local git repos to your storage, until you do this MGit will NOT work properly.</string>
+    <string name="dialog_permission_not_granted">Gitling requires that you grant it write access to be able to write local git repos to your storage, until you do this Gitling will NOT work properly.</string>
 
     <!-- Others -->
     <string name="pull_msg_init">Pulling … </string>
@@ -168,13 +168,13 @@
     <string name="action_add_private_key">Add Private Key</string>
 
     <!-- Crash reporting via ACRA -->
-    <string name="crash_toast_text">MGit error - gathering data to email a crash report</string>
+    <string name="crash_toast_text">Gitling error - gathering data to email a crash report</string>
     <string name="crash_report_email" translatable="false">bmaneeshacooray@gmail.com</string>
 
     <!-- Intent filters -->
     <string name="cloning">Cloning … </string>
     <string name="importing">Importing … </string>
-    <string name="clone_with_mgit">Clone with MGit</string>
+    <string name="clone_with_mgit">Clone with Gitling</string>
     <string name="invalid_url">Invalid URL!</string>
     <string name="https" translatable="false">https</string>
     <string name="http" translatable="false">http</string>
@@ -194,6 +194,6 @@
     <string name="preference_eng_lang">English Language</string>
     <string name="preference_eng_lang_summary">Use English instead of the default language</string>
     <string name="pref_key_use_english" translatable="false">use.english</string>
-    <string name="dialog_access_all_files_title">Access MGit to access all files</string>
-    <string name="dialog_access_all_files_msg">To function correctly and be able to do things like finding modified files in your git working directory MGit needs permission to access all files.\n\nGrant permission?</string>
+    <string name="dialog_access_all_files_title">Access Gitling to access all files</string>
+    <string name="dialog_access_all_files_msg">To function correctly and be able to do things like finding modified files in your git working directory Gitling needs permission to access all files.\n\nGrant permission?</string>
 </resources>

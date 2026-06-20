@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import me.sheimi.sgit.R
 
 @Composable
 fun EmptyStateView(
@@ -43,7 +45,7 @@ fun EmptyStateView(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Welcome to MGit!",
+            text = "Welcome to ${stringResource(R.string.app_name)}!",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
