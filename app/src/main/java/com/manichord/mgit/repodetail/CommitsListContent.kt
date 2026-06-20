@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +32,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revplot.PlotCommit
 import org.eclipse.jgit.revplot.PlotLane
 import org.eclipse.jgit.revwalk.RevCommit
@@ -189,12 +192,58 @@ private fun CommitRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.width(8.dp))
+        if (plotCommit != null && plotCommit.refCount > 0) {
+            for (i in 0 until plotCommit.refCount) {
+                RefChip(ref = plotCommit.getRef(i))
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+        }
         Text(
             text = commit.shortMessage,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+private enum class RefKind { HEAD, BRANCH, REMOTE, TAG }
+
+private fun refKind(ref: Ref): RefKind = when {
+    ref.name == "HEAD" -> RefKind.HEAD
+    ref.name.startsWith("refs/heads/") -> RefKind.BRANCH
+    ref.name.startsWith("refs/remotes/") -> RefKind.REMOTE
+    ref.name.startsWith("refs/tags/") -> RefKind.TAG
+    else -> RefKind.BRANCH
+}
+
+private fun refLabel(ref: Ref): String = when (refKind(ref)) {
+    RefKind.HEAD -> "HEAD"
+    RefKind.BRANCH -> ref.name.removePrefix("refs/heads/")
+    RefKind.REMOTE -> ref.name.removePrefix("refs/remotes/")
+    RefKind.TAG -> ref.name.removePrefix("refs/tags/")
+}
+
+/** A small lazygit-style colored badge for a branch/tag/HEAD ref pointing at this commit. */
+@Composable
+private fun RefChip(ref: Ref) {
+    val kind = refKind(ref)
+    val (containerColor, contentColor) = when (kind) {
+        RefKind.HEAD, RefKind.BRANCH ->
+            MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        RefKind.REMOTE ->
+            MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        RefKind.TAG ->
+            MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+    }
+    Surface(color = containerColor, contentColor = contentColor, shape = RoundedCornerShape(4.dp)) {
+        Text(
+            text = refLabel(ref),
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
         )
     }
 }
