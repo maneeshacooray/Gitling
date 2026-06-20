@@ -1,15 +1,19 @@
 package com.manichord.mgit.dialogs
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.R
-import me.sheimi.sgit.dialogs.DummyDialogListener
 import timber.log.Timber
 
 class ErrorDialog : SheimiDialogFragment() {
@@ -20,46 +24,39 @@ class ErrorDialog : SheimiDialogFragment() {
     var errorTitleRes: Int = 0
         get() = if (field != 0) field else R.string.dialog_error_title
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        super.onCreateDialog(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val details = (mThrowable as? Exception)?.message ?: ""
+        val title = getString(errorTitleRes)
+        val message = getString(mErrorRes) + "\n" + details
 
-        val builder = AlertDialog.Builder(rawActivity)
-        val inflater = rawActivity.layoutInflater
-        val layout = inflater.inflate(R.layout.dialog_error, null)
-        val details = when (mThrowable) {
-            is Exception -> {
-                (mThrowable as Exception).message
-            }
-            else -> ""
-        }
-        // Use findViewById instead of the removed kotlin-android-extensions synthetic import
-        layout.findViewById<TextView>(R.id.error_message)
-            .setText(getString(mErrorRes) + "\n" + details)
-
-        builder.setView(layout)
-
-        // set button listener
-        builder.setTitle(errorTitleRes)
-        builder.setPositiveButton(
-            getString(R.string.label_ok),
-            DummyDialogListener())
-        return builder.create()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog as AlertDialog
-        val positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE) as Button
-        positiveButton.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                // when debugging just log the exception
-                if (mThrowable != null) {
-                    Timber.e(mThrowable)
-                } else {
-                    Timber.e(if (mErrorRes != 0) getString(mErrorRes) else "")
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    AlertDialog(
+                        onDismissRequest = { dismiss() },
+                        title = { Text(title) },
+                        text = { Text(message) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                if (BuildConfig.DEBUG) {
+                                    if (mThrowable != null) {
+                                        Timber.e(mThrowable)
+                                    } else if (mErrorRes != 0) {
+                                        Timber.e(getString(mErrorRes))
+                                    }
+                                }
+                                dismiss()
+                            }) {
+                                Text(stringResource(R.string.label_ok))
+                            }
+                        }
+                    )
                 }
             }
-            dismiss()
         }
     }
 

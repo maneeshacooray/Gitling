@@ -17,7 +17,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -260,7 +260,7 @@ public class SheimiFragmentActivity extends AppCompatActivity {
 
     public void promptForPassword(OnPasswordEntered onPasswordEntered,
             int errorId) {
-        promptForPassword(onPasswordEntered, errorId);
+        promptForPassword(onPasswordEntered, getString(errorId));
     }
 
     public void promptForPassword(final OnPasswordEntered onPasswordEntered,
@@ -275,40 +275,11 @@ public class SheimiFragmentActivity extends AppCompatActivity {
 
     private void promptForPasswordInner(
             final OnPasswordEntered onPasswordEntered, String errorInfo) {
-        LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.dialog_prompt_for_password,
-                null);
-        final EditText username = (EditText) layout.findViewById(R.id.username);
-        final EditText password = (EditText) layout.findViewById(R.id.password);
-        final CheckBox checkBox = (CheckBox) layout
-                .findViewById(R.id.savePassword);
-        if (errorInfo == null) {
-            errorInfo = getString(R.string.dialog_prompt_for_password_title);
-        }
-        newDialogBuilder()
-                .setTitle(errorInfo)
-                .setView(layout)
-                .setPositiveButton(R.string.label_done,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                onPasswordEntered.onClicked(username.getText()
-                                        .toString(),
-                                        password.getText()
-                                                .toString(),
-                                        checkBox.isChecked());
-
-                            }
-                        })
-                .setNegativeButton(R.string.label_cancel,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialogInterface, int i) {
-                                onPasswordEntered.onCanceled();
-                            }
-                        })
-                .show();
+        String title = errorInfo != null ? errorInfo
+                : getString(R.string.dialog_prompt_for_password_title);
+        ViewGroup container = findViewById(android.R.id.content);
+        com.manichord.mgit.dialogs.PasswordPromptDialog.show(
+                container, title, onPasswordEntered);
     }
 
     public static interface onOptionDialogClicked {
