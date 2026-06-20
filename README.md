@@ -1,11 +1,30 @@
-# Gitling
+<p align="center">
+  <img src="docs/icon.png" width="120" alt="Gitling icon">
+</p>
 
-Gitling is a Git client for Android, built with Jetpack Compose and Material 3 Expressive.
+<h1 align="center">Gitling</h1>
+
+<p align="center">Gitling is a Git client for Android, built with Jetpack Compose and Material 3 Expressive.</p>
 
 It's a fork of [MGit](https://github.com/maks/MGit) (itself a continuation of [SGit](https://github.com/sheimi/SGit)), modernized with a current Android toolchain, a from-scratch Compose UI, one-tap GitHub sign-in, and a new identity.
 
 * If you encounter any issues (bugs, crashes, etc.), please open an issue on [GitHub](https://github.com/maneeshacooray/Gitling/issues/new) describing what happened and how to reproduce it.
 * This app requires a minimum of Android 6.0 (API 23).
+
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/repo_list.png" width="260" alt="Repository list"></td>
+    <td><img src="docs/screenshots/commit_graph.png" width="260" alt="Commit graph, all branches"></td>
+    <td><img src="docs/screenshots/settings.png" width="260" alt="Settings"></td>
+  </tr>
+  <tr>
+    <td align="center">Repository list</td>
+    <td align="center">Full branch/merge commit graph</td>
+    <td align="center">Settings</td>
+  </tr>
+</table>
 
 ### Editing files
 
