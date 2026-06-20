@@ -17,7 +17,9 @@ import me.sheimi.sgit.R
 @Composable
 fun EmptyStateView(
     onActionClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isGitHubConnected: Boolean = true,
+    onConnectGitHubClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -71,6 +73,14 @@ fun EmptyStateView(
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Clone Repository")
+        }
+
+        if (!isGitHubConnected) {
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(onClick = onConnectGitHubClick) {
+                Text("Connect with GitHub")
+            }
         }
     }
 }

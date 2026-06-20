@@ -19,6 +19,11 @@ import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 
 class UserSettingsActivity : SheimiFragmentActivity() {
 
+    companion object {
+        const val EXTRA_INITIAL_SCREEN = "initial_screen"
+        const val SCREEN_ACCOUNTS = "accounts"
+    }
+
     override fun getThemeResource(): Int {
         return if (Profile.getTheme(this) == 1) {
             R.style.DarkAppTheme_NoActionBar
@@ -48,8 +53,9 @@ class UserSettingsActivity : SheimiFragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val initialScreen = intent.getStringExtra(EXTRA_INITIAL_SCREEN) ?: "settings"
         setContent {
-            var currentScreen by remember { mutableStateOf("settings") }
+            var currentScreen by remember { mutableStateOf(initialScreen) }
             val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
             val fontOption by viewModel.fontOption.observeAsState(com.manichord.mgit.ui.theme.FontOption.DEFAULT)
 
