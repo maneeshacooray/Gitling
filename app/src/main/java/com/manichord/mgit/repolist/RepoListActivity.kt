@@ -17,7 +17,6 @@ import me.sheimi.sgit.activities.RepoDetailActivity
 import me.sheimi.sgit.activities.UserSettingsActivity
 import me.sheimi.sgit.activities.explorer.ExploreFileActivity
 import me.sheimi.sgit.activities.explorer.FileExplorerActivity
-import me.sheimi.sgit.activities.explorer.ImportRepositoryActivity
 import me.sheimi.sgit.database.RepoDbManager
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.repo.tasks.repo.CloneTask

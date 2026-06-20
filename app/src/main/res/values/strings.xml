@@ -7,9 +7,6 @@
     <string name="preference_file_key" translatable="false">com.manichord.mgit</string>
 
     <!-- action -->
-    <string name="action_search">Search</string>
-    <string name="action_clone">Clone</string>
-    <string name="action_import_repo">Import Repository</string>
     <string name="action_settings">Settings</string>
     <string name="action_mode_rename_key">Rename key</string>
     <string name="action_mode_rename_branch">Rename branch</string>
@@ -20,19 +17,10 @@
     <string name="action_mode_show_public_key">Show public key</string>
     <string name="action_mode_edit_key_password">Edit key password</string>
     <string name="action_feedback">Feedback</string>
-    <string name="action_choose_language">Choose Language</string>
     <string name="action_mode_diff">Diff</string>
-    <string name="action_edit">Edit</string>
-    <string name="action_edit_save">Save</string>
-    <string name="action_copy_all">Copy whole file</string>
-    <string name="action_edit_in_other_app">Edit in other apps</string>
     <string name="action_reset">Reset</string>
     <string name="action_toggle_drawer">Toggle Drawer</string>
     <string name="action_copy_commit_str">Copy Commit Hash</string>
-    <string name="action_create_external_repo">Create External Repo</string>
-    <string name="action_share_diff">Share diff</string>
-    <string name="action_save_diff">Save diff</string>
-    <string name="action_send_report">Send report</string>
 
     <!-- label msg -->
     <string name="label_ok">OK</string>
@@ -67,8 +55,6 @@
 
     <!-- for title -->
     <string name="title_activity_repo_detail">Repository</string>
-    <string name="title_activity_import_repository">Import Repository</string>
-    <string name="title_activity_view_file">File: </string>
     <string name="title_activity_commit_diff">Diff:   </string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
