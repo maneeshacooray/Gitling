@@ -1,135 +1,57 @@
-# MGit
+# Gitling
 
-MGit is a Git client Android App.
+Gitling is a Git client for Android, built with Jetpack Compose and Material 3 Expressive.
 
-This is a continuation of [the SGit project](https://github.com/sheimi/SGit).
+It's a fork of [MGit](https://github.com/maks/MGit) (itself a continuation of [SGit](https://github.com/sheimi/SGit)), modernized with a current Android toolchain, a from-scratch Compose UI, one-tap GitHub sign-in, and a new identity.
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
-      alt="Get it on Google Play"
-      height="80">](https://play.google.com/store/apps/details?id=com.manichord.mgit)
-[<img src="https://f-droid.org/badge/get-it-on.png"
-      alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/packages/com.manichord.mgit)
+* If you encounter any issues (bugs, crashes, etc.), please open an issue on [GitHub](https://github.com/maneeshacooray/Gitling/issues/new) describing what happened and how to reproduce it.
+* This app requires a minimum of Android 6.0 (API 23).
 
-## Notes
+### Editing files
 
-[![Build Status](https://travis-ci.org/maks/MGit.svg?branch=master)](https://travis-ci.org/maks/MGit)
+Gitling doesn't include an internal text editor -- to edit files, you'll need an editor app installed that supports opening files via Android's File Provider mechanism (most code/text editor apps do).
 
-[![Join the chat at https://gitter.im/MGit-Android/Lobby](https://badges.gitter.im/MGit-Android/Lobby.svg)](https://gitter.im/MGit-Android/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Features
 
-[![Translate - with Stringlate](https://img.shields.io/badge/translate%20with-stringlate-green.svg)](https://lonamiwebs.github.io/stringlate/translate?git=https%3A%2F%2Fgithub.com%2Fmaks%2FMGit)
-
-* If you encounter any issues (bugs, crashes, etc.) and want to help improve this project, please open an issue on [GitHub](https://github.com/maks/MGit/issues/new) describing: what the issues are; and how they were caused, to allow for re-creation and fixing of bugs.
-* This app requires minimum of Android v6.0
-
-### Editing Files
-
-As of version 1.5.7, MGit no longer provides an internal texteditor, instead if you wish to edit files, you will need to have an editor app installed. 
-
-An open source editor that has been tested to work with MGit is ["Viper Exit, nee Turbo Editor"](https://github.com/maks/viper-edit)
-
-but others that support File Providers should also work.
-
-## Supported Features
-
-* Create local repositories
-* Clone remote repositories
-* Pull from origin
-* Delete local repositories
-* Browse files
-* Browse commit messages (short)
-* Checkout branches and tags
-* HTTP/HTTPS/SSH are supported (including SSH with private key passphrase)
-* Username/Password authentication is supported
-* Search local repositories
-* Private key management
-* Manually choose code language
-* `git diff` between commits
-* Import existing repositories (that is, you can copy a repository from computer and import to MGit)
-* Checkout remote branches
-* Merge branches
-* Push merged content
-* Edit file via external app that can edit the given file type
-* Commit and push changed files
-* Committer information
-* Prompt for password
-* *Option* to save username/password
-* `git status`
-* Cancel when cloning
-* Add modified file to stage
-* View state of staged files (aka index)
-* `git rebase`
-* `git cherrypick`
-* `git checkout <file>` (reset changes of a file)
+* Clone, create, and delete local repositories
+* One-tap **Connect with GitHub** (OAuth Device Flow) -- no manual token/password handling for GitHub remotes
+* HTTP/HTTPS/SSH, including SSH with private-key passphrase
+* Username/password and personal access token authentication for any Git host
+* Browse files and commit history, `git diff` between commits
+* Checkout, create, and merge local/remote branches and tags
+* `git status`, staging, `git rebase`, `git cherry-pick`, `git checkout <file>`
+* Private key generation and management
+* Import an existing repository from device storage
+* Light/dark mode that follows the system, with a choice between a fixed brand color or wallpaper-based Material You dynamic color
 
 ## Quick start
 
 ### Clone a remote repository
 
-1. Click on the `+` icon to add a new repository
-2. Enter remote URL (see URL format below)
-3. Enter local repository name - note that this is **not** the full path, as MGit stores all  
-repositories in the same local directory (can be changed in MGit settings)
-4. Click the `Clone` button
-5. If required, you will be prompted for credentials to connect to the remote repo. MGit will download the repository (all branches) to your device
+1. Tap the `+` button to add a new repository
+2. Enter the remote URL (see formats below)
+3. Enter a local repository name -- this is **not** the full path; Gitling stores all repositories under a common root directory (changeable in Settings)
+4. Tap `Clone`
+5. If required, you'll be prompted for credentials -- or connect your GitHub account once in Settings to skip this for GitHub remotes
 
 ### Create a local repository
-1. Click on the `+` icon to add a new repository
-2. Click on `Init Local` to create a local repository
-3. Enter the name for this repository when prompted
-4. A local empty repo will be created
 
-### URL format
+1. Tap the `+` button to add a new repository
+2. Choose `Init Local` to create a local repository
+3. Enter a name when prompted
 
-#### SSH URLs
+### URL formats
 
-* SSH running on standard port (22): `ssh://username@server_name/path/to/repo`
-* SSH running on non-standard port: `ssh://username@server_name:port/path/to/repo`
-* `username` is needed - by default, MGit tries to connect as root.
+**SSH**
+* Standard port (22): `ssh://username@server_name/path/to/repo`
+* Non-standard port: `ssh://username@server_name:port/path/to/repo`
+* A username is required.
 
-#### HTTP(S) URLs
-
-* HTTP(S) URL: `https://server_name/path/to/repo`
-
-## ToDo List
-
-[Future enhancements and bugs are tracked here on Github](https://github.com/maks/MGit/issues).
+**HTTP(S)**
+* `https://server_name/path/to/repo`
 
 ## License
 
-See [GPLv3](./LICENSE)
+GPLv3 -- see [LICENSE](./LICENSE).
 
-All code written by `maks@manichord.com` can at your option also be used under the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
-
-## Help
-
-If you want to help improve this project, contributions, especially translations are very welcome. Also contributions to documentation via the wiki for this repo are also most welcome!
-
-### Contributing code
-
-If you would like to contribute code, either a bugfix or a new feature, please make sure there is a open issue that addresses the new code. 
-**No Pull Requests** will be merged that do not reference an existing issue in the repo.
-
-Please use the Android Studio formatting settings set for this project in the repo.
-
-All strings visible to the user need to go into strings resource file. 
-
-#### Project Goals
-
-* Provide the best GUI git client available on any platform
-* Be usable on both phone, tablet and laptop form-factor devices
-
-#### Non-goals for the project
-
-* Support for proprietary vendor APIs (eg. Github)
-
-#### Major Contributions
-
-For new features, a discussion of the new functionality may need to take place in the comments on the issue covering it, so it may be best for that to occur before you spend time on writing the new code.
-
-The app is about to have a major restructure. All new functionality in the app will be written in Kotlin/Rx per #277. Please be aware that the project is now using Data Binding Library and all future functionality should make use of it.
-
-#### Submitting a Pull Request (PR)
-Fork from this repo, create a new branch, commit your changes and then send a pull request against the **master** branch of this repo.
-
-If you are working on a branch for some time, you may find that changes to master get merged in the meantime, if that happens please do **NOT** merge master into your branch! Instead rebase your branch onto the current head of master.
+This project is a fork of [maks/MGit](https://github.com/maks/MGit), itself a fork of [sheimi/SGit](https://github.com/sheimi/SGit). Credit to both for the original implementation this continues to build on.
