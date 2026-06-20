@@ -5,25 +5,25 @@ import me.sheimi.sgit.database.models.Repo;
 import me.sheimi.sgit.exception.StopTaskException;
 import me.sheimi.sgit.repo.tasks.SheimiAsyncTask.AsyncTaskPostCallback;
 
-public class AddToStageTask extends RepoOpTask {
+public class RemoveFromStageTask extends RepoOpTask {
 
-    public String mFilePattern;
+    public String mFilePath;
     private AsyncTaskPostCallback mCallback;
 
-    public AddToStageTask(Repo repo, String filepattern) {
-        this(repo, filepattern, null);
+    public RemoveFromStageTask(Repo repo, String filePath) {
+        this(repo, filePath, null);
     }
 
-    public AddToStageTask(Repo repo, String filepattern, AsyncTaskPostCallback callback) {
+    public RemoveFromStageTask(Repo repo, String filePath, AsyncTaskPostCallback callback) {
         super(repo);
-        mFilePattern = filepattern;
+        mFilePath = filePath;
         mCallback = callback;
-        setSuccessMsg(R.string.success_add_to_stage);
+        setSuccessMsg(R.string.success_remove_from_stage);
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        return addToStage();
+        return removeFromStage();
     }
 
     protected void onPostExecute(Boolean isSuccess) {
@@ -33,9 +33,9 @@ public class AddToStageTask extends RepoOpTask {
         }
     }
 
-    public boolean addToStage() {
+    public boolean removeFromStage() {
         try {
-            mRepo.getGit().add().addFilepattern(mFilePattern).call();
+            mRepo.getGit().reset().addPath(mFilePath).call();
         } catch (StopTaskException e) {
             return false;
         } catch (Throwable e) {

@@ -48,9 +48,13 @@ fun AccountsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add account manually")
-            }
+            ExtendedFloatingActionButton(
+                onClick = { showAddDialog = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text("Add account") }
+            )
         }
     ) { paddingValues ->
         LazyColumn(

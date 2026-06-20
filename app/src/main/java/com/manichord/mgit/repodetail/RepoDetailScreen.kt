@@ -174,18 +174,34 @@ fun RepoDetailScreen(
 
 @Composable
 fun RepoOperationList(onOperationClick: (index: Int) -> Unit) {
-    // These names match me.sheimi.sgit.activities.delegate.RepoOperationDelegate
+    // These names/icons match me.sheimi.sgit.activities.delegate.RepoOperationDelegate's
+    // mActions order -- index is what gets passed back to onOperationClick.
     val operations = listOf(
-        "New Branch", "Pull", "Push", "Add All", "Commit", "Reset",
-        "Merge", "Fetch", "Rebase", "Cherry Pick", "Diff",
-        "New File", "New Directory", "Add Remote", "Remove Remote",
-        "Delete", "Raw Config", "Options"
+        "New Branch" to Icons.Default.AccountTree,
+        "Pull" to Icons.Default.CloudDownload,
+        "Push" to Icons.Default.CloudUpload,
+        "Add All" to Icons.Default.PlaylistAddCheck,
+        "Commit" to Icons.Default.Save,
+        "Reset" to Icons.Default.RestartAlt,
+        "Merge" to Icons.Default.CallMerge,
+        "Fetch" to Icons.Default.Sync,
+        "Rebase" to Icons.Default.Timeline,
+        "Cherry Pick" to Icons.Default.ContentCopy,
+        "Diff" to Icons.Default.Difference,
+        "New File" to Icons.Default.NoteAdd,
+        "New Directory" to Icons.Default.CreateNewFolder,
+        "Add Remote" to Icons.Default.AddLink,
+        "Remove Remote" to Icons.Default.LinkOff,
+        "Delete" to Icons.Default.Delete,
+        "Raw Config" to Icons.Default.Code,
+        "Options" to Icons.Default.Settings
     )
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        operations.forEachIndexed { index, op ->
+        operations.forEachIndexed { index, (op, icon) ->
             NavigationDrawerItem(
                 label = { Text(op) },
+                icon = { Icon(icon, contentDescription = null) },
                 selected = false,
                 onClick = { onOperationClick(index) },
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
