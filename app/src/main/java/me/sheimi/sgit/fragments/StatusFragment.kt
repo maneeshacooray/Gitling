@@ -9,12 +9,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.repodetail.StatusChangeType
+import com.manichord.mgit.repodetail.StatusFileEntry
 import com.manichord.mgit.repodetail.StatusScreen
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity.OnBackClickListener
 import me.sheimi.sgit.activities.CommitDiffActivity
 import me.sheimi.sgit.database.models.Repo
+import me.sheimi.sgit.repo.tasks.repo.AddToStageTask
+import me.sheimi.sgit.repo.tasks.repo.RemoveFromStageTask
 import me.sheimi.sgit.repo.tasks.repo.StatusTask
+import org.eclipse.jgit.api.Status
 
 class StatusFragment : RepoDetailFragment() {
 
@@ -31,7 +36,10 @@ class StatusFragment : RepoDetailFragment() {
 
     private var repo: Repo? = null
     private var isLoading by mutableStateOf(true)
-    private var statusText by mutableStateOf("")
+    private var isClean by mutableStateOf(false)
+    private var stagedFiles by mutableStateOf(emptyList<StatusFileEntry>())
+    private var unstagedFiles by mutableStateOf(emptyList<StatusFileEntry>())
+    private var conflictingFiles by mutableStateOf(emptyList<String>())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,9 +60,14 @@ class StatusFragment : RepoDetailFragment() {
                 AppTheme {
                     StatusScreen(
                         isLoading = isLoading,
-                        statusText = statusText,
-                        onUnstagedDiffClick = { showDiff("dircache", "filetree") },
-                        onStagedDiffClick = { showDiff("HEAD", "dircache") }
+                        isClean = isClean,
+                        stagedFiles = stagedFiles,
+                        unstagedFiles = unstagedFiles,
+                        conflictingFiles = conflictingFiles,
+                        onStageFile = { path -> stageFile(path) },
+                        onUnstageFile = { path -> unstageFile(path) },
+                        onViewStagedDiff = { showDiff("HEAD", "dircache") },
+                        onViewUnstagedDiff = { showDiff("dircache", "filetree") }
                     )
                 }
             }
@@ -75,14 +88,37 @@ class StatusFragment : RepoDetailFragment() {
         rawActivity.startActivity(intent)
     }
 
+    private fun stageFile(path: String) {
+        val repo = repo ?: return
+        AddToStageTask(repo, path) { reset() }.executeTask()
+    }
+
+    private fun unstageFile(path: String) {
+        val repo = repo ?: return
+        RemoveFromStageTask(repo, path) { reset() }.executeTask()
+    }
+
     override fun reset() {
         val repo = repo ?: return
         isLoading = true
-        val task = StatusTask(repo) { result ->
-            statusText = result
-            isLoading = false
-        }
+        val task = StatusTask(repo) { status -> applyStatus(status) }
         task.executeTask()
+    }
+
+    private fun applyStatus(status: Status?) {
+        if (status == null) {
+            isLoading = false
+            return
+        }
+        isClean = !status.hasUncommittedChanges() && status.isClean
+        stagedFiles = status.added.map { StatusFileEntry(it, StatusChangeType.ADDED) } +
+            status.changed.map { StatusFileEntry(it, StatusChangeType.MODIFIED) } +
+            status.removed.map { StatusFileEntry(it, StatusChangeType.REMOVED) }
+        unstagedFiles = status.modified.map { StatusFileEntry(it, StatusChangeType.MODIFIED) } +
+            status.missing.map { StatusFileEntry(it, StatusChangeType.MISSING) } +
+            status.untracked.map { StatusFileEntry(it, StatusChangeType.UNTRACKED) }
+        conflictingFiles = status.conflicting.toList()
+        isLoading = false
     }
 
     override fun getOnBackClickListener(): OnBackClickListener? = null
