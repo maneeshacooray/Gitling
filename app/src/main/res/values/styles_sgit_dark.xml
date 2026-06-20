@@ -23,8 +23,6 @@
     <style name="Theme.SgitDark" parent="Theme.AppCompat">
         <item name="android:actionMenuTextColor">@android:color/white</item>
         <item name="android:textColor">@android:color/white</item>
-        <item type="drawable" name="ic_file_fl">@drawable/ic_file</item>
-        <item type="drawable" name="ic_folder_fl">@drawable/ic_folder_w</item>
         <item type="drawable" name="ic_branch_l">@drawable/ic_branch_w</item>
         <item type="drawable" name="ic_tag_l">@drawable/ic_tag_w</item>
     </style>

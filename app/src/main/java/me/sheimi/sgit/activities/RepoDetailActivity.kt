@@ -99,7 +99,7 @@ class RepoDetailActivity : SheimiFragmentActivity() {
     }
 
     private fun createFragments() {
-        mFilesFragment = FilesFragment.newInstance(mRepo)
+        mFilesFragment = FilesFragment.newInstance(mRepo!!)
         mCommitsFragment = CommitsFragment.newInstance(mRepo, null)
         mStatusFragment = StatusFragment.newInstance(mRepo)
     }

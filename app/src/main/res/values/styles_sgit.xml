@@ -6,15 +6,15 @@
          Holo action-bar/popup/tab/spinner/progress-bar/cab styles here. Every activity now
          uses the .NoActionBar variant of this theme (see styles.xml) and renders its own
          Compose TopAppBar instead of a system ActionBar, so those attributes were never
-         read anymore, so they were removed along with their drawables/styles. ic_file_fl/ic_folder_fl/
-         ic_branch_l/ic_tag_l are still read directly via Profile.getStyledResource() by
-         the legacy Files/Commits list adapters and the rebase/merge branch pickers.
+         read anymore, so they were removed along with their drawables/styles. ic_branch_l/
+         ic_tag_l are still read directly via Profile.getStyledResource() by the rebase/merge
+         branch pickers. The Files tab moved to Compose and no longer needs ic_file_fl/
+         ic_folder_fl, so they were removed along with the now-unused ic_file_d/ic_folder_d/
+         ic_folder_w drawables.
     -->
     <style name="Theme.Sgit" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionMenuTextColor">@android:color/black</item>
         <item name="android:textColor">@android:color/black</item>
-        <item type="drawable" name="ic_file_fl">@drawable/ic_file_d</item>
-        <item type="drawable" name="ic_folder_fl">@drawable/ic_folder_d</item>
         <item type="drawable" name="ic_branch_l">@drawable/ic_branch_d</item>
         <item type="drawable" name="ic_tag_l">@drawable/ic_tag_d</item>
 

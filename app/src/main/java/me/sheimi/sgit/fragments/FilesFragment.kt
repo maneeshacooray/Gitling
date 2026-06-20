@@ -1,0 +1,176 @@
+package me.sheimi.sgit.fragments
+
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.explorer.FileListContent
+import com.manichord.mgit.ui.theme.AppTheme
+import me.sheimi.android.activities.SheimiFragmentActivity
+import me.sheimi.android.activities.SheimiFragmentActivity.OnBackClickListener
+import me.sheimi.android.utils.FsUtils
+import me.sheimi.sgit.activities.ViewFileActivity
+import me.sheimi.sgit.database.models.Repo
+import me.sheimi.sgit.dialogs.RepoFileOperationDialog
+import timber.log.Timber
+import java.io.File
+import java.io.IOException
+
+class FilesFragment : RepoDetailFragment() {
+
+    companion object {
+        private const val CURRENT_DIR = "current_dir"
+
+        @JvmStatic
+        fun newInstance(repo: Repo): FilesFragment {
+            val fragment = FilesFragment()
+            val bundle = Bundle()
+            bundle.putSerializable(Repo.TAG, repo)
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
+    private var repo: Repo? = null
+    private var rootDir: File? = null
+    private var currentDir: File? = null
+    private var files by mutableStateOf<List<File>>(emptyList())
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        rawActivity.setFilesFragment(this)
+
+        repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
+            ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)
+        val repo = repo ?: return ComposeView(requireContext())
+        rootDir = repo.dir
+
+        savedInstanceState?.getString(CURRENT_DIR)?.let { path ->
+            setCurrentDir(File(path))
+        }
+        reset()
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    val dir = currentDir
+                    FileListContent(
+                        currentPath = dir?.let { relativePath(it) } ?: "",
+                        files = files,
+                        showUpRow = rootDir?.let { dir != null && dir != it } ?: false,
+                        onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
+                        onItemClick = ::onFileClicked,
+                        onItemLongClick = ::onFileLongClicked
+                    )
+                }
+            }
+        }
+    }
+
+    private fun relativePath(dir: File): String {
+        val root = rootDir ?: return dir.absolutePath
+        return FsUtils.getRelativePath(dir, root).ifEmpty { "/" }
+    }
+
+    private fun onFileClicked(file: File) {
+        if (file.isDirectory) {
+            setCurrentDir(file)
+            return
+        }
+        val mime = FsUtils.getMimeType(file)
+        if (FsUtils.isTextMimeType(mime)) {
+            val intent = Intent(activity, ViewFileActivity::class.java)
+            intent.putExtra(ViewFileActivity.TAG_FILE_NAME, file.absolutePath)
+            intent.putExtra(Repo.TAG, repo)
+            rawActivity.startActivity(intent)
+            return
+        }
+        try {
+            FsUtils.openFile(activity as SheimiFragmentActivity, file)
+        } catch (e: ActivityNotFoundException) {
+            Timber.e(e)
+            rawActivity.showMessageDialog(
+                me.sheimi.sgit.R.string.dialog_error_title,
+                getString(me.sheimi.sgit.R.string.error_can_not_open_file)
+            )
+        }
+    }
+
+    private fun onFileLongClicked(file: File) {
+        val dialog = RepoFileOperationDialog()
+        val args = Bundle()
+        args.putString(RepoFileOperationDialog.FILE_PATH, file.absolutePath)
+        dialog.arguments = args
+        dialog.show(parentFragmentManager, "repo-file-op-dialog")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable(Repo.TAG, repo)
+        currentDir?.let { outState.putString(CURRENT_DIR, it.absolutePath) }
+    }
+
+    /** Set the directory listing currently being displayed */
+    fun setCurrentDir(dir: File) {
+        currentDir = dir
+        val filtered = dir.listFiles { file -> file.name != ".git" } ?: emptyArray()
+        files = filtered.sortedWith(
+            compareBy({ !it.isDirectory }, { it.toString() })
+        )
+    }
+
+    /** If the root dir has previously been set, reset the displayed listing to it */
+    fun resetCurrentDir() {
+        rootDir?.let { setCurrentDir(it) }
+    }
+
+    override fun reset() {
+        resetCurrentDir()
+    }
+
+    fun newDir(name: String) {
+        val dir = currentDir ?: return
+        val file = File(dir, name)
+        if (file.exists()) {
+            showToastMessage(me.sheimi.sgit.R.string.alert_file_exists)
+            return
+        }
+        file.mkdir()
+        setCurrentDir(dir)
+    }
+
+    /** Create a new file within the currently displayed directory */
+    @Throws(IOException::class)
+    fun newFile(name: String) {
+        val dir = currentDir ?: return
+        val file = File(dir, name)
+        if (file.exists()) {
+            showToastMessage(me.sheimi.sgit.R.string.alert_file_exists)
+            return
+        }
+        file.createNewFile()
+        setCurrentDir(dir)
+    }
+
+    override fun getOnBackClickListener(): OnBackClickListener {
+        return OnBackClickListener {
+            val root = rootDir
+            val dir = currentDir
+            if (root == null || dir == null || root == dir) {
+                false
+            } else {
+                dir.parentFile?.let { setCurrentDir(it) }
+                true
+            }
+        }
+    }
+}

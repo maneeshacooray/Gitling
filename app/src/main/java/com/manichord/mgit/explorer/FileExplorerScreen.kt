@@ -60,36 +60,63 @@ fun FileExplorerScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        FileListContent(
+            currentPath = currentPath,
+            files = files,
+            showUpRow = showUpRow,
+            onUpClick = onUpClick,
+            onItemClick = onItemClick,
+            onItemLongClick = onItemLongClick,
+            selectedFile = selectedFile,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+/**
+ * The path breadcrumb + file/folder list, with no Scaffold/TopAppBar of its own -- reusable
+ * both as [FileExplorerScreen]'s body and as a tab's content within another screen's Scaffold
+ * (e.g. RepoDetailActivity's Files tab) where an extra TopAppBar would duplicate the one
+ * already there.
+ */
+@Composable
+fun FileListContent(
+    currentPath: String,
+    files: List<File>,
+    showUpRow: Boolean,
+    onUpClick: () -> Unit,
+    onItemClick: (File) -> Unit,
+    onItemLongClick: (File) -> Unit = {},
+    selectedFile: File? = null,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        Text(
+            text = currentPath,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            Text(
-                text = currentPath,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-            )
-            HorizontalDivider()
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                if (showUpRow) {
-                    item {
-                        FileRow(name = "..", isDirectory = true, onClick = onUpClick)
-                    }
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        )
+        HorizontalDivider()
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (showUpRow) {
+                item {
+                    FileRow(name = "..", isDirectory = true, onClick = onUpClick)
                 }
-                items(files, key = { it.absolutePath }) { file ->
-                    FileRow(
-                        name = file.name,
-                        isDirectory = file.isDirectory,
-                        selected = file == selectedFile,
-                        onClick = { onItemClick(file) },
-                        onLongClick = { onItemLongClick(file) }
-                    )
-                }
+            }
+            items(files, key = { it.absolutePath }) { file ->
+                FileRow(
+                    name = file.name,
+                    isDirectory = file.isDirectory,
+                    selected = file == selectedFile,
+                    onClick = { onItemClick(file) },
+                    onLongClick = { onItemLongClick(file) }
+                )
             }
         }
     }

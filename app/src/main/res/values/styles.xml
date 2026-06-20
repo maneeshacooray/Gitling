@@ -1,7 +1,5 @@
 <resources>
 
-    <attr name="ic_file_fl" format="reference" />
-    <attr name="ic_folder_fl" format="reference" />
     <attr name="ic_branch_l" format="reference" />
     <attr name="ic_tag_l" format="reference" />
 
