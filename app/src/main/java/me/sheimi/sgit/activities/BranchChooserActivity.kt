@@ -16,7 +16,6 @@ import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.dialogs.RenameBranchDialog
 import me.sheimi.sgit.repo.tasks.repo.CheckoutTask
 import me.sheimi.sgit.repo.tasks.SheimiAsyncTask
-import android.app.AlertDialog
 import android.widget.Toast
 
 class BranchChooserActivity : SheimiFragmentActivity() {
@@ -78,15 +77,15 @@ class BranchChooserActivity : SheimiFragmentActivity() {
     }
 
     private fun showDeleteDialog(commitName: String) {
-        AlertDialog.Builder(this)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .setTitle(getString(R.string.dialog_branch_delete) + " " + commitName)
-            .setMessage(R.string.dialog_branch_delete_msg)
-            .setPositiveButton(R.string.label_delete) { _, _ ->
-                deleteBranch(commitName)
-            }
-            .setNegativeButton(R.string.label_cancel, null)
-            .show()
+        com.manichord.mgit.dialogs.MessageDialog.show(
+            findViewById(android.R.id.content),
+            getString(R.string.dialog_branch_delete) + " " + commitName,
+            getString(R.string.dialog_branch_delete_msg),
+            getString(R.string.label_delete),
+            getString(R.string.label_cancel),
+            DialogInterface.OnClickListener { _, _ -> deleteBranch(commitName) },
+            DialogInterface.OnClickListener { _, _ -> }
+        )
     }
 
     private fun deleteBranch(commitName: String) {
