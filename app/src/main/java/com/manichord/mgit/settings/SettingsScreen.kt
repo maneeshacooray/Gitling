@@ -30,6 +30,7 @@ fun SettingsScreen(
     val gitUserName by viewModel.gitUserName.observeAsState("")
     val gitUserEmail by viewModel.gitUserEmail.observeAsState("")
     val useGravatar by viewModel.useGravatar.observeAsState(true)
+    val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
 
     Scaffold(
         topBar = {
@@ -64,6 +65,14 @@ fun SettingsScreen(
                 checked = useEnglish,
                 onCheckedChange = { viewModel.setUseEnglish(it) },
                 icon = Icons.Default.Language
+            )
+
+            SettingsSwitchItem(
+                title = stringResource(R.string.preference_use_dynamic_color),
+                summary = stringResource(R.string.preference_use_dynamic_color_summary),
+                checked = useDynamicColor,
+                onCheckedChange = { viewModel.setUseDynamicColor(it) },
+                icon = Icons.Default.Palette
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

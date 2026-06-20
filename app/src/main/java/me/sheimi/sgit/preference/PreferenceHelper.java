@@ -61,6 +61,14 @@ public class PreferenceHelper {
         edit(mContext.getString(R.string.pref_key_use_english), use);
     }
 
+    public boolean useDynamicColor() {
+        return getBoolean(mContext.getString(R.string.pref_key_use_dynamic_color));
+    }
+
+    public void setUseDynamicColor(boolean use) {
+        edit(mContext.getString(R.string.pref_key_use_dynamic_color), use);
+    }
+
     public String getUserName() {
         return getString(mContext.getString(R.string.pref_key_git_user_name));
     }

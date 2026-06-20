@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.material.kolor)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.vectordrawable)
     implementation(libs.androidx.constraintlayout)

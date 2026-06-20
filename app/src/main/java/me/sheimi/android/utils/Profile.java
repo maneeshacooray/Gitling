@@ -94,4 +94,14 @@ public class Profile {
         String useEnglishPrefKey = context.getString(R.string.pref_key_use_english);
         return getProfileSharedPreference(context).getBoolean(useEnglishPrefKey, false);
     }
+
+    public static boolean useDynamicColor(Context context) {
+        String useDynamicColorPrefKey = context.getString(R.string.pref_key_use_dynamic_color);
+        return getProfileSharedPreference(context).getBoolean(useDynamicColorPrefKey, false);
+    }
+
+    public static void setUseDynamicColor(Context context, boolean useDynamicColor) {
+        String useDynamicColorPrefKey = context.getString(R.string.pref_key_use_dynamic_color);
+        getProfileSharedPreference(context).edit().putBoolean(useDynamicColorPrefKey, useDynamicColor).apply();
+    }
 }

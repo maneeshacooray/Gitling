@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import com.manichord.mgit.settings.SettingsScreen
 import com.manichord.mgit.settings.SettingsViewModel
 import com.manichord.mgit.ui.theme.AppTheme
@@ -49,8 +50,9 @@ class UserSettingsActivity : SheimiFragmentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var currentScreen by remember { mutableStateOf("settings") }
+            val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
 
-            AppTheme {
+            AppTheme(useDynamicColor = useDynamicColor) {
                 androidx.compose.animation.Crossfade(targetState = currentScreen) { screen ->
                     when (screen) {
                         "settings" -> SettingsScreen(

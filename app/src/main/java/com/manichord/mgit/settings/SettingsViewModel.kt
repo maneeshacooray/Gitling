@@ -28,6 +28,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val _useGravatar = MutableLiveData(prefsHelper.useGravatar())
     val useGravatar: LiveData<Boolean> = _useGravatar
 
+    private val _useDynamicColor = MutableLiveData(prefsHelper.useDynamicColor())
+    val useDynamicColor: LiveData<Boolean> = _useDynamicColor
+
     private val accountManager = (application as MGitApplication).accountManager!!
     private val githubAuthManager = (application as MGitApplication).githubAuthManager!!
 
@@ -111,5 +114,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setUseGravatar(use: Boolean) {
         prefsHelper.setUseGravatar(use)
         _useGravatar.value = use
+    }
+
+    fun setUseDynamicColor(use: Boolean) {
+        prefsHelper.setUseDynamicColor(use)
+        _useDynamicColor.value = use
     }
 }

@@ -28,6 +28,7 @@ robolectric = "4.14.1"
 desugar = "2.1.5"
 versions-plugin = "0.51.0"
 ksp = "2.1.10-1.0.29"
+material-kolor = "4.1.1"
 
 [libraries]
 # AndroidX
@@ -55,6 +56,7 @@ androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name =
 
 # Google
 material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
+material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "material-kolor" }
 
 # Network & SSH
 jsch = { group = "com.github.mwiede", name = "jsch", version.ref = "jsch" }
