@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.manichord.mgit.auth.DeviceFlowStatus
+import com.manichord.mgit.ui.theme.FontOption
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
 import me.sheimi.sgit.preference.PreferenceHelper
@@ -30,6 +31,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val _useDynamicColor = MutableLiveData(prefsHelper.useDynamicColor())
     val useDynamicColor: LiveData<Boolean> = _useDynamicColor
+
+    private val _fontOption = MutableLiveData(FontOption.fromId(prefsHelper.getAppFont()))
+    val fontOption: LiveData<FontOption> = _fontOption
 
     private val accountManager = (application as MGitApplication).accountManager!!
     private val githubAuthManager = (application as MGitApplication).githubAuthManager!!
@@ -119,5 +123,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setUseDynamicColor(use: Boolean) {
         prefsHelper.setUseDynamicColor(use)
         _useDynamicColor.value = use
+    }
+
+    fun setFontOption(option: FontOption) {
+        prefsHelper.setAppFont(option.id)
+        _fontOption.value = option
     }
 }

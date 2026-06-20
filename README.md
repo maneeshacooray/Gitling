@@ -58,4 +58,4 @@ This project is a fork of [maks/MGit](https://github.com/maks/MGit), itself a fo
 
 ### Third-party fonts
 
-The app's typeface, [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans), is licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL).
+The app's default typeface, [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans), is licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL). Settings > App font also offers [Inter](https://github.com/rsms/inter) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) as alternatives, both also OFL-1.1.

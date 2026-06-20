@@ -9,10 +9,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.manichord.mgit.ui.theme.FontOption
 import me.sheimi.sgit.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,7 @@ fun SettingsScreen(
     val gitUserEmail by viewModel.gitUserEmail.observeAsState("")
     val useGravatar by viewModel.useGravatar.observeAsState(true)
     val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
+    val fontOption by viewModel.fontOption.observeAsState(FontOption.DEFAULT)
 
     Scaffold(
         topBar = {
@@ -73,6 +76,11 @@ fun SettingsScreen(
                 checked = useDynamicColor,
                 onCheckedChange = { viewModel.setUseDynamicColor(it) },
                 icon = Icons.Default.Palette
+            )
+
+            SettingsFontItem(
+                selected = fontOption,
+                onSelect = { viewModel.setFontOption(it) }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -168,6 +176,53 @@ fun SettingsSwitchItem(title: String, summary: String, checked: Boolean, onCheck
         },
         modifier = Modifier.clickable { onCheckedChange(!checked) }
     )
+}
+
+@Composable
+fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.preference_app_font)) },
+        supportingContent = { Text(selected.displayName) },
+        leadingContent = { Icon(Icons.Default.TextFields, null) },
+        modifier = Modifier.clickable { showDialog = true }
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.preference_app_font)) },
+            text = {
+                Column {
+                    FontOption.entries.forEach { option ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSelect(option)
+                                    showDialog = false
+                                }
+                                .padding(vertical = 8.dp)
+                        ) {
+                            RadioButton(selected = option == selected, onClick = {
+                                onSelect(option)
+                                showDialog = false
+                            })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(option.displayName, fontFamily = option.fontFamily)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.label_cancel))
+                }
+            }
+        )
+    }
 }
 
 @Composable

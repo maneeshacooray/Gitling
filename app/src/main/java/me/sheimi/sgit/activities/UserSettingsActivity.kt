@@ -51,8 +51,9 @@ class UserSettingsActivity : SheimiFragmentActivity() {
         setContent {
             var currentScreen by remember { mutableStateOf("settings") }
             val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
+            val fontOption by viewModel.fontOption.observeAsState(com.manichord.mgit.ui.theme.FontOption.DEFAULT)
 
-            AppTheme(useDynamicColor = useDynamicColor) {
+            AppTheme(useDynamicColor = useDynamicColor, fontOption = fontOption) {
                 androidx.compose.animation.Crossfade(targetState = currentScreen) { screen ->
                     when (screen) {
                         "settings" -> SettingsScreen(

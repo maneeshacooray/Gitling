@@ -16,13 +16,15 @@ import me.sheimi.android.utils.Profile
  * Brand color by default (a full tonal palette generated from [BrandSeedColor] via
  * MaterialKolor, so the app always looks like itself), with an opt-in escape hatch to
  * system wallpaper-based Material You color for users who want that instead -- see
- * Settings > "Use wallpaper colors" (Profile.useDynamicColor).
+ * Settings > "Use wallpaper colors" (Profile.useDynamicColor). Typeface is similarly
+ * user-selectable -- see Settings > "App font" (Profile.getAppFont()).
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     useDynamicColor: Boolean = Profile.useDynamicColor(LocalContext.current),
+    fontOption: FontOption = FontOption.fromId(Profile.getAppFont(LocalContext.current)),
     content: @Composable () -> Unit
 ) {
     val systemDynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -41,7 +43,7 @@ fun AppTheme(
 
     MaterialExpressiveTheme(
         colorScheme = colors,
-        typography = Typography,
+        typography = gitlingTypography(fontOption.fontFamily),
         content = content
     )
 }

@@ -104,4 +104,14 @@ public class Profile {
         String useDynamicColorPrefKey = context.getString(R.string.pref_key_use_dynamic_color);
         getProfileSharedPreference(context).edit().putBoolean(useDynamicColorPrefKey, useDynamicColor).apply();
     }
+
+    public static String getAppFont(Context context) {
+        String appFontPrefKey = context.getString(R.string.pref_key_app_font);
+        return getProfileSharedPreference(context).getString(appFontPrefKey, null);
+    }
+
+    public static void setAppFont(Context context, String fontId) {
+        String appFontPrefKey = context.getString(R.string.pref_key_app_font);
+        getProfileSharedPreference(context).edit().putString(appFontPrefKey, fontId).apply();
+    }
 }

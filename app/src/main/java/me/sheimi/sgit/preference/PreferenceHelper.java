@@ -69,6 +69,14 @@ public class PreferenceHelper {
         edit(mContext.getString(R.string.pref_key_use_dynamic_color), use);
     }
 
+    public String getAppFont() {
+        return getString(mContext.getString(R.string.pref_key_app_font));
+    }
+
+    public void setAppFont(String fontId) {
+        edit(mContext.getString(R.string.pref_key_app_font), fontId);
+    }
+
     public String getUserName() {
         return getString(mContext.getString(R.string.pref_key_git_user_name));
     }
