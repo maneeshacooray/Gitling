@@ -55,3 +55,7 @@ Gitling doesn't include an internal text editor -- to edit files, you'll need an
 GPLv3 -- see [LICENSE](./LICENSE).
 
 This project is a fork of [maks/MGit](https://github.com/maks/MGit), itself a fork of [sheimi/SGit](https://github.com/sheimi/SGit). Credit to both for the original implementation this continues to build on.
+
+### Third-party fonts
+
+The app's typeface, [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans), is licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL).
