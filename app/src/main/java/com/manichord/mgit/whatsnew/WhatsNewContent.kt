@@ -1,0 +1,40 @@
+package com.manichord.mgit.whatsnew
+
+/**
+ * versionCode here must match the versionCode set in app/build.gradle.kts for that release --
+ * add a new entry (with the new versionCode) as part of cutting each release.
+ */
+data class WhatsNewEntry(
+    val versionCode: Int,
+    val versionName: String,
+    val highlights: List<String>
+)
+
+object WhatsNewContent {
+    val entries = listOf(
+        WhatsNewEntry(
+            versionCode = 5,
+            versionName = "1.0.4",
+            highlights = listOf(
+                "Status now shows a real per-file list -- stage or unstage individual files instead of just two giant diff buttons",
+                "Added icons throughout the repo menu and the Accounts screen's add button"
+            )
+        ),
+        WhatsNewEntry(
+            versionCode = 4,
+            versionName = "1.0.3",
+            highlights = listOf(
+                "Every dialog in the app now matches Gitling's own look instead of the system default",
+                "Fixed screens not picking up a theme change made elsewhere until restarted"
+            )
+        ),
+        WhatsNewEntry(
+            versionCode = 3,
+            versionName = "1.0.2",
+            highlights = listOf(
+                "Refreshed repo list with a clearer \"New repo\" button and GitHub connect banner",
+                "Started migrating dialogs across the app to match Gitling's brand colors"
+            )
+        )
+    )
+}

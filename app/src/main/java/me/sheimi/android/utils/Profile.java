@@ -114,4 +114,18 @@ public class Profile {
         String appFontPrefKey = context.getString(R.string.pref_key_app_font);
         getProfileSharedPreference(context).edit().putString(appFontPrefKey, fontId).apply();
     }
+
+    /**
+     * -1 means "never recorded" (fresh install) -- distinct from any real versionCode, which
+     * starts at 1, so callers can tell a fresh install apart from an update.
+     */
+    public static int getLastSeenVersionCode(Context context) {
+        String key = context.getString(R.string.pref_key_last_seen_version_code);
+        return getProfileSharedPreference(context).getInt(key, -1);
+    }
+
+    public static void setLastSeenVersionCode(Context context, int versionCode) {
+        String key = context.getString(R.string.pref_key_last_seen_version_code);
+        getProfileSharedPreference(context).edit().putInt(key, versionCode).apply();
+    }
 }

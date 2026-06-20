@@ -168,6 +168,7 @@
     <string name="pref_key_use_dynamic_color" translatable="false">use_dynamic_color</string>
     <string name="preference_app_font">App font</string>
     <string name="pref_key_app_font" translatable="false">app_font</string>
+    <string name="pref_key_last_seen_version_code" translatable="false">last_seen_version_code</string>
     <string name="action_git_profile">Git Profile</string>
     <string name="action_open_in_other_app">Open in other apps</string>
     <string name="action_add_private_key">Add Private Key</string>

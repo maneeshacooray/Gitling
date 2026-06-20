@@ -15,11 +15,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.clone.CloneViewModel
 import com.manichord.mgit.models.AccountType
 import com.manichord.mgit.ui.theme.AppTheme
+import com.manichord.mgit.whatsnew.WhatsNewContent
+import com.manichord.mgit.whatsnew.WhatsNewDialog
 import me.sheimi.android.activities.SheimiFragmentActivity
+import me.sheimi.android.utils.Profile
+import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.RepoDetailActivity
@@ -55,6 +60,23 @@ fun RepoListComposeContent(
         var repoOptionsTarget by remember { mutableStateOf<Repo?>(null) }
         var renameTarget by remember { mutableStateOf<Repo?>(null) }
         var deleteTarget by remember { mutableStateOf<Repo?>(null) }
+
+        val context = LocalContext.current
+        var whatsNewEntries by remember {
+            mutableStateOf(run {
+                val lastSeen = Profile.getLastSeenVersionCode(context)
+                when {
+                    // Fresh install -- nothing to announce, just start tracking from here.
+                    lastSeen < 0 -> {
+                        Profile.setLastSeenVersionCode(context, BuildConfig.VERSION_CODE)
+                        emptyList()
+                    }
+                    lastSeen < BuildConfig.VERSION_CODE ->
+                        WhatsNewContent.entries.filter { it.versionCode in (lastSeen + 1)..BuildConfig.VERSION_CODE }
+                    else -> emptyList()
+                }
+            })
+        }
 
         RepoListScreen(
             repoList = repoListSnapshot,
@@ -162,6 +184,16 @@ fun RepoListComposeContent(
                     deleteTarget = null
                     repo.deleteRepo()
                     repo.cancelTask()
+                }
+            )
+        }
+
+        if (whatsNewEntries.isNotEmpty()) {
+            WhatsNewDialog(
+                entries = whatsNewEntries,
+                onDismiss = {
+                    Profile.setLastSeenVersionCode(context, BuildConfig.VERSION_CODE)
+                    whatsNewEntries = emptyList()
                 }
             )
         }
