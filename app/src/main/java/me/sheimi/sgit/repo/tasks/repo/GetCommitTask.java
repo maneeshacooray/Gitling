@@ -25,7 +25,7 @@ public class GetCommitTask extends RepoOpTask {
     }
 
     public GetCommitTask(Repo repo, String file, GetCommitCallback callback) {
-        super(repo);
+        super(repo, false);
         mFile = file;
         mCallback = callback;
     }

@@ -21,8 +21,24 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
     private int mSuccessMsg = 0;
 
     public RepoOpTask(Repo repo) {
+        this(repo, true);
+    }
+
+    /**
+     * @param requiresExclusiveAccess whether this task needs the repo's single-task-at-a-time
+     *                                slot (see Repo.addTask/removeTask) -- true for anything that
+     *                                writes to the repo (push/pull/commit/checkout/rebase/etc, the
+     *                                default), false for read-only tasks like StatusTask/
+     *                                GetCommitTask/CommitDiffTask, which would otherwise contend
+     *                                with each other (or with repo-open scaffolding) for no real
+     *                                safety benefit -- e.g. switching tabs quickly after opening a
+     *                                repo could silently drop a tab's data load with only a toast
+     *                                ("A task for this repo is already running") as a clue, leaving
+     *                                that tab's loading spinner stuck forever.
+     */
+    public RepoOpTask(Repo repo, boolean requiresExclusiveAccess) {
         mRepo = repo;
-        mIsTaskAdded = repo.addTask(this);
+        mIsTaskAdded = requiresExclusiveAccess ? repo.addTask(this) : true;
     }
 
     protected void onPostExecute(Boolean isSuccess) {
