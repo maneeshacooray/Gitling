@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.database.DataSetObserver
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -54,7 +53,6 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
     private var repo: Repo? = null
     private var file: String? = null
     private lateinit var clipboard: ClipboardManager
-    private lateinit var dateFormatter: java.text.DateFormat
 
     private var rows by mutableStateOf<List<CommitRowState>>(emptyList())
     private var allBranches by mutableStateOf(false)
@@ -86,7 +84,6 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
         this.repo = repo
         file = bundle.getString(FILE)
         clipboard = rawActivity.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
-        dateFormatter = DateFormat.getDateFormat(rawActivity)
 
         val adapter = CommitsListAdapter(rawActivity, chosenItems, repo, file)
         adapter.registerDataSetObserver(object : DataSetObserver() {
@@ -102,7 +99,6 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
                 AppTheme {
                     CommitsListContent(
                         rows = rows,
-                        dateFormatter = dateFormatter,
                         onItemClick = ::onItemClicked,
                         onItemLongClick = ::onItemLongClicked,
                         showBranchScopeToggle = adapter.supportsGraphMode(),

@@ -1,6 +1,5 @@
 package com.manichord.mgit.repodetail
 
-import android.widget.ImageView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,20 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import me.sheimi.android.utils.BasicFunctions
-import me.sheimi.sgit.database.models.Repo
 import org.eclipse.jgit.revplot.PlotCommit
 import org.eclipse.jgit.revplot.PlotLane
 import org.eclipse.jgit.revwalk.RevCommit
-import java.text.DateFormat
 
 sealed class CommitRowState {
     data object Loading : CommitRowState()
@@ -49,7 +42,6 @@ sealed class CommitRowState {
 @Composable
 fun CommitsListContent(
     rows: List<CommitRowState>,
-    dateFormatter: DateFormat,
     onItemClick: (Int) -> Unit,
     onItemLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -101,7 +93,6 @@ fun CommitsListContent(
                         CommitRow(
                             commit = row.commit,
                             selected = row.selected,
-                            dateFormatter = dateFormatter,
                             isFirst = index == 0,
                             isLast = index == lastItemIndex,
                             graphWidthUnits = graphWidthUnits,
@@ -124,13 +115,13 @@ fun CommitsListContent(
 @Composable
 private fun CommitGraphNode(isFirst: Boolean, isLast: Boolean, modifier: Modifier = Modifier) {
     val nodeColor = MaterialTheme.colorScheme.primary
-    Canvas(modifier = modifier.width(32.dp).fillMaxHeight()) {
+    Canvas(modifier = modifier.width(18.dp).fillMaxHeight()) {
         val centerX = size.width / 2
         val centerY = size.height / 2
-        val outerRadius = 9.dp.toPx()
-        val innerRadius = 4.dp.toPx()
-        val strokeWidth = 2.5.dp.toPx()
-        val gap = outerRadius + 4.dp.toPx()
+        val outerRadius = 4.dp.toPx()
+        val innerRadius = 1.8.dp.toPx()
+        val strokeWidth = 1.5.dp.toPx()
+        val gap = outerRadius + 1.5.dp.toPx()
 
         if (!isFirst) {
             drawLine(
@@ -162,26 +153,25 @@ private fun CommitGraphNode(isFirst: Boolean, isLast: Boolean, modifier: Modifie
     }
 }
 
+/** Lazygit-style: one compact line per commit -- graph, short hash, message, no avatar/author/date. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CommitRow(
     commit: RevCommit,
     selected: Boolean,
-    dateFormatter: DateFormat,
     isFirst: Boolean,
     isLast: Boolean,
     graphWidthUnits: Int,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    val person = commit.authorIdent
     Row(
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(horizontal = 8.dp, vertical = 12.dp)
+            .padding(horizontal = 8.dp, vertical = 3.dp)
             .height(IntrinsicSize.Min)
     ) {
         @Suppress("UNCHECKED_CAST")
@@ -191,37 +181,20 @@ private fun CommitRow(
         } else {
             CommitGraphNode(isFirst = isFirst, isLast = isLast)
         }
-        AndroidView(
-            factory = { context -> ImageView(context) },
-            update = { imageView -> BasicFunctions.setAvatarImage(imageView, person.emailAddress) },
-            modifier = Modifier.size(40.dp).clip(CircleShape)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = commit.name.take(7),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(
-                text = Repo.getCommitDisplayName(commit.name),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = commit.shortMessage,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Row {
-                Text(
-                    text = person.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = dateFormatter.format(person.getWhen()),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = commit.shortMessage,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
     }
 }

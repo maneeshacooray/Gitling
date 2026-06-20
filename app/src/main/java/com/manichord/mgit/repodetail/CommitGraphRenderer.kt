@@ -20,7 +20,9 @@ import org.eclipse.jgit.revplot.PlotLane
 /** Mirrors AbstractPlotRenderer's own private LANE_WIDTH/LEFT_PAD (not accessible to us). */
 private const val LANE_WIDTH_UNITS = 14
 private const val LEFT_PAD_UNITS = 2
-private const val DP_PER_UNIT = 1.3f
+// Lazygit-style dense lanes: tight enough that several lanes still read as thin terminal-style
+// pipes rather than the wide, spaced-out canvas lines this used to draw.
+private const val DP_PER_UNIT = 0.55f
 
 private val LaneColors = listOf(
     Color(0xFF4CAF50), // green
