@@ -13,6 +13,14 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 9,
+            versionName = "1.0.8",
+            highlights = listOf(
+                "Fixed the file viewer showing a blank page for most files",
+                "Under-the-hood rewrite: the whole app now runs as a single screen with smooth in-app navigation instead of jumping between separate screens"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 8,
             versionName = "1.0.7",
             highlights = listOf(

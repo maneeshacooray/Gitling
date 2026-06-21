@@ -47,7 +47,7 @@ class FilesFragment : RepoDetailFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        rawActivity.setFilesFragment(this)
+        repoDetailActivity.setFilesFragment(this)
 
         repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
             ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)
@@ -91,14 +91,14 @@ class FilesFragment : RepoDetailFragment() {
             val intent = Intent(activity, ViewFileActivity::class.java)
             intent.putExtra(ViewFileActivity.TAG_FILE_NAME, file.absolutePath)
             intent.putExtra(Repo.TAG, repo)
-            rawActivity.startActivity(intent)
+            repoDetailActivity.startActivity(intent)
             return
         }
         try {
             FsUtils.openFile(activity as SheimiFragmentActivity, file)
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
-            rawActivity.showMessageDialog(
+            repoDetailActivity.showMessageDialog(
                 me.sheimi.sgit.R.string.dialog_error_title,
                 getString(me.sheimi.sgit.R.string.error_can_not_open_file)
             )

@@ -16,6 +16,16 @@
       readOnly: true
     };
     editor = CodeMirror.fromTextArea(editorElm, editorOption);
+    // CSS height:100%/100vh chains don't resolve in this WebView (html/body computed height
+    // comes back 0px even though window.innerHeight is correct) -- set pixel heights directly
+    // from JS instead, which sidesteps that entirely. Re-applied on resize since this Activity
+    // survives rotation (configChanges) and the WebView is resized in place, not reloaded.
+    var syncSize = function() {
+      document.body.style.height = window.innerHeight + "px";
+      if (editor) editor.setSize("100%", window.innerHeight + "px");
+    };
+    syncSize();
+    window.addEventListener('resize', syncSize);
   };
 
   window.setLang = function(l) {

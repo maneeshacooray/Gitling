@@ -1,97 +1,56 @@
 package me.sheimi.sgit.activities.explorer
 
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.activity.addCallback
-import androidx.compose.foundation.layout.Box
+import android.content.ContextWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.manichord.mgit.explorer.FileExplorerScreen
-import com.manichord.mgit.ui.theme.AppTheme
-import me.sheimi.android.activities.SheimiFragmentActivity
-import me.sheimi.android.utils.Profile
-import me.sheimi.sgit.R
+import androidx.fragment.app.FragmentManager
+import com.manichord.mgit.MainActivity
 import java.io.File
 import java.io.FileFilter
 
-abstract class FileExplorerActivity : SheimiFragmentActivity() {
+/**
+ * Shared state/behavior for a file-browsing screen, formerly a real Activity -- now a plain
+ * ContextWrapper-based class constructed by one of MainActivity's NavHost routes ("exploreFile"
+ * or "privateKeyManage"), as part of the single-activity rewrite. rootFolder/fileFilter/
+ * screenTitle are constructor params rather than overridden methods (as they were when this was
+ * an Activity) since calling an open/abstract method from a base class's own init block, before
+ * the subclass's constructor has finished running, is exactly the kind of thing that breaks once
+ * a subclass's override depends on anything set up in ITS OWN constructor.
+ */
+abstract class FileExplorerActivity(
+    protected val mainActivity: MainActivity,
+    private val rootFolder: File,
+    private val fileFilter: FileFilter?,
+    val screenTitle: String
+) : ContextWrapper(mainActivity) {
 
     companion object {
         const val RESULT_PATH = "result_path"
     }
 
-    private lateinit var resolvedRoot: File
+    var currentDirState by mutableStateOf(rootFolder)
+    var filesState by mutableStateOf<List<File>>(emptyList())
+    var selectedFile by mutableStateOf<File?>(null)
 
-    private var currentDirState by mutableStateOf<File?>(null)
-    private var filesState by mutableStateOf<List<File>>(emptyList())
-    protected var selectedFile by mutableStateOf<File?>(null)
+    val currentDir: File get() = currentDirState
 
-    protected val currentDir: File
-        get() = currentDirState ?: resolvedRoot
-
-    protected abstract fun getRootFolder(): File
-    protected abstract fun getExplorerFileFilter(): FileFilter?
-    protected abstract fun onFileClick(file: File)
-    protected open fun onFileLongClick(file: File) {}
-    protected open fun getScreenTitle(): String = ""
+    abstract fun onFileClick(file: File)
+    open fun onFileLongClick(file: File) {}
 
     @Composable
-    protected open fun TopBarActions() {}
+    open fun TopBarActions() {}
 
     /** Optional overlay (e.g. a bottom sheet of actions for [selectedFile]) drawn on top of the list. */
     @Composable
-    protected open fun Overlay() {}
+    open fun Overlay() {}
 
-    override fun getThemeResource(): Int {
-        return if (Profile.getTheme(this) == 1) {
-            R.style.DarkAppTheme_NoActionBar
-        } else {
-            R.style.AppTheme_NoActionBar
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        resolvedRoot = getRootFolder()
-        currentDirState = resolvedRoot
+    init {
         loadFiles()
-
-        // Higher priority than SheimiFragmentActivity's generic "just finish" callback
-        // (registered in its onCreate, called before this one): go up a directory first
-        // if we're not already at the root, only finishing once there's nowhere left to go.
-        onBackPressedDispatcher.addCallback(this) {
-            val parent = currentDir.parentFile
-            if (currentDir != resolvedRoot && parent != null) {
-                setCurrentDir(parent)
-            } else {
-                finish()
-            }
-        }
-
-        setContent {
-            AppTheme {
-                Box {
-                    FileExplorerScreen(
-                        title = getScreenTitle(),
-                        currentPath = currentDir.path,
-                        files = filesState,
-                        showUpRow = currentDir.parentFile != null,
-                        onUpClick = { currentDir.parentFile?.let { setCurrentDir(it) } },
-                        onBackClick = { finish() },
-                        onItemClick = { onFileClick(it) },
-                        onItemLongClick = { onFileLongClick(it) },
-                        selectedFile = selectedFile,
-                        actions = { TopBarActions() }
-                    )
-                    Overlay()
-                }
-            }
-        }
     }
 
-    protected fun setCurrentDir(dir: File) {
+    fun setCurrentDir(dir: File) {
         currentDirState = dir
         loadFiles()
     }
@@ -100,12 +59,26 @@ abstract class FileExplorerActivity : SheimiFragmentActivity() {
         loadFiles()
     }
 
+    /** Goes up a directory if not already at the root; returns false if there's nowhere left to
+     * go (the caller should pop the NavHost route in that case). */
+    fun goUpOrFalse(): Boolean {
+        val parent = currentDir.parentFile
+        return if (currentDir != rootFolder && parent != null) {
+            setCurrentDir(parent)
+            true
+        } else {
+            false
+        }
+    }
+
     private fun loadFiles() {
-        val filter = getExplorerFileFilter()
+        val filter = fileFilter
         val files = (if (filter != null) currentDir.listFiles(filter) else currentDir.listFiles())
             ?: emptyArray()
         filesState = files.sortedWith(
             compareBy({ !it.isDirectory }, { it.toString() })
         )
     }
+
+    fun getSupportFragmentManager(): FragmentManager = mainActivity.supportFragmentManager
 }

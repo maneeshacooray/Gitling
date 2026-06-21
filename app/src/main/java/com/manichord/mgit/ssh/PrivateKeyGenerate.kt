@@ -22,10 +22,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.KeyPair
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 import me.sheimi.sgit.ssh.PrivateKeyUtils
 import org.acra.ktx.sendWithAcra
 import timber.log.Timber
@@ -39,7 +39,7 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val activity = requireActivity() as PrivateKeyManageActivity
+        val activity = (requireActivity() as MainActivity).currentPrivateKeyManageHost!!
 
         return ComposeView(requireContext()).apply {
             setContent {

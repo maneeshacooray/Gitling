@@ -1,9 +1,6 @@
 package me.sheimi.sgit.activities.explorer
 
-import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -25,8 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ssh.PrivateKeyGenerate
-import me.sheimi.android.utils.BasicFunctions
 import me.sheimi.android.utils.FsUtils
 import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.ViewFileActivity
@@ -34,37 +31,23 @@ import me.sheimi.sgit.dialogs.EditKeyPasswordDialog
 import me.sheimi.sgit.dialogs.RenameKeyDialog
 import me.sheimi.sgit.ssh.PrivateKeyUtils
 import java.io.File
-import java.io.FileFilter
 
-class PrivateKeyManageActivity : FileExplorerActivity() {
-
+class PrivateKeyManageActivity(
+    mainActivity: MainActivity
+) : FileExplorerActivity(
+    mainActivity,
+    PrivateKeyUtils.getPrivateKeyFolder(),
+    null,
+    mainActivity.getString(R.string.title_activity_private_key_manage)
+) {
     private var showDeleteConfirm by mutableStateOf(false)
 
-    private val importKeyLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val path = result.data!!.extras?.getString(FileExplorerActivity.RESULT_PATH)
-            if (path != null) {
-                val keyFile = File(path)
-                val newKey = File(getRootFolder(), keyFile.name)
-                FsUtils.copyFile(keyFile, newKey)
-                refreshList()
-            }
-        }
+    fun importKey(path: String) {
+        val keyFile = File(path)
+        val newKey = File(currentDir, keyFile.name)
+        FsUtils.copyFile(keyFile, newKey)
+        refreshList()
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        BasicFunctions.setActiveActivity(this)
-        PrivateKeyUtils.migratePrivateKeys()
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun getRootFolder(): File = PrivateKeyUtils.getPrivateKeyFolder()
-
-    override fun getExplorerFileFilter(): FileFilter? = null
-
-    override fun getScreenTitle(): String = getString(R.string.title_activity_private_key_manage)
 
     override fun onFileClick(file: File) {
         val intent = Intent(this, ViewFileActivity::class.java)
@@ -80,12 +63,12 @@ class PrivateKeyManageActivity : FileExplorerActivity() {
     @Composable
     override fun TopBarActions() {
         IconButton(onClick = {
-            importKeyLauncher.launch(Intent(this, ExploreFileActivity::class.java))
+            mainActivity.openExploreFile { path -> importKey(path) }
         }) {
             Icon(Icons.Default.SaveAlt, contentDescription = getString(R.string.action_import_private_key))
         }
         IconButton(onClick = {
-            PrivateKeyGenerate().show(supportFragmentManager, "generate-key")
+            PrivateKeyGenerate().show(getSupportFragmentManager(), "generate-key")
             refreshList()
         }) {
             Icon(Icons.Default.Add, contentDescription = getString(R.string.action_generate_private_key))
@@ -125,12 +108,12 @@ class PrivateKeyManageActivity : FileExplorerActivity() {
             sheetState = rememberModalBottomSheetState()
         ) {
             ActionRow(getString(R.string.action_mode_rename_key)) {
-                val args = Bundle()
+                val args = android.os.Bundle()
                 args.putString(RenameKeyDialog.FROM_PATH, file.absolutePath)
                 selectedFile = null
                 val dialog = RenameKeyDialog()
                 dialog.arguments = args
-                dialog.show(supportFragmentManager, "rename-dialog")
+                dialog.show(getSupportFragmentManager(), "rename-dialog")
             }
             ActionRow(getString(R.string.action_mode_show_private_key)) {
                 val intent = Intent(this@PrivateKeyManageActivity, ViewFileActivity::class.java)
@@ -150,12 +133,12 @@ class PrivateKeyManageActivity : FileExplorerActivity() {
                 startActivity(intent)
             }
             ActionRow(getString(R.string.action_mode_edit_key_password)) {
-                val args = Bundle()
+                val args = android.os.Bundle()
                 args.putString(EditKeyPasswordDialog.KEY_FILE_EXTRA, file.absolutePath)
                 selectedFile = null
                 val dialog = EditKeyPasswordDialog()
                 dialog.arguments = args
-                dialog.show(supportFragmentManager, "rename-dialog")
+                dialog.show(getSupportFragmentManager(), "rename-dialog")
             }
             ActionRow(getString(R.string.label_delete)) {
                 showDeleteConfirm = true

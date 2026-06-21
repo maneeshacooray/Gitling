@@ -1,118 +1,56 @@
 package me.sheimi.sgit.activities
 
-import android.content.Intent
-import android.os.Build
-import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.IntentCompat
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import com.manichord.mgit.repodetail.RepoDetailScreen
+import android.content.ContextWrapper
+import android.content.DialogInterface
+import android.view.View
+import androidx.fragment.app.FragmentManager
 import com.manichord.mgit.repodetail.RepoDetailViewModel
-import com.manichord.mgit.ui.components.FragmentHost
-import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity
-import me.sheimi.android.utils.BasicFunctions
-import me.sheimi.android.utils.Profile
+import me.sheimi.android.activities.SheimiFragmentActivity.OnEditTextDialogClicked
 import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.delegate.RepoOperationDelegate
 import me.sheimi.sgit.database.models.Repo
-import me.sheimi.sgit.fragments.BaseFragment
 import me.sheimi.sgit.fragments.CommitsFragment
 import me.sheimi.sgit.fragments.FilesFragment
 import me.sheimi.sgit.fragments.StatusFragment
 import me.sheimi.sgit.repo.tasks.SheimiAsyncTask.AsyncTaskCallback
 
-class RepoDetailActivity : SheimiFragmentActivity() {
+/**
+ * Per-repo-screen state and operation dispatch, formerly a real Activity -- now a plain class
+ * wrapping the single hosting MainActivity, as part of the single-activity rewrite. Keeps its
+ * original name/package/public API so the ~35 dialogs/Action classes that reference it by type
+ * (RepoOperationDelegate and every *Action.java, plus PushDialog/MergeDialog/etc.) don't need to
+ * change at all -- they already only ever called methods on it, never relied on it actually
+ * being an Activity subclass. Extending ContextWrapper (rather than plain Any) means it's still
+ * usable anywhere a Context is needed (e.g. `Intent(rawActivity, OtherActivity::class.java)`)
+ * without every call site needing to reach through to the wrapped Activity explicitly.
+ */
+class RepoDetailActivity(
+    private val mainActivity: SheimiFragmentActivity,
+    val repo: Repo,
+    val viewModel: RepoDetailViewModel
+) : ContextWrapper(mainActivity) {
 
-    override fun getThemeResource(): Int {
-        return if (Profile.getTheme(this) == 1) {
-            R.style.DarkAppTheme_NoActionBar
-        } else {
-            R.style.AppTheme_NoActionBar
-        }
-    }
-
-    private val viewModel: RepoDetailViewModel by viewModels()
-    private var mRepo: Repo? = null
     private var mRepoDelegate: RepoOperationDelegate? = null
-
     private var mFilesFragment: FilesFragment? = null
     private var mCommitsFragment: CommitsFragment? = null
     private var mStatusFragment: StatusFragment? = null
 
-    private val branchChooserLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        val branchName = mRepo?.branchName
-        if (branchName == null) {
-            showToastMessage(R.string.error_something_wrong)
-            return@registerForActivityResult
-        }
-        reset(branchName)
-    }
-
-    companion object {
-        private const val BRANCH_CHOOSE_ACTIVITY = 0
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mRepo = IntentCompat.getSerializableExtra(intent, Repo.TAG, Repo::class.java)
-        if (mRepo == null) {
-            finish()
-            return
-        }
-
-        repoInit()
-        viewModel.setRepo(mRepo!!)
-
-        createFragments()
-
-        setContent {
-            AppTheme {
-                RepoDetailScreen(
-                    viewModel = viewModel,
-                    onBackClick = { finish() },
-                    onBranchClick = {
-                        val intent = Intent(this, BranchChooserActivity::class.java)
-                        intent.putExtra(Repo.TAG, mRepo)
-                        branchChooserLauncher.launch(intent)
-                    },
-                    onOperationClick = { index ->
-                        getRepoDelegate().executeAction(index)
-                    },
-                    filesContent = { FragmentHost(supportFragmentManager, mFilesFragment!!) },
-                    commitsContent = { FragmentHost(supportFragmentManager, mCommitsFragment!!) },
-                    statusContent = { FragmentHost(supportFragmentManager, mStatusFragment!!) }
-                )
-            }
-        }
-    }
-
-    private fun repoInit() {
-        mRepo?.updateLatestCommitInfo()
-        mRepo?.getRemotes()
-    }
-
-    private fun createFragments() {
-        mFilesFragment = FilesFragment.newInstance(mRepo!!)
-        mCommitsFragment = CommitsFragment.newInstance(mRepo!!, null)
-        mStatusFragment = StatusFragment.newInstance(mRepo!!)
+    init {
+        repo.updateLatestCommitInfo()
+        repo.remotes
+        viewModel.setRepo(repo)
     }
 
     fun getRepoDelegate(): RepoOperationDelegate {
         if (mRepoDelegate == null) {
-            mRepoDelegate = RepoOperationDelegate(mRepo, this)
+            mRepoDelegate = RepoOperationDelegate(repo, this)
         }
         return mRepoDelegate!!
     }
 
     fun reset(commitName: String) {
-        viewModel.setRepo(mRepo!!) // Refresh
+        viewModel.setRepo(repo) // Refresh
         reset()
     }
 
@@ -127,8 +65,7 @@ class RepoDetailActivity : SheimiFragmentActivity() {
     }
 
     fun error() {
-        finish()
-        showToastMessage(R.string.error_unknown)
+        mainActivity.showToastMessage(R.string.error_unknown)
     }
 
     fun enterDiffActionMode() {
@@ -136,10 +73,45 @@ class RepoDetailActivity : SheimiFragmentActivity() {
         mCommitsFragment?.enterDiffActionMode()
     }
 
+    fun setFilesFragment(filesFragment: FilesFragment) { mFilesFragment = filesFragment }
+    fun getFilesFragment() = mFilesFragment
+    fun setCommitsFragment(commitsFragment: CommitsFragment) { mCommitsFragment = commitsFragment }
+    fun setStatusFragment(statusFragment: StatusFragment) { mStatusFragment = statusFragment }
+
+    // Delegation surface for the handful of Activity-only (non-Context) members the 35
+    // dependent files call on this -- everything else (getApplicationContext, getString,
+    // startActivity, etc.) comes for free from ContextWrapper.
+    fun getSupportFragmentManager(): FragmentManager = mainActivity.supportFragmentManager
+    fun finish() = mainActivity.finish()
+    fun <T : View> findViewById(id: Int): T = mainActivity.findViewById(id)
+
+    fun showMessageDialog(title: Int, msg: Int, positiveBtn: Int, positiveListener: DialogInterface.OnClickListener) =
+        mainActivity.showMessageDialog(title, msg, positiveBtn, positiveListener)
+
+    fun showMessageDialog(title: Int, msg: String, positiveBtn: Int, positiveListener: DialogInterface.OnClickListener) =
+        mainActivity.showMessageDialog(title, msg, positiveBtn, positiveListener)
+
+    fun showMessageDialog(
+        title: Int,
+        msg: String,
+        positiveBtn: Int,
+        negativeBtn: Int,
+        positiveListener: DialogInterface.OnClickListener,
+        negativeListener: DialogInterface.OnClickListener
+    ) = mainActivity.showMessageDialog(title, msg, positiveBtn, negativeBtn, positiveListener, negativeListener)
+
+    fun showMessageDialog(title: Int, msg: String) = mainActivity.showMessageDialog(title, msg)
+
+    fun showToastMessage(resId: Int) = mainActivity.showToastMessage(resId)
+    fun showToastMessage(msg: String) = mainActivity.showToastMessage(msg)
+
+    fun showEditTextDialog(title: Int, hint: Int, positiveBtn: Int, positiveListener: OnEditTextDialogClicked) =
+        mainActivity.showEditTextDialog(title, hint, positiveBtn, positiveListener)
+
     // Progress Callback for delegate actions
-    public inner class ProgressCallback(private val mInitMsg: Int) : AsyncTaskCallback {
+    inner class ProgressCallback(private val mInitMsg: Int) : AsyncTaskCallback {
         override fun onPreExecute() {
-            viewModel.updateProgress(getString(mInitMsg), "0%", "0/0", 0)
+            viewModel.updateProgress(mainActivity.getString(mInitMsg), "0%", "0/0", 0)
         }
 
         override fun onProgressUpdate(vararg progress: String) {
@@ -159,21 +131,5 @@ class RepoDetailActivity : SheimiFragmentActivity() {
             }
             return true
         }
-    }
-
-    // Legacy overrides for fragments
-    fun setFilesFragment(filesFragment: FilesFragment) { mFilesFragment = filesFragment }
-    fun getFilesFragment() = mFilesFragment
-    fun setCommitsFragment(commitsFragment: CommitsFragment) { mCommitsFragment = commitsFragment }
-    fun setStatusFragment(statusFragment: StatusFragment) { mStatusFragment = statusFragment }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_BACK -> {
-                // Fragment back handling logic could go here if needed
-                // But Compose and Screen might handle it better via NavBackHandler
-            }
-        }
-        return super.onKeyUp(keyCode, event)
     }
 }

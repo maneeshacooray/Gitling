@@ -14,10 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 import me.sheimi.sgit.ssh.PrivateKeyUtils
 import timber.log.Timber
 import java.io.File
@@ -37,7 +37,7 @@ class RenameKeyDialog : SheimiDialogFragment() {
     ): View {
         val fromPath = arguments?.getString(FROM_PATH) ?: ""
         fromFile = File(fromPath)
-        val activity = requireActivity() as PrivateKeyManageActivity
+        val activity = (requireActivity() as MainActivity).currentPrivateKeyManageHost!!
 
         return ComposeView(requireContext()).apply {
             setContent {

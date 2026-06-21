@@ -15,11 +15,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 import timber.log.Timber
 import java.io.File
 
@@ -38,7 +38,7 @@ class EditKeyPasswordDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         keyFile = File(arguments?.getString(KEY_FILE_EXTRA) ?: "")
-        val activity = requireActivity() as PrivateKeyManageActivity
+        val activity = (requireActivity() as MainActivity).currentPrivateKeyManageHost!!
 
         return ComposeView(requireContext()).apply {
             setContent {

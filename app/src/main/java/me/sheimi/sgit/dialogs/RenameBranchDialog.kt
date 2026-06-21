@@ -17,9 +17,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.DialogFragment
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.BranchChooserActivity
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.exception.StopTaskException
 import org.eclipse.jgit.api.errors.GitAPIException
@@ -43,7 +43,7 @@ class RenameBranchDialog : DialogFragment() {
         val args = arguments
         fromCommit = args?.getString(FROM_COMMIT) ?: ""
         repo = args?.getSerializable(Repo.TAG) as Repo
-        val activity = requireActivity() as BranchChooserActivity
+        val activity = requireActivity() as MainActivity
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -116,7 +116,7 @@ class RenameBranchDialog : DialogFragment() {
                                     Toast.makeText(context, "can't rename $fromCommit", Toast.LENGTH_LONG).show()
                                 }
 
-                                activity.refreshList()
+                                activity.currentBranchChooserViewModel?.refreshList()
                                 dismiss()
                             }) {
                                 Text(stringResource(R.string.label_rename))
