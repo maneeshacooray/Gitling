@@ -96,9 +96,6 @@ fun RepoListComposeContent(
             onCloneClick = {
                 showCloneSheet = true
             },
-            onSearchClick = {
-                // TODO: Implement search
-            },
             onSettingsClick = {
                 (activity as MainActivity).openUserSettings()
             },

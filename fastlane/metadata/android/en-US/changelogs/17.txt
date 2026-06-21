@@ -1,0 +1,1 @@
+Added search to the repo list -- tap the search icon to filter by name, remote, committer, or commit message.
