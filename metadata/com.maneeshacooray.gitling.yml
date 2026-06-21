@@ -40,11 +40,17 @@ Builds:
     gradle:
       - 'yes'
 
+  - versionName: '1.0.9'
+    versionCode: 10
+    commit: v1.0.9
+    gradle:
+      - 'yes'
+
 AutoUpdateMode: Version
 # Anchored to the 1.0.x scheme specifically (not a generic ^v\d+\.\d+\.\d+$) because this repo's
 # history still contains the original upstream MGit project's old release tags (v1.3.0, v1.5.x,
 # v1.6.x, v1.7.0, etc, reachable through shared commit history) -- a looser pattern would match
 # those too and make F-Droid's checker think they're new Gitling releases.
 UpdateCheckMode: Tags ^v1\.0\.\d+$
-CurrentVersion: '1.0.8'
-CurrentVersionCode: 9
+CurrentVersion: '1.0.9'
+CurrentVersionCode: 10
