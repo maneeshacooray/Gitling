@@ -1,0 +1,18 @@
+Gitling is a Git client for Android, built with Jetpack Compose and Material 3 Expressive.
+
+It's a fork of MGit (itself a continuation of SGit), modernized with a current Android toolchain, a from-scratch Compose UI, one-tap GitHub sign-in, and a new identity.
+
+Features:
+
+* Clone, create, and delete local repositories
+* One-tap Connect with GitHub (OAuth Device Flow) -- no manual token/password handling for GitHub remotes
+* HTTP/HTTPS/SSH, including SSH with private-key passphrase
+* Username/password and personal access token authentication for any Git host
+* Browse files and commit history, git diff between commits
+* Checkout, create, and merge local/remote branches and tags
+* git status, staging, git rebase, git cherry-pick, git checkout <file>
+* Private key generation and management
+* Import an existing repository from device storage
+* Light/dark mode that follows the system, with a choice between a fixed brand color or wallpaper-based Material You dynamic color
+
+Gitling doesn't include an internal text editor -- to edit files, you'll need an editor app installed that supports opening files via Android's File Provider mechanism (most code/text editor apps do).
