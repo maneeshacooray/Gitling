@@ -24,6 +24,14 @@ It's a fork of [MGit](https://github.com/maks/MGit) (itself a continuation of [S
     <td align="center">Full branch/merge commit graph</td>
     <td align="center">Settings</td>
   </tr>
+  <tr>
+    <td><img src="docs/screenshots/file_viewer.png" width="260" alt="File viewer with syntax highlighting"></td>
+    <td><img src="docs/screenshots/commit_diff.png" width="260" alt="Commit diff view"></td>
+  </tr>
+  <tr>
+    <td align="center">File viewer with syntax highlighting</td>
+    <td align="center">Commit diff view</td>
+  </tr>
 </table>
 
 ### Editing files
