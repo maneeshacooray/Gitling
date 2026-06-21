@@ -12,37 +12,14 @@ IssueTracker: https://github.com/maneeshacooray/Gitling/issues
 Changelog: https://github.com/maneeshacooray/Gitling/releases
 
 AutoName: Gitling
-Summary: Git client built with Jetpack Compose and Material 3 Expressive
-Description: |-
-    Gitling is a Git client for Android, built with Jetpack Compose and
-    Material 3 Expressive. It's a fork of MGit (itself a continuation of
-    SGit), modernized with a current Android toolchain, a from-scratch
-    Compose UI, one-tap GitHub sign-in, and a new identity.
-
-    Features:
-
-    * Clone, create, and delete local repositories
-    * One-tap Connect with GitHub (OAuth Device Flow) -- no manual token or
-      password handling for GitHub remotes
-    * HTTP/HTTPS/SSH, including SSH with private-key passphrase
-    * Username/password and personal access token authentication for any
-      Git host
-    * Browse files and commit history, git diff between commits
-    * Checkout, create, and merge local/remote branches and tags
 
 RepoType: git
 Repo: https://github.com/maneeshacooray/Gitling
 
 Builds:
-  - versionName: '1.0.8'
-    versionCode: 9
-    commit: v1.0.8
-    gradle:
-      - 'yes'
-
-  - versionName: '1.0.9'
-    versionCode: 10
-    commit: v1.0.9
+  - versionName: '1.0.10'
+    versionCode: 11
+    commit: 846ef4fabb0c4f855fca819dbb96433d018d449f
     gradle:
       - 'yes'
 
@@ -52,5 +29,5 @@ AutoUpdateMode: Version
 # v1.6.x, v1.7.0, etc, reachable through shared commit history) -- a looser pattern would match
 # those too and make F-Droid's checker think they're new Gitling releases.
 UpdateCheckMode: Tags ^v1\.0\.\d+$
-CurrentVersion: '1.0.9'
-CurrentVersionCode: 10
+CurrentVersion: '1.0.10'
+CurrentVersionCode: 11
