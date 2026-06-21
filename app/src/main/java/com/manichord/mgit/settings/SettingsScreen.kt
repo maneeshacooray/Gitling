@@ -18,6 +18,7 @@ import com.manichord.mgit.ui.theme.FontOption
 import com.manichord.mgit.update.UpdateCheckResult
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.R
+import me.sheimi.sgit.database.models.Repo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,9 @@ fun SettingsScreen(
     onFeedbackClick: () -> Unit,
     onViewReleaseClick: (String) -> Unit = {}
 ) {
-    val repoRoot = viewModel.repoRoot
+    val repoRoot by viewModel.repoRoot.observeAsState(Repo.getDefaultRepoRootDir().absolutePath)
+    val useSharedMediaStorage by viewModel.useSharedMediaStorage.observeAsState(false)
+    val movingRepoStorage by viewModel.movingRepoStorage.observeAsState(false)
     val useEnglish by viewModel.useEnglish.observeAsState(false)
     val gitUserName by viewModel.gitUserName.observeAsState("")
     val gitUserEmail by viewModel.gitUserEmail.observeAsState("")
@@ -63,6 +66,19 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.preference_repo_location)) },
                 supportingContent = { Text(repoRoot) },
                 leadingContent = { Icon(Icons.Default.Folder, null) }
+            )
+
+            SettingsSwitchItem(
+                title = stringResource(R.string.preference_use_shared_media_storage),
+                summary = if (movingRepoStorage) {
+                    "Moving repos..."
+                } else {
+                    stringResource(R.string.preference_use_shared_media_storage_summary)
+                },
+                checked = useSharedMediaStorage,
+                onCheckedChange = { viewModel.setUseSharedMediaStorage(it) },
+                icon = Icons.Default.FolderShared,
+                enabled = !movingRepoStorage
             )
 
             SettingsSwitchItem(
@@ -176,15 +192,22 @@ fun SettingsClickableItem(title: String, summary: String, icon: androidx.compose
 }
 
 @Composable
-fun SettingsSwitchItem(title: String, summary: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+fun SettingsSwitchItem(
+    title: String,
+    summary: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    enabled: Boolean = true
+) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = { Text(summary) },
         leadingContent = { Icon(icon, null) },
         trailingContent = {
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
+            Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
         },
-        modifier = Modifier.clickable { onCheckedChange(!checked) }
+        modifier = Modifier.clickable(enabled = enabled) { onCheckedChange(!checked) }
     )
 }
 

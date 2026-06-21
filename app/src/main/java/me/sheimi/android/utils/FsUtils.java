@@ -98,6 +98,22 @@ public class FsUtils {
         }
     }
 
+    /** Get a File representing a dir within Context.getExternalMediaDirs() -- like
+     * getExternalDir(), this needs no storage permission on any Android version, but unlike
+     * Android/data (where getExternalDir() lives), Android/media is NOT subject to Android 11's
+     * block on other apps browsing into another app's external storage. So files here are
+     * reachable by other apps that have their own storage access (e.g. a file manager with "all
+     * files" granted), without Gitling itself needing to request anything. */
+    public static File getMediaDir(String dirname, boolean isCreate) {
+        SheimiFragmentActivity activeActivity = BasicFunctions.getActiveActivity();
+        File[] mediaDirs = activeActivity.getExternalMediaDirs();
+        File mDir = new File(mediaDirs[0], dirname);
+        if (!mDir.exists() && isCreate) {
+            mDir.mkdirs();
+        }
+        return mDir;
+    }
+
     public static String getMimeType(String url) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(url

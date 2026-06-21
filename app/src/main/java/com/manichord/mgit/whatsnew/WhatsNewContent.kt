@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 20,
+            versionName = "1.0.19",
+            highlights = listOf(
+                "Added a Settings toggle to make repos visible to other apps (e.g. a file manager) -- still no extra permission needed either way, and switching it moves your existing repos automatically"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 19,
             versionName = "1.0.18",
             highlights = listOf(

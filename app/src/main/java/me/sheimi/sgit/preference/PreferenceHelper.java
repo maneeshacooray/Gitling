@@ -69,6 +69,17 @@ public class PreferenceHelper {
         edit(mContext.getString(R.string.pref_key_use_dynamic_color), use);
     }
 
+    /** False (default): repos live in Android/data/<pkg>/files, private to Gitling. True:
+     * repos live in Android/media/<pkg>, reachable by other apps with their own storage access.
+     * Both are permission-free for Gitling itself either way -- see FsUtils.getMediaDir(). */
+    public boolean useSharedMediaStorage() {
+        return getBoolean(mContext.getString(R.string.pref_key_use_shared_media_storage));
+    }
+
+    public void setUseSharedMediaStorage(boolean use) {
+        edit(mContext.getString(R.string.pref_key_use_shared_media_storage), use);
+    }
+
     public String getAppFont() {
         return getString(mContext.getString(R.string.pref_key_app_font));
     }

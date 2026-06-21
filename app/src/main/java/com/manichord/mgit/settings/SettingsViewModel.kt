@@ -19,9 +19,35 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val prefsHelper: PreferenceHelper = (application as MGitApplication).prefenceHelper!!
 
-    // Fixed -- repos always live under the app-private default root now (no custom-location
-    // picker; see CloneView/RepoListScreen), so this is purely informational.
-    val repoRoot: String = Repo.getDefaultRepoRootDir().absolutePath
+    // Informational display of the current default root -- there's no custom-location picker
+    // (see CloneView/RepoListScreen), but it does change when useSharedMediaStorage is toggled.
+    private val _repoRoot = MutableLiveData(Repo.getDefaultRepoRootDir().absolutePath)
+    val repoRoot: LiveData<String> = _repoRoot
+
+    private val _useSharedMediaStorage = MutableLiveData(prefsHelper.useSharedMediaStorage())
+    val useSharedMediaStorage: LiveData<Boolean> = _useSharedMediaStorage
+
+    private val _movingRepoStorage = MutableLiveData(false)
+    val movingRepoStorage: LiveData<Boolean> = _movingRepoStorage
+
+    /** Moves every bare-named repo's directory to the other default root, then flips the
+     * preference -- both roots are always accessible to Gitling regardless of the current
+     * setting (see Repo.getDefaultRepoRootDir()), so this is a real move, not a "some repos
+     * become unreachable" migration. Runs off the main thread since it's real disk I/O
+     * proportional to repo size/count. */
+    fun setUseSharedMediaStorage(use: Boolean) {
+        val app = getApplication<MGitApplication>()
+        val oldRoot = Repo.getDefaultRepoRootDir()
+        _movingRepoStorage.value = true
+        Thread {
+            prefsHelper.setUseSharedMediaStorage(use)
+            val newRoot = Repo.getDefaultRepoRootDir()
+            Repo.moveReposBetweenDefaultRoots(app, oldRoot, newRoot)
+            _movingRepoStorage.postValue(false)
+            _useSharedMediaStorage.postValue(use)
+            _repoRoot.postValue(newRoot.absolutePath)
+        }.start()
+    }
 
     private val _useEnglish = MutableLiveData(prefsHelper.useEnglish())
     val useEnglish: LiveData<Boolean> = _useEnglish

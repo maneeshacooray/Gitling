@@ -513,12 +513,46 @@ public class Repo implements Comparable<Repo>, Serializable {
         }
     }
 
-    /** The fixed, app-private external-files directory all repos live under by default --
-     * requires no storage permission on any Android version, since it's the app's own sandbox.
-     * Used both for display (Settings, clone destination) and to detect a stale custom root
-     * left over from before repos were restricted to this directory. */
+    /** The default root all repos live under -- either Android/data/<pkg>/files (private to
+     * Gitling, the default) or Android/media/<pkg> (reachable by other apps with their own
+     * storage access), per PreferenceHelper.useSharedMediaStorage(). Both are permission-free
+     * for Gitling itself; see FsUtils.getMediaDir(). Used both for display (Settings, clone
+     * destination) and to detect a stale custom root left over from before repos were
+     * restricted to one of these two directories. */
     public static File getDefaultRepoRootDir() {
-        return FsUtils.getExternalDir(REPO_DIR, true);
+        PreferenceHelper prefs = ((MGitApplication) MGitApplication.getContext()).getPrefenceHelper();
+        return prefs.useSharedMediaStorage()
+                ? FsUtils.getMediaDir(REPO_DIR, true)
+                : FsUtils.getExternalDir(REPO_DIR, true);
+    }
+
+    /** Moves every bare, root-relative (non-external) repo's directory from one default root to
+     * the other -- called when the user flips the "make repos visible to other apps" Settings
+     * toggle. Both roots are always accessible to Gitling regardless of the current setting (see
+     * getDefaultRepoRootDir()), so this is a real move, not just a migration notice like
+     * migrateAwayFromCustomRoot() -- nothing needs to become unreachable here. Skips (and logs)
+     * any repo whose destination already exists rather than risk overwriting unrelated data. */
+    public static void moveReposBetweenDefaultRoots(Context context, File oldRoot, File newRoot) {
+        List<Repo> allRepos = Repo.getRepoList(context, RepoDbManager.queryAllRepo());
+        for (Repo repo : allRepos) {
+            if (repo.isExternal()) {
+                continue;
+            }
+            File oldDir = new File(oldRoot, repo.mLocalPath);
+            File newDir = new File(newRoot, repo.mLocalPath);
+            if (!oldDir.exists() || oldDir.equals(newDir)) {
+                continue;
+            }
+            if (newDir.exists()) {
+                Timber.w("Skipping move for %s -- destination already exists: %s", repo.mLocalPath, newDir);
+                continue;
+            }
+            try {
+                org.apache.commons.io.FileUtils.moveDirectory(oldDir, newDir);
+            } catch (IOException e) {
+                Timber.e(e, "Failed to move repo %s from %s to %s", repo.mLocalPath, oldDir, newDir);
+            }
+        }
     }
 
     /** One-time migration for anyone updating from a build that still let them set a custom
