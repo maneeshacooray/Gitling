@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 16,
+            versionName = "1.0.15",
+            highlights = listOf(
+                "Added a \"Check for Updates\" button in Settings, and the version row there now shows your actual installed version"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 15,
             versionName = "1.0.14",
             highlights = listOf(

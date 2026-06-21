@@ -1,0 +1,1 @@
+Added a "Check for Updates" button in Settings, and the version row there now shows your actual installed version.

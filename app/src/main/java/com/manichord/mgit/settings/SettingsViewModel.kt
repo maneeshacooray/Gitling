@@ -6,6 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.manichord.mgit.auth.DeviceFlowStatus
 import com.manichord.mgit.ui.theme.FontOption
+import com.manichord.mgit.update.UpdateCheckResult
+import com.manichord.mgit.update.UpdateChecker
+import me.sheimi.android.utils.Profile
+import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
 import me.sheimi.sgit.preference.PreferenceHelper
@@ -128,5 +132,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setFontOption(option: FontOption) {
         prefsHelper.setAppFont(option.id)
         _fontOption.value = option
+    }
+
+    private val updateChecker = UpdateChecker()
+
+    private val _checkingForUpdate = MutableLiveData(false)
+    val checkingForUpdate: LiveData<Boolean> = _checkingForUpdate
+
+    private val _updateCheckResult = MutableLiveData<UpdateCheckResult?>(null)
+    val updateCheckResult: LiveData<UpdateCheckResult?> = _updateCheckResult
+
+    /** Manual check, triggered from the Settings "Check for Updates" row -- bypasses the 24h
+     * cooldown RepoListViewModel applies for its own passive check, since the user explicitly
+     * asked for this one. Still updates the same shared last-checked timestamp, so the passive
+     * check on the repo list won't immediately redo the same work. */
+    fun checkForUpdate() {
+        _checkingForUpdate.value = true
+        updateChecker.checkForUpdate(BuildConfig.VERSION_NAME) { result ->
+            Profile.setLastUpdateCheckTime(getApplication(), System.currentTimeMillis())
+            _checkingForUpdate.value = false
+            _updateCheckResult.value = result
+        }
     }
 }
