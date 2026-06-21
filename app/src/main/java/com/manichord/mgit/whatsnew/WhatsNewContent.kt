@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 14,
+            versionName = "1.0.13",
+            highlights = listOf(
+                "Picking a new repo storage location now finds and adds any existing repos already there"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 13,
             versionName = "1.0.12",
             highlights = listOf(

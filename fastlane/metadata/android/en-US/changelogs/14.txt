@@ -1,0 +1,1 @@
+Picking a new repo storage location now finds and adds any existing repos already there.
