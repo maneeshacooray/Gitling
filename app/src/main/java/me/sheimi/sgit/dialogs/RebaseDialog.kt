@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.RepoDetailActivity
+import com.manichord.mgit.MainActivity
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.repo.tasks.SheimiAsyncTask.AsyncTaskPostCallback
 import me.sheimi.sgit.repo.tasks.repo.RebaseTask
@@ -35,7 +35,7 @@ class RebaseDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         val repo = arguments?.getSerializable(Repo.TAG) as Repo
-        val activity = requireActivity() as RepoDetailActivity
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
         val currentBranchName = repo.branchName
         val branches = repo.branches.filter { it != currentBranchName }
 

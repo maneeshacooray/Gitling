@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.RepoDetailActivity
+import com.manichord.mgit.MainActivity
 import me.sheimi.sgit.database.models.Repo
 
 class CheckoutDialog : SheimiDialogFragment() {
@@ -35,7 +35,7 @@ class CheckoutDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         commit = arguments?.getString(BASE_COMMIT) ?: ""
-        val activity = requireActivity() as RepoDetailActivity
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
         val message = getString(R.string.dialog_comfirm_checkout_commit_msg) +
             " " + Repo.getCommitDisplayName(commit)
 

@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.RepoDetailActivity
+import com.manichord.mgit.MainActivity
 import me.sheimi.sgit.database.models.Repo
 
 class MergeDialog : SheimiDialogFragment() {
@@ -46,7 +46,7 @@ class MergeDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         val repo = arguments?.getSerializable(Repo.TAG) as Repo
-        val activity = requireActivity() as RepoDetailActivity
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
         val currentBranchDisplayName = repo.currentDisplayName
         val branches = repo.localBranches.filter {
             Repo.getCommitDisplayName(it.name) != currentBranchDisplayName

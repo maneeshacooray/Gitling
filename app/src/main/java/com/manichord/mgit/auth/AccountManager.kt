@@ -1,5 +1,7 @@
 package com.manichord.mgit.auth
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.manichord.mgit.models.Account
 import com.manichord.mgit.models.AccountType
 import me.sheimi.android.utils.SecurePrefsHelper
@@ -10,6 +12,17 @@ import timber.log.Timber
 class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
 
     private val KEY_ACCOUNTS = "global_accounts"
+
+    /** Fires whenever accounts are added/updated/deleted, so every ViewModel holding its own
+     * cached copy of getAccounts() (SettingsViewModel, CloneViewModel) can refresh in response,
+     * regardless of Activity lifecycle timing. This matters specifically for the GitHub OAuth
+     * Device Flow: completeSignIn() below runs on GitHubAuthManager's background polling thread,
+     * which can land *after* the user has already switched back to the app (and any
+     * onResume-triggered refresh has already run and found nothing yet) -- postValue (safe from
+     * any thread) is the only reliable way to notify observers at the moment the account is
+     * actually saved. */
+    private val _accountsChanged = MutableLiveData<Unit>()
+    val accountsChanged: LiveData<Unit> = _accountsChanged
 
     fun getAccounts(): List<Account> {
         val jsonString = securePrefsHelper.get(KEY_ACCOUNTS) ?: return emptyList()
@@ -39,11 +52,13 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
         val accounts = getAccounts().toMutableList()
         accounts.add(account)
         saveAccounts(accounts)
+        _accountsChanged.postValue(Unit)
     }
 
     fun deleteAccount(accountId: Long) {
         val accounts = getAccounts().filter { it.id != accountId }
         saveAccounts(accounts)
+        _accountsChanged.postValue(Unit)
     }
 
     /** Best-effort match of a git remote URL to a connected account, by host -> AccountType. */
@@ -69,6 +84,7 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
             if (it.id == updatedAccount.id) updatedAccount else it
         }
         saveAccounts(accounts)
+        _accountsChanged.postValue(Unit)
     }
 
     private fun saveAccounts(accounts: List<Account>) {

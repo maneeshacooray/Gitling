@@ -524,10 +524,11 @@ class MainActivity : SheimiFragmentActivity() {
         } else {
             checkAndRequestRequiredPermissions(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        // Refresh accounts in case the user completed GitHub OAuth in the browser -- both
-        // ViewModels keep their own independent accounts list, so both need a nudge.
+        // Refresh accounts in case the user completed GitHub OAuth in the browser. (CloneViewModel
+        // doesn't need an equivalent call here -- it observes AccountManager.accountsChanged
+        // directly, which fires the moment an account is actually saved rather than depending on
+        // Activity resume timing.)
         settingsViewModel.refreshAccounts()
-        cloneViewModel.refreshAccounts()
     }
 
     private fun initUpdatedSSL() {

@@ -42,6 +42,13 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoadingRepos = kotlinx.coroutines.flow.MutableStateFlow(false)
     val isLoadingRepos = _isLoadingRepos.asStateFlow()
 
+    // observeForever since this ViewModel isn't a LifecycleOwner -- removed in onCleared().
+    // Without this, a GitHub account connected via the OAuth Device Flow (completed on a
+    // background polling thread, see GitHubAuthManager) wouldn't show up here until something
+    // else happened to call refreshAccounts(), which an Activity-lifecycle-timed refresh can
+    // easily miss if the background poll lands just after the user switches back to the app.
+    private val accountsChangedObserver = androidx.lifecycle.Observer<Unit> { refreshAccounts() }
+
     init {
         visible.value = false
         initLocal.value = false
@@ -49,6 +56,12 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
         val prefsHelper = application.prefenceHelper!!
         cloneLocation.value = prefsHelper.repoRoot?.absolutePath ?: ""
         refreshAccounts()
+        accountManager.accountsChanged.observeForever(accountsChangedObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        accountManager.accountsChanged.removeObserver(accountsChangedObserver)
     }
 
     fun selectAccount(account: com.manichord.mgit.models.Account?) {

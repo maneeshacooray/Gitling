@@ -20,7 +20,7 @@ import com.manichord.mgit.tasks.repo.UpdateIndexTask
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.RepoDetailActivity
+import com.manichord.mgit.MainActivity
 import me.sheimi.sgit.repo.tasks.repo.DeleteFileFromRepoTask.DeleteOperationType
 
 class RepoFileOperationDialog : SheimiDialogFragment() {
@@ -42,7 +42,7 @@ class RepoFileOperationDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         val filePath = arguments?.getString(FILE_PATH) ?: ""
-        val activity = requireActivity() as RepoDetailActivity
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
 
         fun showRemoveFileMessageDialog(
             dialogTitle: Int,
