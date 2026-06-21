@@ -1,7 +1,6 @@
 package com.manichord.mgit
 
 import android.Manifest
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -47,7 +46,6 @@ import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.CommitDiffActivity
 import me.sheimi.sgit.activities.RepoDetailActivity
 import me.sheimi.sgit.activities.explorer.ExploreFileActivity
-import me.sheimi.sgit.activities.explorer.FileExplorerActivity
 import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 import me.sheimi.sgit.database.RepoDbManager
 import me.sheimi.sgit.database.models.Repo
@@ -61,7 +59,6 @@ import me.sheimi.sgit.repo.tasks.repo.CloneTask
 import me.sheimi.sgit.ssh.PrivateKeyUtils
 import me.sheimi.android.utils.Profile
 import timber.log.Timber
-import java.io.File
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
@@ -164,10 +161,6 @@ class MainActivity : SheimiFragmentActivity() {
                 showToastMessage("That location isn't supported -- please pick a folder on internal storage.")
             }
         }
-    }
-
-    companion object {
-        private const val REQUEST_IMPORT_REPO = 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -553,34 +546,5 @@ class MainActivity : SheimiFragmentActivity() {
 
     private fun hideCloneView() {
         cloneViewModel.show(false)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK || data == null) return
-
-        when (requestCode) {
-            REQUEST_IMPORT_REPO -> {
-                val path = data.extras?.getString(FileExplorerActivity.RESULT_PATH) ?: return
-                val file = File(path)
-                val dotGit = File(file, Repo.DOT_GIT_DIR)
-                if (!dotGit.exists()) {
-                    showToastMessage(getString(R.string.error_no_repository))
-                    return
-                }
-
-                showMessageDialog(
-                    R.string.dialog_comfirm_import_repo_title,
-                    getString(R.string.dialog_comfirm_import_repo_msg),
-                    R.string.label_import,
-                    { _, _ ->
-                        // Import logic
-                        val args = Bundle().apply { putString("from_path", path) }
-                        // Need to import dialog - would eventually be a Compose screen
-                        // For now we still use the Fragment dialog
-                    }
-                )
-            }
-        }
     }
 }
