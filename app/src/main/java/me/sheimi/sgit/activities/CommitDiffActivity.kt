@@ -2,24 +2,18 @@ package me.sheimi.sgit.activities
 
 import android.content.Intent
 import android.graphics.Color
-import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
-import androidx.core.content.IntentCompat
-import com.manichord.mgit.diff.CommitDiffScreen
-import com.manichord.mgit.ui.theme.AppTheme
+import com.manichord.mgit.MainActivity
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.revwalk.RevCommit
 import timber.log.Timber
-import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.android.utils.CodeGuesser
 import me.sheimi.android.utils.FsUtils
 import me.sheimi.android.utils.Profile
@@ -31,8 +25,20 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-class CommitDiffActivity : SheimiFragmentActivity() {
-
+/**
+ * Per-diff-screen state and JS-bridge, formerly a real Activity -- now a plain class constructed
+ * by MainActivity's "commitDiff" NavHost route, as part of the single-activity rewrite. Unlike
+ * RepoDetailActivity this doesn't need to be a Context (nothing casts to it or uses it to launch
+ * Intents) so it's a plain class, not a ContextWrapper -- its few Activity-only needs (starting
+ * the share/save-diff intents, toasts, strings) are reached through the wrapped MainActivity.
+ */
+class CommitDiffActivity(
+    private val mainActivity: MainActivity,
+    private val oldCommit: String?,
+    private val newCommit: String,
+    private val showDescription: Boolean,
+    private val repo: Repo?
+) {
     companion object {
         const val OLD_COMMIT = "old commit"
         const val NEW_COMMIT = "new commit"
@@ -49,68 +55,20 @@ class CommitDiffActivity : SheimiFragmentActivity() {
             "</head><body></body>"
     }
 
-    private var oldCommit: String? = null
-    private lateinit var newCommit: String
-    private var showDescription: Boolean = false
-    private var repo: Repo? = null
     private var commit: RevCommit? = null
     private var diffStrs: List<String> = emptyList()
     private var diffEntries: List<DiffEntry> = emptyList()
 
-    private var isLoading by mutableStateOf(true)
+    var isLoading by mutableStateOf(true)
     private var webView: WebView? = null
 
-    private val saveDiffLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK && result.data != null) {
-            val diffUri = result.data!!.data
-            if (diffUri != null) {
-                try {
-                    contentResolver.openOutputStream(diffUri)?.use { saveDiff(it) }
-                } catch (e: IOException) {
-                    showToastMessage(R.string.alert_file_creation_failure)
-                }
-            }
-        }
-    }
-
-    override fun getThemeResource(): Int {
-        return if (Profile.getTheme(this) == 1) {
-            R.style.DarkAppTheme_NoActionBar
-        } else {
-            R.style.AppTheme_NoActionBar
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val extras = intent.extras!!
-        oldCommit = extras.getString(OLD_COMMIT)
-        newCommit = extras.getString(NEW_COMMIT)!!
-        showDescription = extras.getBoolean(SHOW_DESCRIPTION)
-        repo = IntentCompat.getSerializableExtra(intent, Repo.TAG, Repo::class.java)
-
+    val screenTitle: String = run {
         var title = Repo.getCommitDisplayName(newCommit)
         oldCommit?.let { title += " : " + Repo.getCommitDisplayName(it) }
-        val screenTitle = getString(R.string.title_activity_commit_diff) + title
-
-        setContent {
-            AppTheme {
-                CommitDiffScreen(
-                    title = screenTitle,
-                    isLoading = isLoading,
-                    onBackClick = { finish() },
-                    onShareClick = { shareDiff() },
-                    onSaveClick = { launchSaveDiff() },
-                    onWebViewCreated = { setupWebView(it) }
-                )
-            }
-        }
+        mainActivity.getString(R.string.title_activity_commit_diff) + title
     }
 
-    private fun setupWebView(view: WebView) {
+    fun setupWebView(view: WebView) {
         if (webView != null) return // AndroidView's factory should only run once; guard anyway
         webView = view
         view.addJavascriptInterface(CodeLoader(), JS_INTERFACE)
@@ -139,7 +97,7 @@ class CommitDiffActivity : SheimiFragmentActivity() {
             "CommitDate: ${committer.whenAsInstant}\n"
     }
 
-    private fun saveDiff(fos: OutputStream) {
+    fun saveDiff(fos: OutputStream) {
         commit?.let { c ->
             fos.write(formatCommitInfo().toByteArray())
             fos.write("\n".toByteArray())
@@ -159,29 +117,29 @@ class CommitDiffActivity : SheimiFragmentActivity() {
         return File(FsUtils.getExternalDir("diff", true), "$fname.diff")
     }
 
-    private fun shareDiff() {
+    fun shareDiff() {
         try {
             val diff = sharedDiffPathName()
             FileOutputStream(diff).use { saveDiff(it) }
             // A raw file:// Uri triggers FileUriExposedException on API 24+ -- share via
             // the app's existing FileProvider instead (already used by FsUtils.openFile()).
-            val diffUri = FileProvider.getUriForFile(this, FsUtils.PROVIDER_AUTHORITY, diff)
+            val diffUri = FileProvider.getUriForFile(mainActivity, FsUtils.PROVIDER_AUTHORITY, diff)
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/x-patch"
                 putExtra(Intent.EXTRA_STREAM, diffUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            startActivity(Intent.createChooser(shareIntent, null))
+            mainActivity.startActivity(Intent.createChooser(shareIntent, null))
         } catch (e: IOException) {
-            showToastMessage(R.string.alert_file_creation_failure)
+            mainActivity.showToastMessage(R.string.alert_file_creation_failure)
         }
     }
 
-    private fun launchSaveDiff() {
+    fun launchSaveDiff() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
             .setType("text/x-patch")
             .putExtra(Intent.EXTRA_TITLE, "${Repo.getCommitDisplayName(newCommit)}.diff")
-        saveDiffLauncher.launch(intent)
+        mainActivity.launchSaveDiff(intent)
     }
 
     private inner class CodeLoader {
@@ -222,6 +180,6 @@ class CommitDiffActivity : SheimiFragmentActivity() {
         fun getDiffSize(): Int = diffEntries.size
 
         @JavascriptInterface
-        fun getTheme(): String = Profile.getCodeMirrorTheme(applicationContext)
+        fun getTheme(): String = Profile.getCodeMirrorTheme(mainActivity.applicationContext)
     }
 }

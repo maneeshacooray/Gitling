@@ -37,9 +37,6 @@
         <activity android:name=".activities.ViewFileActivity" android:configChanges="orientation|keyboardHidden" android:parentActivityName="com.manichord.mgit.MainActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.manichord.mgit.MainActivity" />
         </activity>
-        <activity android:name=".activities.CommitDiffActivity" android:parentActivityName="com.manichord.mgit.MainActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.manichord.mgit.MainActivity" />
-        </activity>
         <activity android:name=".activities.explorer.PrivateKeyManageActivity" android:label="@string/title_activity_private_key_manage" android:parentActivityName="com.manichord.mgit.MainActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.manichord.mgit.MainActivity" />
         </activity>

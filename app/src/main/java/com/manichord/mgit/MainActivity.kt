@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.manichord.mgit.branchchooser.BranchChooserScreen
 import com.manichord.mgit.branchchooser.BranchChooserViewModel
 import com.manichord.mgit.clone.CloneViewModel
+import com.manichord.mgit.diff.CommitDiffScreen
 import com.manichord.mgit.dialogs.MessageDialog
 import com.manichord.mgit.repodetail.RepoDetailScreen
 import com.manichord.mgit.repodetail.RepoDetailViewModel
@@ -28,6 +30,7 @@ import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
+import me.sheimi.sgit.activities.CommitDiffActivity
 import me.sheimi.sgit.activities.RepoDetailActivity
 import me.sheimi.sgit.activities.explorer.FileExplorerActivity
 import me.sheimi.sgit.database.RepoDbManager
@@ -43,6 +46,7 @@ import me.sheimi.sgit.ssh.PrivateKeyUtils
 import me.sheimi.android.utils.Profile
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -84,6 +88,41 @@ class MainActivity : SheimiFragmentActivity() {
      * RenameBranchDialog (`(requireActivity() as MainActivity).currentBranchChooserViewModel`)
      * since BranchChooserActivity no longer exists as a type to cast to. */
     var currentBranchChooserViewModel: BranchChooserViewModel? = null
+
+    /** Set just before navigating to "commitDiff"; mirrors pendingRepoForDetail above. */
+    private var pendingCommitDiffArgs: CommitDiffArgs? = null
+
+    private data class CommitDiffArgs(
+        val oldCommit: String?,
+        val newCommit: String,
+        val showDescription: Boolean,
+        val repo: Repo?
+    )
+
+    /** The live commitDiff screen's state/dispatch object, if that route is currently showing --
+     * read by saveDiffLauncher's callback below since CommitDiffActivity no longer is a
+     * ComponentActivity able to own that launcher itself. */
+    private var currentCommitDiffHost: CommitDiffActivity? = null
+
+    private val saveDiffLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val host = currentCommitDiffHost ?: return@registerForActivityResult
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val diffUri = result.data!!.data
+            if (diffUri != null) {
+                try {
+                    contentResolver.openOutputStream(diffUri)?.use { host.saveDiff(it) }
+                } catch (e: IOException) {
+                    showToastMessage(R.string.alert_file_creation_failure)
+                }
+            }
+        }
+    }
+
+    fun launchSaveDiff(intent: Intent) {
+        saveDiffLauncher.launch(intent)
+    }
 
     companion object {
         private const val REQUEST_IMPORT_REPO = 0
@@ -180,6 +219,37 @@ class MainActivity : SheimiFragmentActivity() {
                         }
                     }
                 }
+                composable("commitDiff") {
+                    val args = pendingCommitDiffArgs
+                    if (args == null) {
+                        navController.popBackStack()
+                    } else {
+                        val host = remember(args) {
+                            CommitDiffActivity(
+                                this@MainActivity, args.oldCommit, args.newCommit, args.showDescription, args.repo
+                            ).also { currentCommitDiffHost = it }
+                        }
+
+                        DisposableEffect(host) {
+                            onDispose {
+                                if (currentCommitDiffHost === host) {
+                                    currentCommitDiffHost = null
+                                }
+                            }
+                        }
+
+                        AppTheme {
+                            CommitDiffScreen(
+                                title = host.screenTitle,
+                                isLoading = host.isLoading,
+                                onBackClick = { navController.popBackStack() },
+                                onShareClick = { host.shareDiff() },
+                                onSaveClick = { host.launchSaveDiff() },
+                                onWebViewCreated = { host.setupWebView(it) }
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -194,6 +264,11 @@ class MainActivity : SheimiFragmentActivity() {
     private fun openBranchChooser(repo: Repo) {
         pendingRepoForBranchChooser = repo
         navController.navigate("branchChooser")
+    }
+
+    fun openCommitDiff(oldCommit: String?, newCommit: String, showDescription: Boolean, repo: Repo?) {
+        pendingCommitDiffArgs = CommitDiffArgs(oldCommit, newCommit, showDescription, repo)
+        navController.navigate("commitDiff")
     }
 
     private fun checkoutBranch(repo: Repo, commitName: String) {

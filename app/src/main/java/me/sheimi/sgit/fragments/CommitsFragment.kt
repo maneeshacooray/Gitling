@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.database.DataSetObserver
 import android.os.Bundle
 import android.view.ActionMode
@@ -18,13 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.repodetail.CommitRowState
 import com.manichord.mgit.repodetail.CommitsListContent
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity.OnBackClickListener
 import me.sheimi.sgit.R
-import me.sheimi.sgit.activities.CommitDiffActivity
-import me.sheimi.sgit.activities.RepoDetailActivity
 import me.sheimi.sgit.adapters.CommitsListAdapter
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.dialogs.CheckoutDialog
@@ -77,7 +75,7 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        (rawActivity as? com.manichord.mgit.MainActivity)?.currentRepoDetailHost?.setCommitsFragment(this)
+        (rawActivity as? MainActivity)?.currentRepoDetailHost?.setCommitsFragment(this)
 
         val bundle = arguments ?: return ComposeView(requireContext())
         val repo = bundle.getSerializable(Repo.TAG) as? Repo ?: return ComposeView(requireContext())
@@ -171,13 +169,8 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean = true
 
     private fun showDiff(actionMode: ActionMode?, oldCommit: String?, newCommit: String, showDescription: Boolean) {
-        val intent = Intent(rawActivity, CommitDiffActivity::class.java)
-        oldCommit?.let { intent.putExtra(CommitDiffActivity.OLD_COMMIT, it) }
-        intent.putExtra(CommitDiffActivity.NEW_COMMIT, newCommit)
-        intent.putExtra(CommitDiffActivity.SHOW_DESCRIPTION, showDescription)
-        intent.putExtra(Repo.TAG, repo)
         actionMode?.finish()
-        rawActivity.startActivity(intent)
+        (rawActivity as MainActivity).openCommitDiff(oldCommit, newCommit, showDescription, repo)
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {

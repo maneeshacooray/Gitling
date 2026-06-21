@@ -1,6 +1,5 @@
 package me.sheimi.sgit.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.repodetail.StatusChangeType
 import com.manichord.mgit.repodetail.StatusFileEntry
 import com.manichord.mgit.repodetail.StatusScreen
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity.OnBackClickListener
-import me.sheimi.sgit.activities.CommitDiffActivity
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.repo.tasks.repo.AddToStageTask
 import me.sheimi.sgit.repo.tasks.repo.RemoveFromStageTask
@@ -80,12 +79,7 @@ class StatusFragment : RepoDetailFragment() {
     }
 
     private fun showDiff(oldCommit: String, newCommit: String) {
-        val intent = Intent(repoDetailActivity, CommitDiffActivity::class.java)
-        intent.putExtra(CommitDiffActivity.OLD_COMMIT, oldCommit)
-        intent.putExtra(CommitDiffActivity.NEW_COMMIT, newCommit)
-        intent.putExtra(CommitDiffActivity.SHOW_DESCRIPTION, false)
-        intent.putExtra(Repo.TAG, repo)
-        repoDetailActivity.startActivity(intent)
+        (rawActivity as MainActivity).openCommitDiff(oldCommit, newCommit, false, repo)
     }
 
     private fun stageFile(path: String) {
