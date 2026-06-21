@@ -21,16 +21,19 @@ AutoName: Gitling
 
 RepoType: git
 Repo: https://github.com/maneeshacooray/Gitling
+Binaries: https://github.com/maneeshacooray/Gitling/releases/download/v%v/app-release.apk
 
 Builds:
-  - versionName: 1.0.10
-    versionCode: 11
-    commit: 846ef4fabb0c4f855fca819dbb96433d018d449f
+  - versionName: 1.0.17
+    versionCode: 18
+    commit: 0c0ae4bf0c0878a3c9642621a62b439fee7dae2b
     subdir: app
     gradle:
       - yes
 
+AllowedAPKSigningKeys: b1868505e313bc8b534d0bd09ae11b72f4c81a28a4a0b8972566b360fd39b4e1
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v1\.0\.\d+$
-CurrentVersion: 1.0.10
-CurrentVersionCode: 11
+CurrentVersion: 1.0.17
+CurrentVersionCode: 18
