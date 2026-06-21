@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 15,
+            versionName = "1.0.14",
+            highlights = listOf(
+                "Gitling now lets you know when a new version is available on GitHub"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 14,
             versionName = "1.0.13",
             highlights = listOf(

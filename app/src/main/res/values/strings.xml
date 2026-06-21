@@ -169,6 +169,8 @@
     <string name="preference_app_font">App font</string>
     <string name="pref_key_app_font" translatable="false">app_font</string>
     <string name="pref_key_last_seen_version_code" translatable="false">last_seen_version_code</string>
+    <string name="pref_key_last_update_check_time" translatable="false">last_update_check_time</string>
+    <string name="pref_key_dismissed_update_version" translatable="false">dismissed_update_version</string>
     <string name="action_git_profile">Git Profile</string>
     <string name="action_open_in_other_app">Open in other apps</string>
     <string name="action_add_private_key">Add Private Key</string>

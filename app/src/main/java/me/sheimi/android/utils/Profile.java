@@ -128,4 +128,28 @@ public class Profile {
         String key = context.getString(R.string.pref_key_last_seen_version_code);
         getProfileSharedPreference(context).edit().putInt(key, versionCode).apply();
     }
+
+    /** 0 means "never checked" -- used to throttle UpdateChecker's GitHub API call to once per
+     * cooldown window rather than on every app launch. */
+    public static long getLastUpdateCheckTime(Context context) {
+        String key = context.getString(R.string.pref_key_last_update_check_time);
+        return getProfileSharedPreference(context).getLong(key, 0L);
+    }
+
+    public static void setLastUpdateCheckTime(Context context, long timeMillis) {
+        String key = context.getString(R.string.pref_key_last_update_check_time);
+        getProfileSharedPreference(context).edit().putLong(key, timeMillis).apply();
+    }
+
+    /** The version the user dismissed the update banner for, so it doesn't reappear every
+     * launch -- but does reappear if a newer version ships after the dismissal. */
+    public static String getDismissedUpdateVersion(Context context) {
+        String key = context.getString(R.string.pref_key_dismissed_update_version);
+        return getProfileSharedPreference(context).getString(key, "");
+    }
+
+    public static void setDismissedUpdateVersion(Context context, String version) {
+        String key = context.getString(R.string.pref_key_dismissed_update_version);
+        getProfileSharedPreference(context).edit().putString(key, version).apply();
+    }
 }

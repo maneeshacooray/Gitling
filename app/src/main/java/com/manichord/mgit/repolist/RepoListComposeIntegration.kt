@@ -43,6 +43,7 @@ fun RepoListComposeContent(
     AppTheme {
         val repoListSnapshot by viewModel.repoList.collectAsState()
         val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
+        val updateAvailable by viewModel.updateAvailable.collectAsState()
         var showCloneSheet by remember { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
 
@@ -103,7 +104,12 @@ fun RepoListComposeContent(
             },
             onConnectGitHubClick = {
                 (activity as MainActivity).openUserSettings(initialScreen = "accounts")
-            }
+            },
+            updateAvailableVersion = updateAvailable?.versionName,
+            onViewReleaseClick = {
+                updateAvailable?.let { activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.releaseUrl))) }
+            },
+            onDismissUpdateClick = { viewModel.dismissUpdateAvailable() }
         )
 
         if (showPermissionDialog) {

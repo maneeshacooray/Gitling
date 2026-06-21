@@ -1,0 +1,1 @@
+Gitling now lets you know when a new version is available on GitHub.
