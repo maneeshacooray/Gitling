@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 22,
+            versionName = "1.0.21",
+            highlights = listOf(
+                "Fixed a crash opening a repo's Files or Status tab right after Android relaunches the app (e.g. after certain system display/font settings change)"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 21,
             versionName = "1.0.20",
             highlights = listOf(

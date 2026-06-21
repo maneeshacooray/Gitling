@@ -1,0 +1,1 @@
+Fixed a crash opening a repo's Files or Status tab right after Android relaunches the app (e.g. after certain system display/font settings change).

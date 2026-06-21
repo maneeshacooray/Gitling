@@ -45,7 +45,12 @@ class StatusFragment : RepoDetailFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        repoDetailActivity.setStatusFragment(this)
+        // Safe call, not repoDetailActivity (a non-null-typed Java getter) -- on an Activity
+        // relaunch (e.g. certain config changes Android doesn't hand to onConfigurationChanged),
+        // FragmentManager restores previously-shown fragments during onStart(), before Compose's
+        // NavHost has re-run and repopulated MainActivity.currentRepoDetailHost. Matches the
+        // pattern CommitsFragment already uses for the same reason.
+        (rawActivity as? MainActivity)?.currentRepoDetailHost?.setStatusFragment(this)
 
         repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
             ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)

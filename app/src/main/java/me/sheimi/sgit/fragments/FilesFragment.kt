@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.MainActivity
 import com.manichord.mgit.explorer.FileListContent
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity
@@ -53,7 +54,12 @@ class FilesFragment : RepoDetailFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        repoDetailActivity.setFilesFragment(this)
+        // Safe call, not repoDetailActivity (a non-null-typed Java getter) -- on an Activity
+        // relaunch (e.g. certain config changes Android doesn't hand to onConfigurationChanged),
+        // FragmentManager restores previously-shown fragments during onStart(), before Compose's
+        // NavHost has re-run and repopulated MainActivity.currentRepoDetailHost. Matches the
+        // pattern CommitsFragment already uses for the same reason.
+        (rawActivity as? MainActivity)?.currentRepoDetailHost?.setFilesFragment(this)
 
         repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
             ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)
@@ -137,14 +143,17 @@ class FilesFragment : RepoDetailFragment() {
             val intent = Intent(activity, ViewFileActivity::class.java)
             intent.putExtra(ViewFileActivity.TAG_FILE_NAME, file.absolutePath)
             intent.putExtra(Repo.TAG, repo)
-            repoDetailActivity.startActivity(intent)
+            // rawActivity directly, not repoDetailActivity -- this is just a plain Activity
+            // context/dialog call, no need to route it through the (sometimes
+            // not-yet-populated, see onCreateView above) RepoDetailActivity wrapper at all.
+            rawActivity.startActivity(intent)
             return
         }
         try {
             FsUtils.openFile(activity as SheimiFragmentActivity, file)
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
-            repoDetailActivity.showMessageDialog(
+            rawActivity.showMessageDialog(
                 me.sheimi.sgit.R.string.dialog_error_title,
                 getString(me.sheimi.sgit.R.string.error_can_not_open_file)
             )
