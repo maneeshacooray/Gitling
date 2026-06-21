@@ -1,0 +1,46 @@
+# This file by itself doesn't publish anything -- F-Droid only reads metadata from its own
+# fdroiddata repo (gitlab.com/fdroid/fdroiddata). To actually get listed, copy this file to
+# metadata/com.maneeshacooray.gitling.yml there and open a merge request. Keeping a copy here
+# is just so the build recipe lives next to the source it describes.
+Categories:
+  - Development
+License: GPL-3.0-or-later
+AuthorName: Maneesha Cooray
+AuthorEmail: bmaneeshacooray@gmail.com
+SourceCode: https://github.com/maneeshacooray/Gitling
+IssueTracker: https://github.com/maneeshacooray/Gitling/issues
+Changelog: https://github.com/maneeshacooray/Gitling/releases
+
+AutoName: Gitling
+Summary: Git client built with Jetpack Compose and Material 3 Expressive
+Description: |-
+    Gitling is a Git client for Android, built with Jetpack Compose and
+    Material 3 Expressive. It's a fork of MGit (itself a continuation of
+    SGit), modernized with a current Android toolchain, a from-scratch
+    Compose UI, one-tap GitHub sign-in, and a new identity.
+
+    Features:
+
+    * Clone, create, and delete local repositories
+    * One-tap Connect with GitHub (OAuth Device Flow) -- no manual token or
+      password handling for GitHub remotes
+    * HTTP/HTTPS/SSH, including SSH with private-key passphrase
+    * Username/password and personal access token authentication for any
+      Git host
+    * Browse files and commit history, git diff between commits
+    * Checkout, create, and merge local/remote branches and tags
+
+RepoType: git
+Repo: https://github.com/maneeshacooray/Gitling
+
+Builds:
+  - versionName: '1.0.8'
+    versionCode: 9
+    commit: v1.0.8
+    gradle:
+      - 'yes'
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.0.8'
+CurrentVersionCode: 9
