@@ -15,6 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.manichord.mgit.ui.theme.FontOption
+import com.manichord.mgit.update.UpdateCheckResult
+import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,7 +27,8 @@ fun SettingsScreen(
     onManageAccountsClick: () -> Unit,
     onManageSshKeysClick: () -> Unit,
     onFeedbackClick: () -> Unit,
-    onRepoRootClick: () -> Unit
+    onRepoRootClick: () -> Unit,
+    onViewReleaseClick: (String) -> Unit = {}
 ) {
     val repoRoot by viewModel.repoRoot.observeAsState("")
     val useEnglish by viewModel.useEnglish.observeAsState(false)
@@ -34,6 +37,8 @@ fun SettingsScreen(
     val useGravatar by viewModel.useGravatar.observeAsState(true)
     val useDynamicColor by viewModel.useDynamicColor.observeAsState(false)
     val fontOption by viewModel.fontOption.observeAsState(FontOption.DEFAULT)
+    val checkingForUpdate by viewModel.checkingForUpdate.observeAsState(false)
+    val updateCheckResult by viewModel.updateCheckResult.observeAsState(null)
 
     Scaffold(
         topBar = {
@@ -137,8 +142,15 @@ fun SettingsScreen(
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.preference_app_version)) },
-                supportingContent = { Text("Modernized v2.0") },
+                supportingContent = { Text(BuildConfig.VERSION_NAME) },
                 leadingContent = { Icon(Icons.Default.Info, null) }
+            )
+
+            SettingsUpdateCheckItem(
+                checking = checkingForUpdate,
+                result = updateCheckResult,
+                onCheckClick = { viewModel.checkForUpdate() },
+                onViewReleaseClick = onViewReleaseClick
             )
         }
     }
@@ -175,6 +187,39 @@ fun SettingsSwitchItem(title: String, summary: String, checked: Boolean, onCheck
             Switch(checked = checked, onCheckedChange = onCheckedChange)
         },
         modifier = Modifier.clickable { onCheckedChange(!checked) }
+    )
+}
+
+@Composable
+fun SettingsUpdateCheckItem(
+    checking: Boolean,
+    result: UpdateCheckResult?,
+    onCheckClick: () -> Unit,
+    onViewReleaseClick: (String) -> Unit
+) {
+    ListItem(
+        headlineContent = { Text("Check for Updates") },
+        supportingContent = {
+            Text(
+                when {
+                    checking -> "Checking..."
+                    result is UpdateCheckResult.UpdateAvailable -> "Version ${result.versionName} is available"
+                    result is UpdateCheckResult.UpToDate -> "You're on the latest version"
+                    result is UpdateCheckResult.Failed -> "Couldn't check for updates -- check your connection"
+                    else -> "Tap to check"
+                }
+            )
+        },
+        leadingContent = { Icon(Icons.Default.Refresh, null) },
+        trailingContent = {
+            when {
+                checking -> CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                result is UpdateCheckResult.UpdateAvailable -> {
+                    TextButton(onClick = { onViewReleaseClick(result.releaseUrl) }) { Text("View") }
+                }
+            }
+        },
+        modifier = Modifier.clickable(enabled = !checking, onClick = onCheckClick)
     )
 }
 

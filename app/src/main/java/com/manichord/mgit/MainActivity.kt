@@ -432,7 +432,10 @@ class MainActivity : SheimiFragmentActivity() {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.feedback_url)))
                                         startActivity(intent)
                                     },
-                                    onRepoRootClick = { folderPickerLauncher.launch(null) }
+                                    onRepoRootClick = { folderPickerLauncher.launch(null) },
+                                    onViewReleaseClick = { url ->
+                                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                    }
                                 )
                                 "accounts" -> AccountsScreen(
                                     viewModel = settingsViewModel,
