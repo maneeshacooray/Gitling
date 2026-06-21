@@ -524,8 +524,10 @@ class MainActivity : SheimiFragmentActivity() {
         } else {
             checkAndRequestRequiredPermissions(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        // Refresh accounts in case the user completed GitHub OAuth in the browser
+        // Refresh accounts in case the user completed GitHub OAuth in the browser -- both
+        // ViewModels keep their own independent accounts list, so both need a nudge.
         settingsViewModel.refreshAccounts()
+        cloneViewModel.refreshAccounts()
     }
 
     private fun initUpdatedSSL() {
