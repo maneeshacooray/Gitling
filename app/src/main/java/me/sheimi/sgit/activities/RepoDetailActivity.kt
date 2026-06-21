@@ -78,6 +78,9 @@ class RepoDetailActivity(
     fun setCommitsFragment(commitsFragment: CommitsFragment) { mCommitsFragment = commitsFragment }
     fun setStatusFragment(statusFragment: StatusFragment) { mStatusFragment = statusFragment }
 
+    fun searchFiles(query: String?) = mFilesFragment?.setFileSearchQuery(query)
+    fun searchCommits(query: String?) = mCommitsFragment?.setFilter(query)
+
     // Delegation surface for the handful of Activity-only (non-Context) members the 35
     // dependent files call on this -- everything else (getApplicationContext, getString,
     // startActivity, etc.) comes for free from ContextWrapper.

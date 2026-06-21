@@ -88,7 +88,12 @@ fun FileListContent(
     onItemClick: (File) -> Unit,
     onItemLongClick: (File) -> Unit = {},
     selectedFile: File? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** When non-null, shows each row's result of this (typically a path relative to the repo
+     * root) as a subtitle beneath its name -- used for flat, cross-directory results (e.g. a
+     * recursive filename search) where the bare name alone wouldn't disambiguate same-named
+     * files in different folders. */
+    displayPath: ((File) -> String)? = null
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -112,6 +117,7 @@ fun FileListContent(
             items(files, key = { it.absolutePath }) { file ->
                 FileRow(
                     name = file.name,
+                    path = displayPath?.invoke(file),
                     isDirectory = file.isDirectory,
                     selected = file == selectedFile,
                     onClick = { onItemClick(file) },
@@ -127,6 +133,7 @@ fun FileListContent(
 private fun FileRow(
     name: String,
     isDirectory: Boolean,
+    path: String? = null,
     selected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {}
@@ -145,11 +152,22 @@ private fun FileRow(
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = name,
-            style = MaterialTheme.typography.bodyLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (path != null) {
+                Text(
+                    text = path,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 }

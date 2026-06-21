@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 18,
+            versionName = "1.0.17",
+            highlights = listOf(
+                "Added search to the Files and Commits tabs inside a repo -- find a file anywhere in the repo, or a commit by message, author, or hash"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 17,
             versionName = "1.0.16",
             highlights = listOf(

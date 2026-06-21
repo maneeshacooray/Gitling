@@ -1,0 +1,1 @@
+Added search to the Files and Commits tabs inside a repo -- find a file anywhere in the repo, or a commit by message, author, or hash.

@@ -40,6 +40,12 @@ class FilesFragment : RepoDetailFragment() {
     private var repo: Repo? = null
     private var rootDir: File? = null
     private var currentDir: File? = null
+    // Must be Compose state, not a plain var: the header text below reads this directly, and if
+    // the filtered `files` list happens to come out structurally equal between two keystrokes
+    // (e.g. "h" and "he" both matching only "helper.js"), mutableStateOf's equality check skips
+    // recomposition entirely -- silently leaving the header showing a stale query unless this is
+    // independently tracked.
+    private var searchQuery by mutableStateOf<String?>(null)
     private var files by mutableStateOf<List<File>>(emptyList())
 
     override fun onCreateView(
@@ -63,22 +69,62 @@ class FilesFragment : RepoDetailFragment() {
             setContent {
                 AppTheme {
                     val dir = currentDir
+                    val query = searchQuery
                     FileListContent(
-                        currentPath = dir?.let { relativePath(it) } ?: "",
+                        currentPath = if (query != null) {
+                            "Search results for \"$query\""
+                        } else {
+                            dir?.let { relativePath(it) } ?: ""
+                        },
                         files = files,
-                        showUpRow = rootDir?.let { dir != null && dir != it } ?: false,
+                        showUpRow = query == null && (rootDir?.let { dir != null && dir != it } ?: false),
                         onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
                         onItemClick = ::onFileClicked,
-                        onItemLongClick = ::onFileLongClicked
+                        onItemLongClick = ::onFileLongClicked,
+                        displayPath = if (query != null) ::relativePath else null
                     )
                 }
             }
         }
     }
 
-    private fun relativePath(dir: File): String {
-        val root = rootDir ?: return dir.absolutePath
-        return FsUtils.getRelativePath(dir, root).ifEmpty { "/" }
+    private fun relativePath(file: File): String {
+        val root = rootDir ?: return file.absolutePath
+        return FsUtils.getRelativePath(file, root).ifEmpty { "/" }
+    }
+
+    /** Switches the Files tab into search mode: a recursive, flat match by filename across the
+     * whole repo (not just the current directory), since that's what's actually useful when
+     * looking for a specific file in a repo with many subdirectories. Pass null/blank to return
+     * to normal directory browsing at the last-viewed directory. */
+    fun setFileSearchQuery(query: String?) {
+        searchQuery = query?.takeIf { it.isNotBlank() }
+        refreshFiles()
+    }
+
+    private fun refreshFiles() {
+        val query = searchQuery
+        if (query != null) {
+            files = rootDir?.let { searchFilesRecursively(it, query) } ?: emptyList()
+        } else {
+            currentDir?.let { setCurrentDir(it) }
+        }
+    }
+
+    private fun searchFilesRecursively(root: File, query: String): List<File> {
+        val results = mutableListOf<File>()
+        fun walk(dir: File) {
+            val children = dir.listFiles { f -> f.name != ".git" } ?: return
+            for (child in children) {
+                if (child.isDirectory) {
+                    walk(child)
+                } else if (child.name.contains(query, ignoreCase = true)) {
+                    results.add(child)
+                }
+            }
+        }
+        walk(root)
+        return results.sortedBy { it.name }
     }
 
     private fun onFileClicked(file: File) {

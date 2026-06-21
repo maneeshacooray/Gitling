@@ -271,7 +271,9 @@ class MainActivity : SheimiFragmentActivity() {
                                 },
                                 filesContent = { FragmentHost(supportFragmentManager, filesFragment) },
                                 commitsContent = { FragmentHost(supportFragmentManager, commitsFragment) },
-                                statusContent = { FragmentHost(supportFragmentManager, statusFragment) }
+                                statusContent = { FragmentHost(supportFragmentManager, statusFragment) },
+                                onFilesSearchQueryChange = { query -> host.searchFiles(query) },
+                                onCommitsSearchQueryChange = { query -> host.searchCommits(query) }
                             )
                         }
                     }

@@ -3,22 +3,32 @@ package com.manichord.mgit.repodetail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+
+private const val TAB_FILES = 0
+private const val TAB_COMMITS = 1
+private const val TAB_STATUS = 2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +39,9 @@ fun RepoDetailScreen(
     onOperationClick: (index: Int) -> Unit,
     filesContent: @Composable () -> Unit,
     commitsContent: @Composable () -> Unit,
-    statusContent: @Composable () -> Unit
+    statusContent: @Composable () -> Unit,
+    onFilesSearchQueryChange: (String) -> Unit = {},
+    onCommitsSearchQueryChange: (String) -> Unit = {}
 ) {
     val repo by viewModel.repo.observeAsState()
     val isDrawerOpen by viewModel.isDrawerOpen.observeAsState(false)
@@ -53,6 +65,20 @@ fun RepoDetailScreen(
     )
 
     val pagerState = rememberPagerState(pageCount = { tabs.size })
+    var isSearchActive by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val searchFocusRequester = remember { FocusRequester() }
+
+    // Each tab's search is independent -- switching tabs while searching would otherwise leave
+    // a stale query applied to whichever tab the user navigated away from, so just exit search.
+    LaunchedEffect(pagerState.currentPage) {
+        if (isSearchActive) {
+            isSearchActive = false
+            searchQuery = ""
+            onFilesSearchQueryChange("")
+            onCommitsSearchQueryChange("")
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -77,29 +103,92 @@ fun RepoDetailScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Column {
-                            Text(
-                                text = repo?.diaplayName ?: "Loading...",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            repo?.branchName?.let { branch ->
-                                SuggestionChip(
-                                    onClick = onBranchClick,
-                                    label = { Text(branch) },
-                                    icon = { Icon(Icons.Default.AccountTree, null, Modifier.size(16.dp)) }
+                        if (isSearchActive) {
+                            LaunchedEffect(Unit) { searchFocusRequester.requestFocus() }
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { query ->
+                                    searchQuery = query
+                                    when (pagerState.currentPage) {
+                                        TAB_FILES -> onFilesSearchQueryChange(query)
+                                        TAB_COMMITS -> onCommitsSearchQueryChange(query)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(searchFocusRequester),
+                                placeholder = {
+                                    Text(
+                                        if (pagerState.currentPage == TAB_FILES) "Search files"
+                                        else "Search commits"
+                                    )
+                                },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
                                 )
+                            )
+                        } else {
+                            Column {
+                                Text(
+                                    text = repo?.diaplayName ?: "Loading...",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                repo?.branchName?.let { branch ->
+                                    SuggestionChip(
+                                        onClick = onBranchClick,
+                                        label = { Text(branch) },
+                                        icon = { Icon(Icons.Default.AccountTree, null, Modifier.size(16.dp)) }
+                                    )
+                                }
                             }
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        if (isSearchActive) {
+                            IconButton(onClick = {
+                                isSearchActive = false
+                                searchQuery = ""
+                                when (pagerState.currentPage) {
+                                    TAB_FILES -> onFilesSearchQueryChange("")
+                                    TAB_COMMITS -> onCommitsSearchQueryChange("")
+                                }
+                            }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close search")
+                            }
+                        } else {
+                            IconButton(onClick = onBackClick) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            }
                         }
                     },
                     actions = {
-                        IconButton(onClick = { viewModel.setDrawerOpen(true) }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        if (isSearchActive) {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = {
+                                    searchQuery = ""
+                                    when (pagerState.currentPage) {
+                                        TAB_FILES -> onFilesSearchQueryChange("")
+                                        TAB_COMMITS -> onCommitsSearchQueryChange("")
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                                }
+                            }
+                        } else {
+                            if (pagerState.currentPage == TAB_FILES || pagerState.currentPage == TAB_COMMITS) {
+                                IconButton(onClick = { isSearchActive = true }) {
+                                    Icon(Icons.Default.Search, contentDescription = "Search")
+                                }
+                            }
+                            IconButton(onClick = { viewModel.setDrawerOpen(true) }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            }
                         }
                     }
                 )
