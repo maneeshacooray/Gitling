@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 11,
+            versionName = "1.0.10",
+            highlights = listOf(
+                "Housekeeping release -- no user-facing changes"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 10,
             versionName = "1.0.9",
             highlights = listOf(
