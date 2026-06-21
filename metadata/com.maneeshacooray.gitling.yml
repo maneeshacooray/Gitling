@@ -2,6 +2,12 @@
 # fdroiddata repo (gitlab.com/fdroid/fdroiddata). To actually get listed, copy this file to
 # metadata/com.maneeshacooray.gitling.yml there and open a merge request. Keeping a copy here
 # is just so the build recipe lives next to the source it describes.
+#
+# UpdateCheckMode is anchored to the 1.0.x scheme specifically (not a generic
+# ^v\d+\.\d+\.\d+$) because this repo's history still contains the original upstream MGit
+# project's old release tags (v1.3.0, v1.5.x, v1.6.x, v1.7.0, etc, reachable through shared
+# commit history) -- a looser pattern would match those too and make F-Droid's checker think
+# they're new Gitling releases.
 Categories:
   - Development
 License: GPL-3.0-or-later
@@ -17,17 +23,14 @@ RepoType: git
 Repo: https://github.com/maneeshacooray/Gitling
 
 Builds:
-  - versionName: '1.0.10'
+  - versionName: 1.0.10
     versionCode: 11
     commit: 846ef4fabb0c4f855fca819dbb96433d018d449f
+    subdir: app
     gradle:
-      - 'yes'
+      - yes
 
 AutoUpdateMode: Version
-# Anchored to the 1.0.x scheme specifically (not a generic ^v\d+\.\d+\.\d+$) because this repo's
-# history still contains the original upstream MGit project's old release tags (v1.3.0, v1.5.x,
-# v1.6.x, v1.7.0, etc, reachable through shared commit history) -- a looser pattern would match
-# those too and make F-Droid's checker think they're new Gitling releases.
 UpdateCheckMode: Tags ^v1\.0\.\d+$
-CurrentVersion: '1.0.10'
+CurrentVersion: 1.0.10
 CurrentVersionCode: 11
