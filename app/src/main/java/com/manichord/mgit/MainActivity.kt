@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -178,6 +179,19 @@ class MainActivity : SheimiFragmentActivity() {
 
         setContent {
             navController = rememberNavController()
+
+            // Picks up a repo staged by openRepoDetailSafely() (handleIntent/
+            // handleWidgetOpenRepoIntent in onCreate, called before this composition was
+            // guaranteed to exist) and navigates now that navController actually does. Runs
+            // once per Activity instance; skipped if we're already showing repoDetail (e.g.
+            // NavController's own back stack restored that route after a config-change
+            // recreate) to avoid pushing a redundant duplicate entry.
+            LaunchedEffect(Unit) {
+                if (pendingRepoForDetail != null && navController.currentDestination?.route != "repoDetail") {
+                    navController.navigate("repoDetail")
+                }
+            }
+
             NavHost(navController = navController, startDestination = "repoList") {
                 composable("repoList") {
                     RepoListComposeContent(
@@ -411,6 +425,20 @@ class MainActivity : SheimiFragmentActivity() {
         navController.navigate("repoDetail")
     }
 
+    /** Like openRepoDetail(), but safe to call from onCreate's tail (handleIntent/
+     * handleWidgetOpenRepoIntent below) where setContent's first composition -- and thus
+     * navController -- isn't guaranteed to have run yet (confirmed by a production crash:
+     * UninitializedPropertyAccessException on navController from a cold-started widget tap).
+     * Falls back to just staging pendingRepoForDetail; the NavHost's own LaunchedEffect picks
+     * it up and navigates once the composition is actually ready. */
+    private fun openRepoDetailSafely(repo: Repo) {
+        if (::navController.isInitialized) {
+            openRepoDetail(repo)
+        } else {
+            pendingRepoForDetail = repo
+        }
+    }
+
     private fun openBranchChooser(repo: Repo) {
         pendingRepoForBranchChooser = repo
         navController.navigate("branchChooser")
@@ -504,9 +532,15 @@ class MainActivity : SheimiFragmentActivity() {
     private fun handleWidgetOpenRepoIntent(intent: Intent?) {
         val repoId = intent?.getIntExtra(EXTRA_OPEN_REPO_ID, -1) ?: -1
         if (repoId == -1) return
-        val repo = Repo.getRepoList(this, RepoDbManager.getRepoById(repoId.toLong())).firstOrNull()
+        // RepoDbManager.getRepoById returns null (not an empty cursor) when nothing matches --
+        // a real possibility here specifically, since the widget's displayed repo list can be
+        // stale relative to the current DB (e.g. the user deleted that repo in-app since the
+        // widget last refreshed). Repo.getRepoList()/Repo.getRepoById() both assume a non-null
+        // cursor and NPE otherwise, so check first rather than feeding it through.
+        val cursor = RepoDbManager.getRepoById(repoId.toLong()) ?: return
+        val repo = Repo.getRepoList(this, cursor).firstOrNull()
         if (repo != null) {
-            openRepoDetail(repo)
+            openRepoDetailSafely(repo)
         }
     }
 
@@ -529,7 +563,7 @@ class MainActivity : SheimiFragmentActivity() {
 
             if (repositoriesWithSameRemote.isNotEmpty()) {
                 showToastMessage(R.string.repository_already_present)
-                openRepoDetail(repositoriesWithSameRemote[0])
+                openRepoDetailSafely(repositoriesWithSameRemote[0])
             } else if (Repo.getDir((applicationContext as MGitApplication).prefenceHelper, repoName).exists()) {
                 cloneViewModel.remoteUrl = repoUrlBuilder.toString()
                 showCloneView()

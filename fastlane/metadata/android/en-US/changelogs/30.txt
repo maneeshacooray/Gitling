@@ -1,0 +1,1 @@
+Fixed a crash tapping a repo in the home-screen widget right after the app had been killed in the background.

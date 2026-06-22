@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 30,
+            versionName = "1.0.29",
+            highlights = listOf(
+                "Fixed a crash tapping a repo in the home-screen widget right after the app had been killed in the background"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 29,
             versionName = "1.0.28",
             highlights = listOf(
