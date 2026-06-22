@@ -1,0 +1,1 @@
+Housekeeping release -- stops stripping debug symbols from bundled third-party native libraries so builds are byte-identical across machines (needed for F-Droid's reproducible-build verification), no user-facing changes.

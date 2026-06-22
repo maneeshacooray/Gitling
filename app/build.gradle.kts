@@ -12,8 +12,8 @@ android {
         applicationId = "com.maneeshacooray.gitling"
         minSdk = 23
         targetSdk = 37
-        versionCode = 26
-        versionName = "1.0.25"
+        versionCode = 27
+        versionName = "1.0.26"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
@@ -72,6 +72,17 @@ android {
         resources {
             excludes += setOf("META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE")
             excludes += "META-INF/versions/**/OSGI-INF/MANIFEST.MF"
+        }
+        // This app has no native source of its own -- all .so files come prebuilt from
+        // dependencies (e.g. Conscrypt). AGP's debug-symbol stripping for those runs the NDK's
+        // llvm-strip, and which NDK version gets resolved for that isn't pinned anywhere, so it
+        // can (and does) differ across build machines, producing a non-byte-identical .so even
+        // though the underlying dependency artifact is identical -- this broke F-Droid's
+        // reproducible-build verification (libconscrypt_jni.so differed for all 4 ABIs between
+        // GitHub Actions' build and F-Droid's, even after the JDK was made to match). Disabling
+        // stripping makes these libraries a straight, environment-independent copy instead.
+        jniLibs {
+            keepDebugSymbols += "**/*.so"
         }
     }
 }
