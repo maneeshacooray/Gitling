@@ -28,7 +28,8 @@ fun SettingsScreen(
     onManageAccountsClick: () -> Unit,
     onManageSshKeysClick: () -> Unit,
     onFeedbackClick: () -> Unit,
-    onViewReleaseClick: (String) -> Unit = {}
+    onViewReleaseClick: (String) -> Unit = {},
+    onAddWidgetClick: () -> Unit = {}
 ) {
     val repoRoot by viewModel.repoRoot.observeAsState(Repo.getDefaultRepoRootDir().absolutePath)
     val useSharedMediaStorage by viewModel.useSharedMediaStorage.observeAsState(false)
@@ -100,6 +101,13 @@ fun SettingsScreen(
             SettingsFontItem(
                 selected = fontOption,
                 onSelect = { viewModel.setFontOption(it) }
+            )
+
+            SettingsClickableItem(
+                title = stringResource(R.string.preference_add_widget),
+                summary = stringResource(R.string.preference_add_widget_summary),
+                icon = Icons.Default.Widgets,
+                onClick = onAddWidgetClick
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

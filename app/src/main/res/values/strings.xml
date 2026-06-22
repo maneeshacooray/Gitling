@@ -2,6 +2,9 @@
 <resources>
 
     <string name="app_name" translatable="false">Gitling</string>
+    <string name="widget_label">Gitling repos</string>
+    <string name="widget_description">Shows your cloned repos and whether each has uncommitted changes. Tap a repo to open it.</string>
+    <string name="widget_pin_not_supported">Your launcher doesn\'t support adding widgets this way -- long-press your home screen and choose Widgets instead.</string>
     <string name="default_text">Default Text</string>
     <string name="title_clone_repo">Clone Repository</string>
     <string name="preference_file_key" translatable="false">com.manichord.mgit</string>
@@ -165,6 +168,8 @@
     <string name="preference_use_dynamic_color">Use wallpaper colors</string>
     <string name="preference_use_dynamic_color_summary">Match Gitling\'s colors to your wallpaper (Material You) instead of its own brand color</string>
     <string name="pref_key_use_dynamic_color" translatable="false">use_dynamic_color</string>
+    <string name="preference_add_widget">Add widget to home screen</string>
+    <string name="preference_add_widget_summary">Shows your repos and whether each has uncommitted changes</string>
     <string name="preference_use_shared_media_storage">Make repos visible to other apps</string>
     <string name="preference_use_shared_media_storage_summary">Store repos somewhere other apps (e.g. a file manager with storage access) can also reach, instead of Gitling\'s own private folder</string>
     <string name="pref_key_use_shared_media_storage" translatable="false">use_shared_media_storage</string>

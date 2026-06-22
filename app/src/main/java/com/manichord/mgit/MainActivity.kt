@@ -1,5 +1,7 @@
 package com.manichord.mgit
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -386,7 +388,8 @@ class MainActivity : SheimiFragmentActivity() {
                                     },
                                     onViewReleaseClick = { url ->
                                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                    }
+                                    },
+                                    onAddWidgetClick = { requestPinRepoListWidget() }
                                 )
                                 "accounts" -> AccountsScreen(
                                     viewModel = settingsViewModel,
@@ -400,6 +403,7 @@ class MainActivity : SheimiFragmentActivity() {
         }
 
         handleIntent(intent)
+        handleWidgetOpenRepoIntent(intent)
     }
 
     fun openRepoDetail(repo: Repo) {
@@ -429,6 +433,16 @@ class MainActivity : SheimiFragmentActivity() {
     fun openUserSettings(initialScreen: String = "settings") {
         pendingUserSettingsInitialScreen = initialScreen
         navController.navigate("userSettings")
+    }
+
+    private fun requestPinRepoListWidget() {
+        val appWidgetManager = getSystemService(AppWidgetManager::class.java)
+        val provider = ComponentName(this, com.manichord.mgit.widget.RepoListWidgetReceiver::class.java)
+        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+            appWidgetManager.requestPinAppWidget(provider, null, null)
+        } else {
+            showToastMessage(R.string.widget_pin_not_supported)
+        }
     }
 
     private fun checkoutBranch(repo: Repo, commitName: String) {
@@ -484,6 +498,16 @@ class MainActivity : SheimiFragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
+        handleWidgetOpenRepoIntent(intent)
+    }
+
+    private fun handleWidgetOpenRepoIntent(intent: Intent?) {
+        val repoId = intent?.getIntExtra(EXTRA_OPEN_REPO_ID, -1) ?: -1
+        if (repoId == -1) return
+        val repo = Repo.getRepoList(this, RepoDbManager.getRepoById(repoId.toLong())).firstOrNull()
+        if (repo != null) {
+            openRepoDetail(repo)
+        }
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -538,11 +562,15 @@ class MainActivity : SheimiFragmentActivity() {
         outState.putString(KEY_PENDING_USER_SETTINGS_INITIAL_SCREEN, pendingUserSettingsInitialScreen)
     }
 
-    private companion object {
-        const val KEY_PENDING_REPO_FOR_DETAIL = "pending_repo_for_detail"
-        const val KEY_PENDING_REPO_FOR_BRANCH_CHOOSER = "pending_repo_for_branch_chooser"
-        const val KEY_PENDING_COMMIT_DIFF_ARGS = "pending_commit_diff_args"
-        const val KEY_PENDING_USER_SETTINGS_INITIAL_SCREEN = "pending_user_settings_initial_screen"
+    companion object {
+        private const val KEY_PENDING_REPO_FOR_DETAIL = "pending_repo_for_detail"
+        private const val KEY_PENDING_REPO_FOR_BRANCH_CHOOSER = "pending_repo_for_branch_chooser"
+        private const val KEY_PENDING_COMMIT_DIFF_ARGS = "pending_commit_diff_args"
+        private const val KEY_PENDING_USER_SETTINGS_INITIAL_SCREEN = "pending_user_settings_initial_screen"
+
+        /** Set by the home-screen widget's "open repo" tap action (see widget/RepoWidgetActions.kt)
+         * to route straight to that repo's detail screen instead of the repo list. */
+        const val EXTRA_OPEN_REPO_ID = "com.manichord.mgit.OPEN_REPO_ID"
     }
 
     private fun initUpdatedSSL() {

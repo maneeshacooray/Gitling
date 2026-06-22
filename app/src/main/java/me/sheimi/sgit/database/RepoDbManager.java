@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import me.sheimi.android.utils.BasicFunctions;
+import me.sheimi.sgit.MGitApplication;
 
 /**
  * Manage entries in the persisted database tracking local repo metadata.
@@ -33,7 +34,14 @@ public class RepoDbManager {
 
     private static RepoDbManager getInstance() {
         if (mInstance == null) {
-            mInstance = new RepoDbManager(BasicFunctions.getActiveActivity());
+            // Falls back to the Application context rather than always assuming an Activity is
+            // active -- the home-screen widget can trigger a query before the app's UI has ever
+            // run in this process (e.g. a periodic background update right after device boot).
+            Context context = BasicFunctions.getActiveActivity();
+            if (context == null) {
+                context = MGitApplication.getContext();
+            }
+            mInstance = new RepoDbManager(context);
         }
         return mInstance;
     }

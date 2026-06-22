@@ -1,0 +1,1 @@
+Added a home-screen widget -- shows your repos and whether each has uncommitted changes, tap one to open it. Add it from Settings or your launcher's widget picker.

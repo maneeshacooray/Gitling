@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 29,
+            versionName = "1.0.28",
+            highlights = listOf(
+                "Added a home-screen widget -- shows your repos and whether each has uncommitted changes, tap one to open it. Add it from Settings or your launcher's widget picker"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 28,
             versionName = "1.0.27",
             highlights = listOf(

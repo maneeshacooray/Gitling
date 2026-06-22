@@ -29,6 +29,7 @@ desugar = "2.1.5"
 versions-plugin = "0.51.0"
 ksp = "2.1.10-1.0.29"
 material-kolor = "4.1.1"
+glance = "1.1.1"
 
 [libraries]
 # AndroidX
@@ -53,6 +54,8 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
 # Google
 material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
