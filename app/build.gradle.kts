@@ -8,12 +8,23 @@ android {
     namespace = "me.sheimi.sgit"
     compileSdk = 37
 
+    // AGP embeds an extra "Dependency metadata" block in the release APK's signing block by
+    // default (for Google Play's SDK Console/dependency-transparency feature) -- F-Droid's
+    // "check apk" verification explicitly scans for and rejects any such extra signing block,
+    // since it's not something derivable from the source the way the APK's actual content is.
+    // Only disabled for the raw APK (what GitHub releases and F-Droid build from) -- left enabled
+    // for the AAB (includeInBundle stays at its default) so a future Play Store upload still
+    // gets the full dependency-transparency metadata Google Play actually uses it for.
+    dependenciesInfo {
+        includeInApk = false
+    }
+
     defaultConfig {
         applicationId = "com.maneeshacooray.gitling"
         minSdk = 23
         targetSdk = 37
-        versionCode = 27
-        versionName = "1.0.26"
+        versionCode = 28
+        versionName = "1.0.27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true

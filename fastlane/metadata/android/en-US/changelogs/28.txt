@@ -1,0 +1,1 @@
+Housekeeping release -- removes an extra metadata block Google's build tooling adds to the downloadable APK (F-Droid's verification rejects it), no user-facing changes.

@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 28,
+            versionName = "1.0.27",
+            highlights = listOf(
+                "Housekeeping release -- removes an extra metadata block Google's build tooling adds to the downloadable APK (F-Droid's verification rejects it), no user-facing changes"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 27,
             versionName = "1.0.26",
             highlights = listOf(
