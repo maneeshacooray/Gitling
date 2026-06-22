@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gitling Privacy Policy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #222; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Gitling Privacy Policy</h1>
+<p><em>Last updated: June 22, 2026</em></p>
+
+<p>Gitling is a Git client for Android. This policy explains what data Gitling handles and how.</p>
+
+<h2>Data Gitling does not collect</h2>
+<p>Gitling contains no analytics, advertising, or tracking SDKs of any kind. It does not collect usage statistics, does not sell or share any data with third parties, and does not require an account to use its core features.</p>
+
+<h2>Git repository data</h2>
+<p>When you clone, pull, or push a repository, Gitling connects directly from your device to the Git host you specify (e.g. GitHub, GitLab, Bitbucket, or a self-hosted server) using the standard Git protocol over HTTPS or SSH. Gitling has no server of its own and never sees or stores this traffic anywhere except on your device.</p>
+
+<h2>Credentials</h2>
+<p>If you save a username/password, personal access token, GitHub OAuth token, or an SSH private key passphrase in Gitling, it is encrypted using the Android Keystore and stored only on your device. It is never transmitted to Gitling's developer or any third party, except to the Git host itself when authenticating a Git operation you initiate.</p>
+
+<h2>GitHub sign-in</h2>
+<p>Gitling's optional "Connect with GitHub" feature uses GitHub's OAuth Device Flow. Your GitHub credentials are entered directly on github.com, never inside Gitling. The resulting access token is stored encrypted on your device as described above.</p>
+
+<h2>Crash reports</h2>
+<p>If Gitling crashes, it may ask whether you'd like to send a crash report. If you agree, Gitling opens your device's email app with a pre-filled report (device model, Android version, and the crash details) addressed to the developer -- you must explicitly review and send it yourself. No crash data is collected or transmitted unless you choose to send that email.</p>
+
+<h2>Permissions</h2>
+<p>Gitling requests <code>INTERNET</code> and <code>ACCESS_NETWORK_STATE</code> only, used solely to perform the Git operations you initiate. Gitling does not request storage, contacts, location, or any other device permission.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy can be sent to <a href="mailto:bmaneeshacooray@gmail.com">bmaneeshacooray@gmail.com</a>, or filed as an issue on <a href="https://github.com/maneeshacooray/Gitling/issues">GitHub</a>.</p>
+
+</body>
+</html>
