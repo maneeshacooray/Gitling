@@ -1,0 +1,1 @@
+Housekeeping release -- lets the build system auto-download the exact JDK it needs on machines that don't already have it (fixes a build failure on F-Droid's build servers), no user-facing changes.
