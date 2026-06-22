@@ -12,8 +12,8 @@ android {
         applicationId = "com.maneeshacooray.gitling"
         minSdk = 23
         targetSdk = 37
-        versionCode = 23
-        versionName = "1.0.22"
+        versionCode = 24
+        versionName = "1.0.23"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
@@ -73,6 +73,20 @@ android {
             excludes += setOf("META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE")
             excludes += "META-INF/versions/**/OSGI-INF/MANIFEST.MF"
         }
+    }
+}
+
+// Pins the exact JDK Gradle uses to compile, regardless of whatever JDK is installed on the
+// host machine running the build -- compileOptions above only sets the *output bytecode level*
+// (sourceCompatibility/targetCompatibility), not which JDK actually runs javac/kotlinc/D8. Without
+// this, two CI environments with different host JDKs can produce non-byte-identical APKs from
+// the same source (different D8 dexing output, different java.util.zip/DEFLATE compression
+// behavior for the same input bytes) even though both builds are otherwise correct -- this is
+// what broke F-Droid's reproducible-build verification: GitHub Actions' release workflow
+// explicitly uses Temurin 17, while F-Droid's build container defaults to OpenJDK 21.
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
