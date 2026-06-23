@@ -1,11 +1,13 @@
 package com.manichord.mgit.repodetail
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -156,7 +159,7 @@ private fun CommitGraphNode(isFirst: Boolean, isLast: Boolean, modifier: Modifie
     }
 }
 
-/** Lazygit-style: one compact line per commit -- graph, short hash, message, no avatar/author/date. */
+/** Two-line commit row: hash + message on line 1; date + author + ref chips on line 2. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CommitRow(
@@ -168,43 +171,88 @@ private fun CommitRow(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val dateFormatter = DateFormat.getDateFormat(context)
+    val authorIdent = commit.authorIdent
+    val dateStr = dateFormatter.format(authorIdent.`when`)
+    val authorName = authorIdent.name
+
+    @Suppress("UNCHECKED_CAST")
+    val plotCommit = commit as? PlotCommit<PlotLane>
+
     Row(
-        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(horizontal = 8.dp, vertical = 3.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp)
             .height(IntrinsicSize.Min)
     ) {
-        @Suppress("UNCHECKED_CAST")
-        val plotCommit = commit as? PlotCommit<PlotLane>
+        // Graph column (left side)
         if (plotCommit != null) {
             CommitGraphCanvas(commit = plotCommit, graphWidthUnits = graphWidthUnits)
         } else {
             CommitGraphNode(isFirst = isFirst, isLast = isLast)
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = commit.name.take(7),
-            style = MaterialTheme.typography.labelSmall,
-            fontFamily = FontFamily.Monospace,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        if (plotCommit != null && plotCommit.refCount > 0) {
-            for (i in 0 until plotCommit.refCount) {
-                RefChip(ref = plotCommit.getRef(i))
+
+        // Content column (right side, two rows of text)
+        Column(modifier = Modifier.weight(1f)) {
+            // Line 1: hash + message
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = commit.name.take(7),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = commit.shortMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Line 2: date · author + ref chips
+            FlowRow(
+                modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
+            ) {
+                Text(
+                    text = dateStr,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "·",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = authorName,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                if (plotCommit != null && plotCommit.refCount > 0) {
+                    for (i in 0 until plotCommit.refCount) {
+                        RefChip(ref = plotCommit.getRef(i))
+                        if (i < plotCommit.refCount - 1) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                    }
+                }
             }
         }
-        Text(
-            text = commit.shortMessage,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
     }
 }
 
