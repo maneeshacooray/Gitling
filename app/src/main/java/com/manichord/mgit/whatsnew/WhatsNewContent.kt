@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 31,
+            versionName = "1.0.30",
+            highlights = listOf(
+                "Fixed the Cherry Pick dialog's guide text overflowing past the field border"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 30,
             versionName = "1.0.29",
             highlights = listOf(

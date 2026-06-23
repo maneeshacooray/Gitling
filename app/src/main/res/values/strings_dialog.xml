@@ -3,7 +3,8 @@
 
     <!-- Cherry Pick -->
     <string name="dialog_cherrypick_title">Cherry Pick</string>
-    <string name="dialog_cherrypick_msg_hint">Commit Hash (copy from commit list)</string>
+    <string name="dialog_cherrypick_msg_hint">Commit Hash</string>
+    <string name="dialog_cherrypick_msg_helper">Copy from the commit list</string>
     <string name="dialog_label_cherrypick">Cherry Pick</string>
     <string name="dialog_rebase_title">Choose upstream branch</string>
 

@@ -23,7 +23,8 @@ public class CherryPickAction extends RepoAction {
                     public void onClicked(String text) {
                         cherrypick(text);
                     }
-                });
+                },
+                R.string.dialog_cherrypick_msg_helper);
         mActivity.closeOperationDrawer();
     }
 
