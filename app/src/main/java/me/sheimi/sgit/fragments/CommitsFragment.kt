@@ -163,6 +163,14 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
         val inflater: MenuInflater = mode.menuInflater
         inflater.inflate(R.menu.action_mode_commit_diff, menu)
         mode.setTitle(R.string.action_mode_diff)
+        // The diff screen only exists as a route in MainActivity's NavHost (CommitDiffActivity
+        // is a plain class wrapping a live MainActivity instance, not a launchable Activity) --
+        // when this same CommitsFragment is hosted by ViewFileActivity instead (its "Commits"
+        // tab, showing the commit history filtered to one file -- see ViewFileActivity.kt),
+        // there's nowhere for "Diff" to navigate to. Hide it there rather than offer an action
+        // that can't work (this used to unconditionally cast rawActivity to MainActivity and
+        // crash with a ClassCastException whenever tapped from this tab).
+        menu.findItem(R.id.action_mode_diff)?.isVisible = rawActivity is MainActivity
         return true
     }
 
@@ -170,7 +178,7 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
 
     private fun showDiff(actionMode: ActionMode?, oldCommit: String?, newCommit: String, showDescription: Boolean) {
         actionMode?.finish()
-        (rawActivity as MainActivity).openCommitDiff(oldCommit, newCommit, showDescription, repo)
+        (rawActivity as? MainActivity)?.openCommitDiff(oldCommit, newCommit, showDescription, repo)
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {

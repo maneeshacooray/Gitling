@@ -1,0 +1,1 @@
+Fixed a crash tapping a commit in a file's commit-history tab.

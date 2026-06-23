@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 32,
+            versionName = "1.0.31",
+            highlights = listOf(
+                "Fixed a crash tapping a commit in a file's commit-history tab"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 31,
             versionName = "1.0.30",
             highlights = listOf(
