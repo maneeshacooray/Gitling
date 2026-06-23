@@ -4,6 +4,12 @@
 
 <h1 align="center">Gitling</h1>
 
+<p align="center">
+  <a href="https://github.com/maneeshacooray/Gitling/releases/latest"><img src="https://img.shields.io/github/v/release/maneeshacooray/Gitling?label=GitHub%20release" alt="Latest GitHub release"></a>
+  <a href="https://f-droid.org/packages/com.maneeshacooray.gitling/"><img src="https://img.shields.io/f-droid/v/com.maneeshacooray.gitling" alt="F-Droid version"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/maneeshacooray/Gitling" alt="License: GPLv3"></a>
+</p>
+
 <p align="center">Gitling is a Git client for Android, built with Jetpack Compose and Material 3 Expressive.</p>
 
 It's a fork of [MGit](https://github.com/maks/MGit) (itself a continuation of [SGit](https://github.com/sheimi/SGit)), modernized with a current Android toolchain, a from-scratch Compose UI, one-tap GitHub sign-in, and a new identity.
