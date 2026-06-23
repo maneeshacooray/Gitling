@@ -171,11 +171,21 @@ public class SheimiFragmentActivity extends AppCompatActivity {
 
     public void showEditTextDialog(int title, int hint, int positiveBtn,
             final OnEditTextDialogClicked positiveListener) {
+        showEditTextDialog(title, hint, positiveBtn, positiveListener, 0);
+    }
+
+    /** @param helperText resource id for short guidance shown below the field (wraps normally),
+     * or 0 for none -- use this instead of stuffing long text into the hint/label, which is
+     * rendered as a single-line floating label by Material3 and overflows the field's border
+     * if it doesn't fit on one line when focused. */
+    public void showEditTextDialog(int title, int hint, int positiveBtn,
+            final OnEditTextDialogClicked positiveListener, int helperText) {
         com.manichord.mgit.dialogs.EditTextDialog.show(
                 findViewById(android.R.id.content),
                 getString(title), getString(hint),
                 getString(positiveBtn), getString(R.string.label_cancel),
-                positiveListener);
+                positiveListener,
+                helperText == 0 ? null : getString(helperText));
     }
 
     public void promptForPassword(OnPasswordEntered onPasswordEntered,

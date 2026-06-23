@@ -27,7 +27,8 @@ object EditTextDialog {
         hint: String,
         positiveButtonText: String,
         cancelText: String,
-        positiveListener: OnEditTextDialogClicked
+        positiveListener: OnEditTextDialogClicked,
+        helperText: String? = null
     ) {
         val composeView = ComposeView(container.context)
         container.addView(composeView)
@@ -51,8 +52,16 @@ object EditTextDialog {
                             label = { Text(hint) },
                             singleLine = true,
                             isError = showError,
+                            // Long guidance text (e.g. cherry-pick's "copy from commit list")
+                            // belongs here, not in the label -- Material3's floating label is
+                            // designed to be a single short line when the field is focused and
+                            // doesn't wrap, so anything more than a couple words there visibly
+                            // overflows past the field's border. supportingText below the field
+                            // wraps normally.
                             supportingText = if (showError) {
                                 { Text("Required") }
+                            } else if (helperText != null) {
+                                { Text(helperText) }
                             } else null
                         )
                     },

@@ -111,6 +111,9 @@ class RepoDetailActivity(
     fun showEditTextDialog(title: Int, hint: Int, positiveBtn: Int, positiveListener: OnEditTextDialogClicked) =
         mainActivity.showEditTextDialog(title, hint, positiveBtn, positiveListener)
 
+    fun showEditTextDialog(title: Int, hint: Int, positiveBtn: Int, positiveListener: OnEditTextDialogClicked, helperText: Int) =
+        mainActivity.showEditTextDialog(title, hint, positiveBtn, positiveListener, helperText)
+
     // Progress Callback for delegate actions
     inner class ProgressCallback(private val mInitMsg: Int) : AsyncTaskCallback {
         override fun onPreExecute() {
