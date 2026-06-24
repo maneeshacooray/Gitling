@@ -242,8 +242,8 @@ private fun CommitRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 if (plotCommit != null && plotCommit.refCount > 0) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     for (i in 0 until plotCommit.refCount) {
                         RefChip(ref = plotCommit.getRef(i))
                         if (i < plotCommit.refCount - 1) {
