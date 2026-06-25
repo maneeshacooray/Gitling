@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 enum class StatusChangeType { ADDED, MODIFIED, REMOVED, MISSING, UNTRACKED }
@@ -77,7 +78,7 @@ fun StatusScreen(
                     item { SectionHeader("Conflicts") }
                     items(conflictingFiles) { path ->
                         ListItem(
-                            headlineContent = { Text(path) },
+                            headlineContent = { Text(path, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                             leadingContent = {
                                 Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                             },
@@ -127,7 +128,7 @@ private fun FileRow(
     onAction: () -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(entry.path) },
+        headlineContent = { Text(entry.path, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         leadingContent = {
             Icon(entry.changeType.icon(), contentDescription = entry.changeType.name, tint = entry.changeType.tint())
         },

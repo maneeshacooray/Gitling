@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
@@ -142,7 +143,13 @@ fun RepoDetailScreen(
                                 repo?.branchName?.let { branch ->
                                     SuggestionChip(
                                         onClick = onBranchClick,
-                                        label = { Text(branch) },
+                                        label = {
+                                            Text(
+                                                text = branch,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        },
                                         icon = { Icon(Icons.Default.AccountTree, null, Modifier.size(16.dp)) }
                                     )
                                 }
