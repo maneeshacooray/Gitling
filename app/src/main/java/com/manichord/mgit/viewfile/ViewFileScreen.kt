@@ -38,6 +38,7 @@ const val TAG_MODE_SSH_KEY: Short = 1
 fun ViewFileScreen(
     title: String,
     hasCommitsTab: Boolean,
+    hasBlameTab: Boolean,
     activityMode: Short,
     currentTab: Int,
     onTabSelected: (Int) -> Unit,
@@ -50,7 +51,8 @@ fun ViewFileScreen(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     fileContent: @Composable () -> Unit,
-    commitsContent: @Composable () -> Unit
+    commitsContent: @Composable () -> Unit,
+    blameContent: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -123,14 +125,23 @@ fun ViewFileScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            if (hasCommitsTab) {
+            if (hasCommitsTab || hasBlameTab) {
                 TabRow(selectedTabIndex = currentTab) {
                     Tab(selected = currentTab == 0, onClick = { onTabSelected(0) }, text = { Text("File") })
-                    Tab(selected = currentTab == 1, onClick = { onTabSelected(1) }, text = { Text("Commits") })
+                    if (hasCommitsTab) {
+                        Tab(selected = currentTab == 1, onClick = { onTabSelected(1) }, text = { Text("Commits") })
+                    }
+                    if (hasBlameTab) {
+                        Tab(selected = currentTab == 2, onClick = { onTabSelected(2) }, text = { Text("Blame") })
+                    }
                 }
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                if (currentTab == 0) fileContent() else commitsContent()
+                when (currentTab) {
+                    0 -> fileContent()
+                    1 -> commitsContent()
+                    else -> blameContent()
+                }
             }
         }
     }

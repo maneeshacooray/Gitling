@@ -22,7 +22,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.IntentCompat
 import com.manichord.mgit.ui.components.FragmentHost
 import com.manichord.mgit.ui.theme.AppTheme
+import com.manichord.mgit.viewfile.BlameContent
+import com.manichord.mgit.viewfile.BlameState
 import com.manichord.mgit.viewfile.ViewFileScreen
+import com.manichord.mgit.viewfile.toGroups
 import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.android.utils.CodeGuesser
 import me.sheimi.android.utils.FsUtils
@@ -31,6 +34,7 @@ import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.dialogs.ChooseLanguageDialog
 import me.sheimi.sgit.fragments.CommitsFragment
+import me.sheimi.sgit.repo.tasks.repo.GetBlameTask
 import org.apache.commons.io.FileUtils
 import timber.log.Timber
 import java.io.File
@@ -55,6 +59,7 @@ class ViewFileActivity : SheimiFragmentActivity() {
     private var searchActive by mutableStateOf(false)
     private var searchQuery by mutableStateOf("")
     private var isLoadingFile by mutableStateOf(true)
+    private var blameState by mutableStateOf<BlameState>(BlameState.Loading)
 
     override fun getThemeResource(): Int {
         return if (Profile.getTheme(this) == 1) {
@@ -74,7 +79,15 @@ class ViewFileActivity : SheimiFragmentActivity() {
         file = File(fileName)
 
         if (repo != null) {
-            commitsFragment = CommitsFragment.newInstance(repo, FsUtils.getRelativePath(File(fileName), repo.dir))
+            val relativePath = FsUtils.getRelativePath(File(fileName), repo.dir)
+            commitsFragment = CommitsFragment.newInstance(repo, relativePath)
+            GetBlameTask(repo, relativePath) { result ->
+                blameState = if (result != null) {
+                    BlameState.Loaded(result.toGroups())
+                } else {
+                    BlameState.Error(getString(R.string.error_can_not_open_file))
+                }
+            }.executeTask()
         }
 
         val screenTitle = File(fileName).name
@@ -84,6 +97,7 @@ class ViewFileActivity : SheimiFragmentActivity() {
                 ViewFileScreen(
                     title = screenTitle,
                     hasCommitsTab = commitsFragment != null,
+                    hasBlameTab = repo != null,
                     activityMode = activityMode,
                     currentTab = currentTab,
                     onTabSelected = { currentTab = it },
@@ -125,7 +139,8 @@ class ViewFileActivity : SheimiFragmentActivity() {
                     },
                     commitsContent = {
                         commitsFragment?.let { FragmentHost(supportFragmentManager, it) }
-                    }
+                    },
+                    blameContent = { BlameContent(blameState) }
                 )
             }
         }
