@@ -86,6 +86,44 @@ JAVA_HOME=/opt/homebrew/Cellar/openjdk@21/21.0.11/libexec/openjdk.jdk/Contents/H
 (Path will vary by machine — find it with `ls /opt/homebrew/Cellar/openjdk@21/*/libexec/*.jdk/Contents/Home`
 or equivalent.)
 
+## Building a signed release bundle for the Play Store
+
+Separate from the tag-triggered GitHub workflow above (which builds a signed **APK** for the
+GitHub Release) — Play Store uploads need a signed **`.aab` bundle**, built manually, since there
+is no CI workflow for this side:
+
+```bash
+JAVA_HOME=<path-to-jdk-21> \
+  ./gradlew --no-daemon bundleRelease \
+  -Pspecial \
+  -Palias=<keystore alias> \
+  -Ppassword=<key password> \
+  -Pkeystore=<path to .jks file> \
+  -Pstore_password=<keystore password>
+```
+
+This produces `app/build/outputs/bundle/release/app-release.aab`, the file uploaded to Play
+Console.
+
+- The four `-P` properties feed straight into the `signingConfigs.release` block in
+  `app/build.gradle.kts` (`alias`→`keyAlias`, `password`→`keyPassword`, `keystore`→`storeFile`,
+  `store_password`→`storePassword`) — the same mechanism `assembleRelease` uses for the APK, just
+  a different Gradle task. Without `-Pspecial` and the other three, the `release` signingConfig
+  isn't created and the build falls back to unsigned.
+- `store_password` and `password` are two distinct passwords (the keystore's own password vs. the
+  individual key's password). A wrong value in either fails the Gradle build itself (the
+  `signReleaseBundle`/`signReleaseApk` task, e.g. `keystore password was incorrect` or `Cannot
+  recover key`) — nothing reaches Play Store. Play Store only rejects something itself if you
+  build successfully but with the *wrong keystore entirely* (a different signing key than the one
+  already on record for the app), which surfaces on upload as a certificate-mismatch error.
+- To list the alias(es) in a keystore file: `keytool -list -keystore <path-to-jks>` (prompts for
+  the store password — alias names themselves aren't secret, but the password is).
+- Passwords can be rotated (`keytool -storepasswd`, `keytool -keypasswd`), but both require
+  authenticating with the *current* password first — there is no reset path for a genuinely lost
+  password. If this keystore is the Play App Signing **upload key**, Google's in-console
+  upload-key-reset process is the fallback; if it's the app's actual signing key with Play App
+  Signing not enabled, losing the password permanently blocks future updates to that listing.
+
 ## What happens after pushing the tag
 
 - **GitHub**: `.github/workflows/release.yml` triggers on any tag matching `v[0-9]+.[0-9]+.[0-9]+`,
