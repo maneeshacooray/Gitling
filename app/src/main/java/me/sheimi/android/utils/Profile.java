@@ -164,4 +164,14 @@ public class Profile {
         String key = context.getString(R.string.pref_key_pending_storage_migration_notice);
         getProfileSharedPreference(context).edit().putBoolean(key, pending).apply();
     }
+
+    public static boolean getGitHubBannerDismissed(Context context) {
+        String key = context.getString(R.string.pref_key_github_banner_dismissed);
+        return getProfileSharedPreference(context).getBoolean(key, false);
+    }
+
+    public static void setGitHubBannerDismissed(Context context, boolean dismissed) {
+        String key = context.getString(R.string.pref_key_github_banner_dismissed);
+        getProfileSharedPreference(context).edit().putBoolean(key, dismissed).apply();
+    }
 }

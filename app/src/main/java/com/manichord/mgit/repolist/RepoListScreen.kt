@@ -43,6 +43,8 @@ private fun Repo.matchesSearch(query: String): Boolean {
 fun RepoListScreen(
     repoList: List<Repo>,
     isGitHubConnected: Boolean,
+    githubBannerDismissed: Boolean,
+    onDismissGitHubBanner: () -> Unit,
     onRepoClick: (Repo) -> Unit,
     onRepoLongClick: (Repo) -> Unit,
     onCloneClick: () -> Unit,
@@ -52,7 +54,6 @@ fun RepoListScreen(
     onViewReleaseClick: () -> Unit = {},
     onDismissUpdateClick: () -> Unit = {}
 ) {
-    var githubBannerDismissed by remember { mutableStateOf(false) }
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val searchFocusRequester = remember { FocusRequester() }
@@ -145,7 +146,7 @@ fun RepoListScreen(
             if (!isGitHubConnected && !githubBannerDismissed && repoList.isNotEmpty()) {
                 ConnectGitHubBanner(
                     onConnectClick = onConnectGitHubClick,
-                    onDismissClick = { githubBannerDismissed = true }
+                    onDismissClick = onDismissGitHubBanner
                 )
             }
             Box(modifier = Modifier.fillMaxSize()) {

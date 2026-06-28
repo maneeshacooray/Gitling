@@ -24,6 +24,7 @@ import com.manichord.mgit.whatsnew.WhatsNewContent
 import com.manichord.mgit.whatsnew.WhatsNewDialog
 import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.android.utils.Profile
+import androidx.compose.runtime.saveable.rememberSaveable
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
@@ -61,6 +62,10 @@ fun RepoListComposeContent(
         var deleteTarget by remember { mutableStateOf<Repo?>(null) }
 
         val context = LocalContext.current
+        var githubBannerDismissed by rememberSaveable {
+            mutableStateOf(Profile.getGitHubBannerDismissed(context))
+        }
+
         var whatsNewEntries by remember {
             mutableStateOf(run {
                 val lastSeen = Profile.getLastSeenVersionCode(context)
@@ -80,6 +85,11 @@ fun RepoListComposeContent(
         RepoListScreen(
             repoList = repoListSnapshot,
             isGitHubConnected = isGitHubConnected,
+            githubBannerDismissed = githubBannerDismissed,
+            onDismissGitHubBanner = {
+                githubBannerDismissed = true
+                Profile.setGitHubBannerDismissed(context, true)
+            },
             onRepoClick = { repo ->
                 (activity as com.manichord.mgit.MainActivity).openRepoDetail(repo)
             },

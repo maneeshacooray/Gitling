@@ -179,6 +179,7 @@
     <string name="pref_key_last_update_check_time" translatable="false">last_update_check_time</string>
     <string name="pref_key_dismissed_update_version" translatable="false">dismissed_update_version</string>
     <string name="pref_key_pending_storage_migration_notice" translatable="false">pending_storage_migration_notice</string>
+    <string name="pref_key_github_banner_dismissed" translatable="false">github_banner_dismissed</string>
     <string name="action_git_profile">Git Profile</string>
     <string name="action_open_in_other_app">Open in other apps</string>
     <string name="action_add_private_key">Add Private Key</string>
