@@ -35,6 +35,7 @@ abstract class FileExplorerActivity(
     var selectedFile by mutableStateOf<File?>(null)
 
     val currentDir: File get() = currentDirState
+    val isAtRoot: Boolean get() = currentDirState == rootFolder
 
     abstract fun onFileClick(file: File)
     open fun onFileLongClick(file: File) {}
