@@ -50,6 +50,10 @@ class PrivateKeyManageActivity(
     }
 
     override fun onFileClick(file: File) {
+        if (file.isDirectory) {
+            setCurrentDir(file)
+            return
+        }
         val intent = Intent(this, ViewFileActivity::class.java)
         intent.putExtra(ViewFileActivity.TAG_FILE_NAME, PrivateKeyUtils.getPublicKeyEnsure(file).absolutePath)
         intent.putExtra(ViewFileActivity.TAG_MODE, ViewFileActivity.TAG_MODE_SSH_KEY)
