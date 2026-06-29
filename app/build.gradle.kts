@@ -4,6 +4,93 @@ plugins {
     id("kotlin-parcelize")
 }
 
+// ---------------------------------------------------------------------------
+// JGit Android 12 compatibility — bytecode patch
+//
+// JGit 6.3+ uses InputStream.transferTo() (API 29) and JGit 6.7+ uses
+// InputStream.readNBytes(int) (API 33). Neither is available on Android 12
+// (API 31), and desugar_jdk_libs 2.x does not backport either.
+//
+// Solution: at build time, rewrite every INVOKEVIRTUAL call to those two
+// methods inside JGit classes into INVOKESTATIC calls to StreamCompat shims
+// that are Java-8-compatible. The stack layout is identical for both opcodes
+// (object reference is already first on the stack), so no extra bytecode is
+// emitted.  StreamCompat lives in me.sheimi.sgit.compat.
+// ---------------------------------------------------------------------------
+
+import com.android.build.api.instrumentation.AsmClassVisitorFactory
+import com.android.build.api.instrumentation.ClassContext
+import com.android.build.api.instrumentation.ClassData
+import com.android.build.api.instrumentation.FramesComputationMode
+import com.android.build.api.instrumentation.InstrumentationParameters
+import com.android.build.api.instrumentation.InstrumentationScope
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes
+
+abstract class JGitCompatClassVisitorFactory :
+    AsmClassVisitorFactory<InstrumentationParameters.None> {
+
+    override fun createClassVisitor(
+        classContext: ClassContext,
+        nextClassVisitor: ClassVisitor
+    ): ClassVisitor = object : ClassVisitor(Opcodes.ASM9, nextClassVisitor) {
+        override fun visitMethod(
+            access: Int, name: String, descriptor: String,
+            signature: String?, exceptions: Array<String>?
+        ): MethodVisitor = object : MethodVisitor(
+            Opcodes.ASM9,
+            super.visitMethod(access, name, descriptor, signature, exceptions)
+        ) {
+            override fun visitMethodInsn(
+                opcode: Int, owner: String, name: String,
+                descriptor: String, isInterface: Boolean
+            ) {
+                if (opcode == Opcodes.INVOKEVIRTUAL && owner == "java/io/InputStream") {
+                    when {
+                        name == "readNBytes" && descriptor == "(I)[B" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/StreamCompat",
+                                "readNBytes",
+                                "(Ljava/io/InputStream;I)[B",
+                                false
+                            )
+                            return
+                        }
+                        name == "transferTo" && descriptor == "(Ljava/io/OutputStream;)J" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/StreamCompat",
+                                "transferTo",
+                                "(Ljava/io/InputStream;Ljava/io/OutputStream;)J",
+                                false
+                            )
+                            return
+                        }
+                    }
+                }
+                super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
+            }
+        }
+    }
+
+    override fun isInstrumentable(classData: ClassData): Boolean =
+        classData.className.startsWith("org.eclipse.jgit.")
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.instrumentation.transformClassesWith(
+            JGitCompatClassVisitorFactory::class.java,
+            InstrumentationScope.ALL
+        ) {}
+        variant.instrumentation.setAsmFramesComputationMode(
+            FramesComputationMode.COPY_FRAMES
+        )
+    }
+}
+
 android {
     namespace = "me.sheimi.sgit"
     compileSdk = 37
@@ -83,6 +170,7 @@ android {
         resources {
             excludes += setOf("META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE")
             excludes += "META-INF/versions/**/OSGI-INF/MANIFEST.MF"
+            excludes += "plugin.properties"
         }
         // This app has no native source of its own -- all .so files come prebuilt from
         // dependencies (e.g. Conscrypt). AGP's debug-symbol stripping for those runs the NDK's

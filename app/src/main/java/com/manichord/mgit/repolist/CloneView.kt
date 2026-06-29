@@ -1,7 +1,9 @@
 package com.manichord.mgit.repolist
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,8 +21,6 @@ import com.manichord.mgit.models.Account
 import com.manichord.mgit.models.AccountType
 import com.manichord.mgit.models.GitHubRepo
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.text.style.TextOverflow
 import me.sheimi.sgit.R
@@ -47,8 +47,9 @@ fun CloneView(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
-            .padding(bottom = 32.dp) // Extra padding for bottom sheet
+            .padding(bottom = 32.dp)
     ) {
         Text(
             text = if (initLocal) stringResource(id = R.string.dialog_clone_neutral_label) else stringResource(id = R.string.title_clone_repo),
@@ -232,7 +233,7 @@ fun GitHubRepoBrowser(
     val isLoading by viewModel.isLoadingRepos.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxWidth().heightIn(max = 280.dp)) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             "Your GitHub Repositories",
             style = MaterialTheme.typography.titleSmall,
@@ -259,8 +260,8 @@ fun GitHubRepoBrowser(
                         (it.description?.contains(searchQuery, ignoreCase = true) ?: false)
             }
 
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(filteredRepos) { repo ->
+            Column(modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp).verticalScroll(rememberScrollState())) {
+                filteredRepos.forEach { repo ->
                     GitHubRepoItem(repo = repo, onClick = { onRepoSelected(repo) })
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp), thickness = 0.5.dp)
                 }
