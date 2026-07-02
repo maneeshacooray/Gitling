@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 39,
+            versionName = "1.0.39",
+            highlights = listOf(
+                "Tag repositories with labels and filter the list — long-press a repo, tap Tags, and use the filter chips at the top"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 38,
             versionName = "1.0.38",
             highlights = listOf(

@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.39 - 2026-07-02
+- Tag repositories with labels and filter the list — long-press a repo, tap Tags, and use the filter chips at the top of the repo list
+
 ## 1.0.38 - 2026-07-02
 - Pin repositories to keep them at the top of the list — long-press a repo and tap Pin, tap Unpin to release
 
