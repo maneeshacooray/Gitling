@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 38,
+            versionName = "1.0.38",
+            highlights = listOf(
+                "Pin repositories to keep them at the top of the list — long-press a repo and tap Pin"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 37,
             versionName = "1.0.37",
             highlights = listOf(
