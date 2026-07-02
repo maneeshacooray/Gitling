@@ -45,7 +45,7 @@ public class Repo implements Comparable<Repo>, Serializable {
     /**
      * Generated serialVersionID
      */
-    private static final long serialVersionUID = -4921633809823078219L;
+    private static final long serialVersionUID = -4921633809823078220L;
 
     public static final String TAG = Repo.class.getSimpleName();
 
@@ -65,6 +65,7 @@ public class Repo implements Comparable<Repo>, Serializable {
     private String mLastCommitterEmail;
     private Date mLastCommitDate;
     private String mLastCommitMsg;
+    private boolean mPinned;
     private boolean isDeleted = false;
 
     // lazy load
@@ -89,6 +90,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLastCommitterEmail = RepoContract.getLatestCommitterEmail(cursor);
         mLastCommitDate = RepoContract.getLatestCommitDate(cursor);
         mLastCommitMsg = RepoContract.getLatestCommitMsg(cursor);
+        mPinned = RepoContract.getPinned(cursor);
     }
 
     public Bundle getBundle() {
@@ -241,6 +243,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         out.writeObject(mLastCommitterEmail);
         out.writeObject(mLastCommitDate);
         out.writeObject(mLastCommitMsg);
+        out.writeBoolean(mPinned);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -255,6 +258,18 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLastCommitterEmail = (String) in.readObject();
         mLastCommitDate = (Date) in.readObject();
         mLastCommitMsg = (String) in.readObject();
+        mPinned = in.readBoolean();
+    }
+
+    public boolean isPinned() {
+        return mPinned;
+    }
+
+    public void togglePinned() {
+        mPinned = !mPinned;
+        ContentValues values = new ContentValues();
+        values.put(RepoContract.RepoEntry.COLUMN_NAME_PINNED, mPinned ? 1 : 0);
+        RepoDbManager.updateRepo(mID, values);
     }
 
     @Override

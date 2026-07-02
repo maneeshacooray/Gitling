@@ -11,7 +11,7 @@ import java.text.StringCharacterIterator;
  */
 public class RepoDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "repo.db";
 
     public RepoDbHelper(Context context) {
@@ -24,9 +24,12 @@ public class RepoDbHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-        sqLiteDatabase.execSQL(RepoContract.REPO_ENTRY_DROP);
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        if (oldVersion < 2) {
+            sqLiteDatabase.execSQL("ALTER TABLE " + RepoContract.RepoEntry.TABLE_NAME
+                    + " ADD COLUMN " + RepoContract.RepoEntry.COLUMN_NAME_PINNED
+                    + " INTEGER DEFAULT 0");
+        }
     }
 
     public static String addSlashes(String text) {

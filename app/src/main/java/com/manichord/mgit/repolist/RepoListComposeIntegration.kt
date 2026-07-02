@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -144,7 +145,12 @@ fun RepoListComposeContent(
         repoOptionsTarget?.let { repo ->
             RepoOptionsDialog(
                 repoName = (repo.getDiaplayName() ?: ""),
+                isPinned = repo.isPinned,
                 onDismissRequest = { repoOptionsTarget = null },
+                onPinClick = {
+                    repoOptionsTarget = null
+                    repo.togglePinned()
+                },
                 onRenameClick = {
                     repoOptionsTarget = null
                     renameTarget = repo
@@ -216,7 +222,9 @@ fun RepoListComposeContent(
 @Composable
 private fun RepoOptionsDialog(
     repoName: String,
+    isPinned: Boolean,
     onDismissRequest: () -> Unit,
+    onPinClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -226,6 +234,12 @@ private fun RepoOptionsDialog(
         text = {
             val transparentListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent)
             Column {
+                ListItem(
+                    headlineContent = { Text(if (isPinned) "Unpin" else "Pin") },
+                    leadingContent = { Icon(Icons.Default.PushPin, contentDescription = null) },
+                    colors = transparentListItemColors,
+                    modifier = Modifier.clickable(onClick = onPinClick)
+                )
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.label_rename)) },
                     leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },

@@ -32,12 +32,14 @@ public final class RepoContract {
         public static final String COLUMN_NAME_LATEST_COMMITTER_EMAIL = "latest_committer_email";
         public static final String COLUMN_NAME_LATEST_COMMIT_DATE = "latest_commit_date";
         public static final String COLUMN_NAME_LATEST_COMMIT_MSG = "latest_commit_msg";
+        public static final String COLUMN_NAME_PINNED = "pinned";
         public static final String[] ALL_COLUMNS = { _ID,
                 COLUMN_NAME_LOCAL_PATH, COLUMN_NAME_REMOTE_URL,
                 COLUMN_NAME_REPO_STATUS, COLUMN_NAME_LATEST_COMMITTER_UNAME,
                 COLUMN_NAME_LATEST_COMMITTER_EMAIL,
                 COLUMN_NAME_LATEST_COMMIT_DATE, COLUMN_NAME_LATEST_COMMIT_MSG,
-                COLUMN_NAME_USERNAME, COLUMN_NAME_PASSWORD };
+                COLUMN_NAME_USERNAME, COLUMN_NAME_PASSWORD,
+                COLUMN_NAME_PINNED };
     }
 
     public static final String REPO_ENTRY_CREATE = "CREATE TABLE "
@@ -52,6 +54,7 @@ public final class RepoContract {
             + RepoEntry.COLUMN_NAME_LATEST_COMMITTER_EMAIL + TEXT_TYPE
             + COMMA_SEP + RepoEntry.COLUMN_NAME_LATEST_COMMIT_DATE + TEXT_TYPE
             + COMMA_SEP + RepoEntry.COLUMN_NAME_LATEST_COMMIT_MSG + TEXT_TYPE
+            + COMMA_SEP + RepoEntry.COLUMN_NAME_PINNED + INT_TYPE + "DEFAULT 0"
             + " )";
 
     public static final String REPO_ENTRY_DROP = "DROP TABLE IF EXISTS "
@@ -100,6 +103,10 @@ public final class RepoContract {
 
     public static String getPassword(Cursor cursor) {
         return cursor.getString(9);
+    }
+
+    public static boolean getPinned(Cursor cursor) {
+        return cursor.getInt(10) != 0;
     }
 
 }

@@ -163,7 +163,7 @@ fun RepoListScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 88.dp) // Space for FAB
                     ) {
-                        items(displayedRepoList) { repo ->
+                        items(displayedRepoList, key = { it.getID() }) { repo ->
                             RepoCard(
                                 repo = repo,
                                 onClick = { onRepoClick(repo) },

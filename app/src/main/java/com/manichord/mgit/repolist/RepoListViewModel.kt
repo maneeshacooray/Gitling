@@ -14,7 +14,6 @@ import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.database.RepoContract
 import me.sheimi.sgit.database.RepoDbManager
 import me.sheimi.sgit.database.models.Repo
-import java.util.Collections
 
 class RepoListViewModel(application: Application) : AndroidViewModel(application), RepoDbManager.RepoDbObserver {
 
@@ -58,7 +57,7 @@ class RepoListViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             val cursor = RepoDbManager.queryAllRepo()
             val repos = Repo.getRepoList(getApplication(), cursor)
-            Collections.sort(repos)
+            repos.sortWith(compareByDescending<Repo> { it.isPinned() }.thenByDescending { it.getID() })
             cursor.close()
             _repoList.value = repos
         }
