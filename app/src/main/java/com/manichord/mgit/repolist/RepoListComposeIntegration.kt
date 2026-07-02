@@ -5,11 +5,16 @@ import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
@@ -61,6 +66,13 @@ fun RepoListComposeContent(
         var repoOptionsTarget by remember { mutableStateOf<Repo?>(null) }
         var renameTarget by remember { mutableStateOf<Repo?>(null) }
         var deleteTarget by remember { mutableStateOf<Repo?>(null) }
+        var tagsTarget by remember { mutableStateOf<Repo?>(null) }
+
+        val allTags: List<String> = remember(repoListSnapshot) {
+            repoListSnapshot.flatMap { repo: Repo ->
+                repo.labels.filterIsInstance<String>()
+            }.distinct().sorted()
+        }
 
         val context = LocalContext.current
         var githubBannerDismissed by rememberSaveable {
@@ -151,6 +163,10 @@ fun RepoListComposeContent(
                     repoOptionsTarget = null
                     repo.togglePinned()
                 },
+                onTagsClick = {
+                    repoOptionsTarget = null
+                    tagsTarget = repo
+                },
                 onRenameClick = {
                     repoOptionsTarget = null
                     renameTarget = repo
@@ -158,6 +174,18 @@ fun RepoListComposeContent(
                 onDeleteClick = {
                     repoOptionsTarget = null
                     deleteTarget = repo
+                }
+            )
+        }
+
+        tagsTarget?.let { repo ->
+            TagEditorDialog(
+                repo = repo,
+                allTags = allTags,
+                onDismissRequest = { tagsTarget = null },
+                onConfirm = { newTags ->
+                    tagsTarget = null
+                    repo.setLabels(newTags)
                 }
             )
         }
@@ -225,6 +253,7 @@ private fun RepoOptionsDialog(
     isPinned: Boolean,
     onDismissRequest: () -> Unit,
     onPinClick: () -> Unit,
+    onTagsClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -241,6 +270,12 @@ private fun RepoOptionsDialog(
                     modifier = Modifier.clickable(onClick = onPinClick)
                 )
                 ListItem(
+                    headlineContent = { Text("Tags") },
+                    leadingContent = { Icon(Icons.Default.Label, contentDescription = null) },
+                    colors = transparentListItemColors,
+                    modifier = Modifier.clickable(onClick = onTagsClick)
+                )
+                ListItem(
                     headlineContent = { Text(stringResource(R.string.label_rename)) },
                     leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
                     colors = transparentListItemColors,
@@ -255,6 +290,77 @@ private fun RepoOptionsDialog(
             }
         },
         confirmButton = {
+            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun TagEditorDialog(
+    repo: Repo,
+    allTags: List<String>,
+    onDismissRequest: () -> Unit,
+    onConfirm: (Set<String>) -> Unit
+) {
+    var selected by remember { mutableStateOf<Set<String>>(HashSet<String>(repo.labels)) }
+    var newTagText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text("Tags") },
+        text = {
+            val displayedTags = remember(allTags, selected) {
+                (allTags + selected.toList()).distinct().sorted()
+            }
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                displayedTags.forEach { tag ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                selected = if (selected.contains(tag)) selected - tag else selected + tag
+                            }
+                    ) {
+                        Checkbox(
+                            checked = selected.contains(tag),
+                            onCheckedChange = { checked ->
+                                selected = if (checked) selected + tag else selected - tag
+                            }
+                        )
+                        Text(tag, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = newTagText,
+                        onValueChange = { newTagText = it },
+                        placeholder = { Text("New tag") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                    IconButton(
+                        onClick = {
+                            val tag = newTagText.trim().lowercase()
+                            if (tag.isNotEmpty()) {
+                                selected = selected + tag
+                                newTagText = ""
+                            }
+                        },
+                        enabled = newTagText.isNotBlank()
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add tag")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(selected) }) { Text("OK") }
+        },
+        dismissButton = {
             TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
         }
     )

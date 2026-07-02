@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class Repo implements Comparable<Repo>, Serializable {
     /**
      * Generated serialVersionID
      */
-    private static final long serialVersionUID = -4921633809823078220L;
+    private static final long serialVersionUID = -4921633809823078221L;
 
     public static final String TAG = Repo.class.getSimpleName();
 
@@ -66,6 +67,7 @@ public class Repo implements Comparable<Repo>, Serializable {
     private Date mLastCommitDate;
     private String mLastCommitMsg;
     private boolean mPinned;
+    private Set<String> mTags;
     private boolean isDeleted = false;
 
     // lazy load
@@ -91,6 +93,21 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLastCommitDate = RepoContract.getLatestCommitDate(cursor);
         mLastCommitMsg = RepoContract.getLatestCommitMsg(cursor);
         mPinned = RepoContract.getPinned(cursor);
+        mTags = parseTags(RepoContract.getTags(cursor));
+    }
+
+    private static Set<String> parseTags(String raw) {
+        Set<String> tags = new LinkedHashSet<>();
+        if (raw == null || raw.isEmpty()) return tags;
+        for (String t : raw.split(",")) {
+            String trimmed = t.trim();
+            if (!trimmed.isEmpty()) tags.add(trimmed);
+        }
+        return tags;
+    }
+
+    private static String serializeTags(Set<String> tags) {
+        return String.join(",", tags);
     }
 
     public Bundle getBundle() {
@@ -244,6 +261,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         out.writeObject(mLastCommitDate);
         out.writeObject(mLastCommitMsg);
         out.writeBoolean(mPinned);
+        out.writeObject(serializeTags(mTags));
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -259,6 +277,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLastCommitDate = (Date) in.readObject();
         mLastCommitMsg = (String) in.readObject();
         mPinned = in.readBoolean();
+        mTags = parseTags((String) in.readObject());
     }
 
     public boolean isPinned() {
@@ -269,6 +288,21 @@ public class Repo implements Comparable<Repo>, Serializable {
         mPinned = !mPinned;
         ContentValues values = new ContentValues();
         values.put(RepoContract.RepoEntry.COLUMN_NAME_PINNED, mPinned ? 1 : 0);
+        RepoDbManager.updateRepo(mID, values);
+    }
+
+    public Set<String> getLabels() {
+        return mTags;
+    }
+
+    public boolean hasLabel(String label) {
+        return mTags.contains(label);
+    }
+
+    public void setLabels(Set<String> labels) {
+        mTags = new LinkedHashSet<>(labels);
+        ContentValues values = new ContentValues();
+        values.put(RepoContract.RepoEntry.COLUMN_NAME_TAGS, serializeTags(mTags));
         RepoDbManager.updateRepo(mID, values);
     }
 

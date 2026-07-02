@@ -2,6 +2,7 @@ package com.manichord.mgit.repolist
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -56,10 +57,22 @@ fun RepoListScreen(
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var selectedTag by remember { mutableStateOf<String?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
 
-    val displayedRepoList = remember(repoList, searchQuery) {
-        if (searchQuery.isBlank()) repoList else repoList.filter { it.matchesSearch(searchQuery) }
+    val allTags: List<String> = remember(repoList) {
+        repoList.flatMap { repo: me.sheimi.sgit.database.models.Repo ->
+            repo.labels.filterIsInstance<String>()
+        }.distinct().sorted()
+    }
+
+    // If the selected tag was removed, fall back to "All" without mutating state during composition
+    val effectiveTag: String? = if (selectedTag != null && allTags.contains(selectedTag)) selectedTag else null
+
+    val displayedRepoList = remember(repoList, searchQuery, selectedTag) {
+        repoList
+            .filter { effectiveTag == null || it.hasLabel(effectiveTag) }
+            .filter { searchQuery.isBlank() || it.matchesSearch(searchQuery) }
     }
 
     Scaffold(
@@ -148,6 +161,27 @@ fun RepoListScreen(
                     onConnectClick = onConnectGitHubClick,
                     onDismissClick = onDismissGitHubBanner
                 )
+            }
+            if (allTags.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    item {
+                        FilterChip(
+                            selected = effectiveTag == null,
+                            onClick = { selectedTag = null },
+                            label = { Text("All") }
+                        )
+                    }
+                    items(allTags, key = { it }) { tag ->
+                        FilterChip(
+                            selected = effectiveTag == tag,
+                            onClick = { selectedTag = if (effectiveTag == tag) null else tag },
+                            label = { Text(tag) }
+                        )
+                    }
+                }
             }
             Box(modifier = Modifier.fillMaxSize()) {
                 if (repoList.isEmpty()) {

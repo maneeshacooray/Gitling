@@ -11,7 +11,7 @@ import java.text.StringCharacterIterator;
  */
 public class RepoDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "repo.db";
 
     public RepoDbHelper(Context context) {
@@ -29,6 +29,11 @@ public class RepoDbHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL("ALTER TABLE " + RepoContract.RepoEntry.TABLE_NAME
                     + " ADD COLUMN " + RepoContract.RepoEntry.COLUMN_NAME_PINNED
                     + " INTEGER DEFAULT 0");
+        }
+        if (oldVersion < 3) {
+            sqLiteDatabase.execSQL("ALTER TABLE " + RepoContract.RepoEntry.TABLE_NAME
+                    + " ADD COLUMN " + RepoContract.RepoEntry.COLUMN_NAME_TAGS
+                    + " TEXT DEFAULT ''");
         }
     }
 
