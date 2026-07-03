@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,6 +31,7 @@ import androidx.compose.foundation.rememberScrollState
 private const val TAB_FILES = 0
 private const val TAB_COMMITS = 1
 private const val TAB_STATUS = 2
+private const val TAB_CONSOLE = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +43,7 @@ fun RepoDetailScreen(
     filesContent: @Composable () -> Unit,
     commitsContent: @Composable () -> Unit,
     statusContent: @Composable () -> Unit,
+    consoleContent: @Composable () -> Unit = {},
     onFilesSearchQueryChange: (String) -> Unit = {},
     onCommitsSearchQueryChange: (String) -> Unit = {}
 ) {
@@ -62,7 +65,8 @@ fun RepoDetailScreen(
     val tabs = listOf(
         TabItem(stringResource(R.string.tab_files_label), Icons.Default.FolderCopy),
         TabItem(stringResource(R.string.tab_commits_label), Icons.Default.History),
-        TabItem(stringResource(R.string.tab_status_label), Icons.Default.Assessment)
+        TabItem(stringResource(R.string.tab_status_label), Icons.Default.Assessment),
+        TabItem(stringResource(R.string.tab_console_label), Icons.Outlined.Terminal)
     )
 
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -193,6 +197,11 @@ fun RepoDetailScreen(
                                     Icon(Icons.Default.Search, contentDescription = "Search")
                                 }
                             }
+                            if (pagerState.currentPage == TAB_CONSOLE) {
+                                IconButton(onClick = { viewModel.clearConsole() }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear console")
+                                }
+                            }
                             IconButton(onClick = { viewModel.setDrawerOpen(true) }) {
                                 Icon(Icons.Default.Menu, contentDescription = "Menu")
                             }
@@ -228,6 +237,7 @@ fun RepoDetailScreen(
                             0 -> filesContent()
                             1 -> commitsContent()
                             2 -> statusContent()
+                            3 -> consoleContent()
                         }
                     }
 

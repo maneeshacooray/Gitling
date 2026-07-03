@@ -3,6 +3,10 @@ package com.manichord.mgit.repodetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.sheimi.sgit.database.models.Repo
 
 class RepoDetailViewModel : ViewModel() {
@@ -46,5 +50,31 @@ class RepoDetailViewModel : ViewModel() {
 
     fun hideProgress() {
         _progressState.value = _progressState.value?.copy(visible = false)
+    }
+
+    // Console state
+    data class ConsoleEntry(val command: String, val output: String)
+
+    private val _consoleEntries = MutableLiveData<List<ConsoleEntry>>(emptyList())
+    val consoleEntries: LiveData<List<ConsoleEntry>> = _consoleEntries
+
+    private val _consoleRunning = MutableLiveData(false)
+    val consoleRunning: LiveData<Boolean> = _consoleRunning
+
+    fun runConsoleCommand(repo: Repo, command: String) {
+        if (_consoleRunning.value == true) return
+        _consoleRunning.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            val output = GitCommandEngine.execute(repo, command)
+            withContext(Dispatchers.Main) {
+                val current = _consoleEntries.value.orEmpty()
+                _consoleEntries.value = current + ConsoleEntry(command, output)
+                _consoleRunning.value = false
+            }
+        }
+    }
+
+    fun clearConsole() {
+        _consoleEntries.value = emptyList()
     }
 }

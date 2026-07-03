@@ -29,6 +29,7 @@ import com.manichord.mgit.clone.CloneViewModel
 import com.manichord.mgit.diff.CommitDiffScreen
 import com.manichord.mgit.dialogs.MessageDialog
 import com.manichord.mgit.explorer.FileExplorerScreen
+import com.manichord.mgit.repodetail.GitConsoleScreen
 import com.manichord.mgit.repodetail.RepoDetailScreen
 import com.manichord.mgit.repodetail.RepoDetailViewModel
 import com.manichord.mgit.repolist.RepoListComposeContent
@@ -238,6 +239,7 @@ class MainActivity : SheimiFragmentActivity() {
                                 filesContent = { FragmentHost(supportFragmentManager, filesFragment) },
                                 commitsContent = { FragmentHost(supportFragmentManager, commitsFragment) },
                                 statusContent = { FragmentHost(supportFragmentManager, statusFragment) },
+                                consoleContent = { GitConsoleScreen(viewModel = host.viewModel, repo = host.repo) },
                                 onFilesSearchQueryChange = { query -> host.searchFiles(query) },
                                 onCommitsSearchQueryChange = { query -> host.searchCommits(query) }
                             )
