@@ -39,42 +39,24 @@ fun RepoWidgetContent(repos: List<RepoWidgetEntry>) {
                 .background(GlanceTheme.colors.widgetBackground)
                 .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
-            // Compact header
+            // Refresh button — top right, no header text
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
-                Text(
-                    text = "GITLING",
-                    style = TextStyle(
-                        color = GlanceTheme.colors.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp
-                    ),
-                    modifier = GlanceModifier.defaultWeight()
-                )
+                Spacer(modifier = GlanceModifier.defaultWeight())
                 Text(
                     text = "↻",
                     style = TextStyle(
                         color = GlanceTheme.colors.secondary,
-                        fontSize = 16.sp
+                        fontSize = 14.sp
                     ),
                     modifier = GlanceModifier
-                        .padding(start = 8.dp)
                         .clickable(actionRunCallback<RefreshWidgetAction>())
                 )
             }
 
-            // Divider under header
-            Spacer(modifier = GlanceModifier.height(5.dp))
-            Box(
-                modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(GlanceTheme.colors.onBackground)
-            ) {}
-
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(2.dp))
 
             if (repos.isEmpty()) {
                 Box(
