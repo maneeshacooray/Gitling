@@ -24,6 +24,12 @@
     <string name="action_reset">Reset</string>
     <string name="action_toggle_drawer">Toggle Drawer</string>
     <string name="action_copy_commit_str">Copy Commit Hash</string>
+    <string name="action_mode_create_tag">Tag</string>
+    <string name="dialog_create_tag_title">Create Tag</string>
+    <string name="dialog_create_tag_hint">Tag name (e.g. v1.0.0)</string>
+    <string name="alert_tag_name_required">Tag name is required</string>
+    <string name="alert_tag_already_exists">A tag with that name already exists</string>
+    <string name="success_create_tag">Tag created</string>
 
     <!-- label msg -->
     <string name="label_ok">OK</string>

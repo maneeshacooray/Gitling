@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 40,
+            versionName = "1.0.40",
+            highlights = listOf(
+                "Git command console — tap the Console tab inside any repo to run status, log, diff, branch, and stash commands without leaving the app"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 39,
             versionName = "1.0.39",
             highlights = listOf(

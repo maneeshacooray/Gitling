@@ -1,0 +1,1 @@
+Git command console — tap the new Console tab inside any repo to run status, log, diff, branch, and stash commands directly in the app. No terminal needed; commands run via JGit and output appears in a monospace session view with quick-action chips and command history.
