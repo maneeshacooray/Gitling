@@ -13,8 +13,10 @@ import timber.log.Timber
 data class RepoWidgetEntry(
     val id: Int,
     val displayName: String,
+    val branchName: String?,
     val lastCommitMsg: String?,
-    val isDirty: Boolean
+    val isDirty: Boolean,
+    val isPinned: Boolean
 )
 
 class RepoListWidget : GlanceAppWidget() {
@@ -27,9 +29,6 @@ class RepoListWidget : GlanceAppWidget() {
     }
 
     companion object {
-        // Dirty/clean is computed from local .git state only (same call StatusFragment already
-        // uses) -- no network round-trip, safe to run on whatever triggers this (periodic system
-        // update or a manual refresh tap).
         suspend fun loadRepoEntries(context: Context): List<RepoWidgetEntry> = withContext(Dispatchers.IO) {
             val repos = Repo.getRepoList(context, RepoDbManager.queryAllRepo())
             repos.map { repo ->
@@ -40,13 +39,16 @@ class RepoListWidget : GlanceAppWidget() {
                     Timber.w(e, "Widget: failed to read status for %s", repo.getDiaplayName())
                     false
                 }
+                val branch = try { repo.getBranchName().removePrefix("refs/heads/") } catch (_: Exception) { null }
                 RepoWidgetEntry(
                     id = repo.getID(),
-                    displayName = repo.getDiaplayName() ?: "Unknown repository",
+                    displayName = repo.getDiaplayName() ?: "Unknown",
+                    branchName = branch,
                     lastCommitMsg = repo.getLastCommitMsg(),
-                    isDirty = isDirty
+                    isDirty = isDirty,
+                    isPinned = repo.isPinned
                 )
-            }
+            }.sortedWith(compareByDescending<RepoWidgetEntry> { it.isPinned }.thenBy { it.displayName })
         }
     }
 }

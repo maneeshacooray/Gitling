@@ -14,7 +14,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Context;
+
 import me.sheimi.android.activities.SheimiFragmentActivity;
+import me.sheimi.sgit.MGitApplication;
 import me.sheimi.sgit.R;
 
 /**
@@ -91,10 +94,12 @@ public class FsUtils {
      */
     public static File getAppDir(boolean isExternal) {
         SheimiFragmentActivity activeActivity = BasicFunctions.getActiveActivity();
+        // Fall back to Application context when called from a non-Activity context (e.g. widget)
+        Context context = activeActivity != null ? activeActivity : MGitApplication.getContext();
         if (isExternal) {
-            return activeActivity.getExternalFilesDir(null);
+            return context.getExternalFilesDir(null);
         } else {
-            return activeActivity.getFilesDir();
+            return context.getFilesDir();
         }
     }
 
@@ -106,7 +111,9 @@ public class FsUtils {
      * files" granted), without Gitling itself needing to request anything. */
     public static File getMediaDir(String dirname, boolean isCreate) {
         SheimiFragmentActivity activeActivity = BasicFunctions.getActiveActivity();
-        File[] mediaDirs = activeActivity.getExternalMediaDirs();
+        // Fall back to Application context when called from a non-Activity context (e.g. widget)
+        Context context = activeActivity != null ? activeActivity : MGitApplication.getContext();
+        File[] mediaDirs = context.getExternalMediaDirs();
         File mDir = new File(mediaDirs[0], dirname);
         if (!mDir.exists() && isCreate) {
             mDir.mkdirs();
