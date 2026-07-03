@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.40 - 2026-07-03
+- Git command console — tap the new Console tab inside any repo to run status, log, diff, branch, and stash commands directly in the app. No terminal needed; commands run via JGit and output appears in a monospace session view with quick-action chips and command history.
+
 ## 1.0.39 - 2026-07-02
 - Tag repositories with labels and filter the list — long-press a repo, tap Tags, and use the filter chips at the top of the repo list
 
