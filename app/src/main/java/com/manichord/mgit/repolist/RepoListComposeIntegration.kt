@@ -1,7 +1,5 @@
 package com.manichord.mgit.repolist
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -48,7 +46,6 @@ fun RepoListComposeContent(
 ) {
     AppTheme {
         val repoListSnapshot by viewModel.repoList.collectAsState()
-        val updateAvailable by viewModel.updateAvailable.collectAsState()
         val showStorageMigrationNotice by viewModel.showStorageMigrationNotice.collectAsState()
         var showCloneSheet by remember { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
@@ -125,11 +122,6 @@ fun RepoListComposeContent(
             onConnectGitHubClick = {
                 (activity as MainActivity).openUserSettings(initialScreen = "accounts")
             },
-            updateAvailableVersion = updateAvailable?.versionName,
-            onViewReleaseClick = {
-                updateAvailable?.let { activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.releaseUrl))) }
-            },
-            onDismissUpdateClick = { viewModel.dismissUpdateAvailable() }
         )
 
         if (showCloneSheet) {

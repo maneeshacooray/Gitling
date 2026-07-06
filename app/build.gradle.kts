@@ -110,8 +110,8 @@ android {
         applicationId = "com.maneeshacooray.gitling"
         minSdk = 23
         targetSdk = 37
-        versionCode = 44
-        versionName = "1.0.44"
+        versionCode = 45
+        versionName = "1.0.45"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true

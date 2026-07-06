@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 45,
+            versionName = "1.0.45",
+            highlights = listOf(
+                "Removed the automatic update banner — no more interruptions on the home screen. Check for updates any time from Settings"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 44,
             versionName = "1.0.44",
             highlights = listOf(

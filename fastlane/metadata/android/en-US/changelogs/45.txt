@@ -1,0 +1,1 @@
+Removed the automatic "update available" banner from the home screen. Check for updates any time from Settings.

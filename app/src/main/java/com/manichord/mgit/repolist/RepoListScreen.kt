@@ -50,10 +50,7 @@ fun RepoListScreen(
     onRepoLongClick: (Repo) -> Unit,
     onCloneClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onConnectGitHubClick: () -> Unit,
-    updateAvailableVersion: String? = null,
-    onViewReleaseClick: () -> Unit = {},
-    onDismissUpdateClick: () -> Unit = {}
+    onConnectGitHubClick: () -> Unit
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -149,13 +146,6 @@ fun RepoListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (updateAvailableVersion != null) {
-                UpdateAvailableBanner(
-                    versionName = updateAvailableVersion,
-                    onViewReleaseClick = onViewReleaseClick,
-                    onDismissClick = onDismissUpdateClick
-                )
-            }
             if (!isGitHubConnected && !githubBannerDismissed && repoList.isNotEmpty()) {
                 ConnectGitHubBanner(
                     onConnectClick = onConnectGitHubClick,
@@ -234,45 +224,6 @@ private fun NoSearchResultsView(query: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-    }
-}
-
-@Composable
-private fun UpdateAvailableBanner(
-    versionName: String,
-    onViewReleaseClick: () -> Unit,
-    onDismissClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp, 8.dp, 16.dp, 0.dp),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.tertiaryContainer
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                "Update available",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                "Version $versionName is available on GitHub",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = onDismissClick) { Text("Not now") }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = onViewReleaseClick) { Text("View release") }
-            }
-        }
     }
 }
 
