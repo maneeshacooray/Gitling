@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 43,
+            versionName = "1.0.43",
+            highlights = listOf(
+                "Fixed blank File tab after switching to Blame and back — file content now stays visible when returning to the File tab"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 42,
             versionName = "1.0.42",
             highlights = listOf(

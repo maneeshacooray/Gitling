@@ -1,0 +1,1 @@
+Fixed a bug where the File tab would show a blank page after tapping Blame and then returning to File — file content now stays visible across tab switches.
