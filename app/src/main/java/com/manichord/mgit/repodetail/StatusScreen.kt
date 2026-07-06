@@ -61,6 +61,8 @@ fun StatusScreen(
     conflictingFiles: List<String>,
     onStageFile: (String) -> Unit,
     onUnstageFile: (String) -> Unit,
+    onStageAll: () -> Unit,
+    onUnstageAll: () -> Unit,
     onViewStagedDiff: () -> Unit,
     onViewUnstagedDiff: () -> Unit
 ) {
@@ -87,13 +89,27 @@ fun StatusScreen(
                     }
                 }
                 if (stagedFiles.isNotEmpty()) {
-                    item { SectionHeader("Staged Changes", onViewDiff = onViewStagedDiff) }
+                    item {
+                        SectionHeader(
+                            "Staged Changes",
+                            onViewDiff = onViewStagedDiff,
+                            onBulkAction = onUnstageAll,
+                            bulkActionLabel = "Unstage all"
+                        )
+                    }
                     items(stagedFiles, key = { "staged:" + it.path }) { entry ->
                         FileRow(entry, actionIcon = Icons.Default.RemoveCircle, actionDescription = "Unstage", onAction = { onUnstageFile(entry.path) })
                     }
                 }
                 if (unstagedFiles.isNotEmpty()) {
-                    item { SectionHeader("Unstaged Changes", onViewDiff = onViewUnstagedDiff) }
+                    item {
+                        SectionHeader(
+                            "Unstaged Changes",
+                            onViewDiff = onViewUnstagedDiff,
+                            onBulkAction = onStageAll,
+                            bulkActionLabel = "Stage all"
+                        )
+                    }
                     items(unstagedFiles, key = { "unstaged:" + it.path }) { entry ->
                         FileRow(entry, actionIcon = Icons.Default.AddCircle, actionDescription = "Stage", onAction = { onStageFile(entry.path) })
                     }
@@ -104,16 +120,26 @@ fun StatusScreen(
 }
 
 @Composable
-private fun SectionHeader(title: String, onViewDiff: (() -> Unit)? = null) {
+private fun SectionHeader(
+    title: String,
+    onViewDiff: (() -> Unit)? = null,
+    onBulkAction: (() -> Unit)? = null,
+    bulkActionLabel: String? = null
+) {
     Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-            if (onViewDiff != null) {
-                TextButton(onClick = onViewDiff) { Text("View diff") }
+            Row {
+                if (onBulkAction != null && bulkActionLabel != null) {
+                    TextButton(onClick = onBulkAction) { Text(bulkActionLabel) }
+                }
+                if (onViewDiff != null) {
+                    TextButton(onClick = onViewDiff) { Text("View diff") }
+                }
             }
         }
     }

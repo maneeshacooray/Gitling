@@ -18,6 +18,7 @@ import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.repo.tasks.repo.AddToStageTask
 import me.sheimi.sgit.repo.tasks.repo.RemoveFromStageTask
 import me.sheimi.sgit.repo.tasks.repo.StatusTask
+import me.sheimi.sgit.repo.tasks.repo.UnstageAllTask
 import org.eclipse.jgit.api.Status
 
 class StatusFragment : RepoDetailFragment() {
@@ -70,6 +71,8 @@ class StatusFragment : RepoDetailFragment() {
                         conflictingFiles = conflictingFiles,
                         onStageFile = { path -> stageFile(path) },
                         onUnstageFile = { path -> unstageFile(path) },
+                        onStageAll = { stageAll() },
+                        onUnstageAll = { unstageAll() },
                         onViewStagedDiff = { showDiff("HEAD", "dircache") },
                         onViewUnstagedDiff = { showDiff("dircache", "filetree") }
                     )
@@ -92,9 +95,19 @@ class StatusFragment : RepoDetailFragment() {
         AddToStageTask(repo, path) { reset() }.executeTask()
     }
 
+    private fun stageAll() {
+        val repo = repo ?: return
+        AddToStageTask(repo, ".") { reset() }.executeTask()
+    }
+
     private fun unstageFile(path: String) {
         val repo = repo ?: return
         RemoveFromStageTask(repo, path) { reset() }.executeTask()
+    }
+
+    private fun unstageAll() {
+        val repo = repo ?: return
+        UnstageAllTask(repo) { reset() }.executeTask()
     }
 
     override fun reset() {
