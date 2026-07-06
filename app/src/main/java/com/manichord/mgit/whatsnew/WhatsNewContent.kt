@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 46,
+            versionName = "1.0.46",
+            highlights = listOf(
+                "Widget now adapts to its size — shrink it to 1 cell tall for a compact repo list showing just names and status, or keep it taller for the full layout with branch and last commit"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 45,
             versionName = "1.0.45",
             highlights = listOf(

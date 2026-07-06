@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.46 - 2026-07-06
+- Widget now adapts to its size — compact mode at 1 cell tall shows just repo names and status dots; taller sizes show branch name and last commit message.
+
 ## 1.0.45 - 2026-07-06
 - Removed the automatic "update available" banner from the home screen — check for updates any time from Settings.
 

@@ -1,0 +1,1 @@
+The home screen widget now adapts to its size. Shrink it to 1 cell tall for a compact view showing just repo names and status indicators, or keep it taller for the full layout with branch name and last commit message.
