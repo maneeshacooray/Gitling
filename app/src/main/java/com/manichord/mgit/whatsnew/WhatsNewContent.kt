@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 42,
+            versionName = "1.0.42",
+            highlights = listOf(
+                "fetch and pull in the console — run network sync commands directly from the Console tab without leaving the app"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 41,
             versionName = "1.0.41",
             highlights = listOf(

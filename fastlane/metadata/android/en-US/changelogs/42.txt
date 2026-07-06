@@ -1,0 +1,1 @@
+fetch and pull commands added to the git console — sync with your remote directly from the Console tab. Both commands use your saved credentials and support SSH remotes.

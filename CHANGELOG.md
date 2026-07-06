@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.42 - 2026-07-03
+- fetch and pull commands added to the git console — sync with your remote directly from the Console tab.
+
 ## 1.0.41 - 2026-07-03
 - Redesigned home screen widget — each repo now shows its branch name, last commit message, and a status indicator (clean vs. dirty).
 
