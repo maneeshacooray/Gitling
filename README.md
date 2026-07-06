@@ -21,22 +21,28 @@ It's a fork of [MGit](https://github.com/maks/MGit) (itself a continuation of [S
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/repo_list.png" width="260" alt="Repository list"></td>
-    <td><img src="docs/screenshots/commit_graph.png" width="260" alt="Commit graph, all branches"></td>
-    <td><img src="docs/screenshots/settings.png" width="260" alt="Settings"></td>
+    <td><img src="docs/screenshots/repo_list.png" width="220" alt="Repository list"></td>
+    <td><img src="docs/screenshots/commit_graph.png" width="220" alt="Commit graph"></td>
+    <td><img src="docs/screenshots/console_tab.png" width="220" alt="Git console"></td>
+    <td><img src="docs/screenshots/status_screen.png" width="220" alt="Status screen"></td>
   </tr>
   <tr>
     <td align="center">Repository list</td>
-    <td align="center">Full branch/merge commit graph</td>
+    <td align="center">Commit graph</td>
+    <td align="center">Git console</td>
+    <td align="center">Status — stage/unstage all</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/file_viewer.png" width="220" alt="File viewer with syntax highlighting"></td>
+    <td><img src="docs/screenshots/file_blame.png" width="220" alt="Blame view"></td>
+    <td><img src="docs/screenshots/commit_diff.png" width="220" alt="Commit diff view"></td>
+    <td><img src="docs/screenshots/settings.png" width="220" alt="Settings"></td>
+  </tr>
+  <tr>
+    <td align="center">File viewer</td>
+    <td align="center">Blame view</td>
+    <td align="center">Commit diff</td>
     <td align="center">Settings</td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/file_viewer.png" width="260" alt="File viewer with syntax highlighting"></td>
-    <td><img src="docs/screenshots/commit_diff.png" width="260" alt="Commit diff view"></td>
-  </tr>
-  <tr>
-    <td align="center">File viewer with syntax highlighting</td>
-    <td align="center">Commit diff view</td>
   </tr>
 </table>
 
@@ -48,11 +54,21 @@ Gitling doesn't include an internal text editor -- to edit files, you'll need an
 
 * Clone, create, and delete local repositories
 * One-tap **Connect with GitHub** (OAuth Device Flow) -- no manual token/password handling for GitHub remotes
+* Self-hosted Forgejo and Gitea support -- add a Custom account with your instance URL
 * HTTP/HTTPS/SSH, including SSH with private-key passphrase
 * Username/password and personal access token authentication for any Git host
+* Full branch/merge commit graph with lazygit-style lane visualization and inline branch/tag/HEAD labels
 * Browse files and commit history, `git diff` between commits
+* File blame view -- see which commit last touched each line
+* Git command console -- run `status`, `log`, `diff`, `branch`, `stash` directly from the Console tab
 * Checkout, create, and merge local/remote branches and tags
 * `git status`, staging, `git rebase`, `git cherry-pick`, `git checkout <file>`
+* Stage All / Unstage All -- bulk-stage or unstage every file from the Status screen in one tap
+* Submodule init and update
+* Search across repos, commit history, and file tree
+* Pin repositories to keep them at the top of the list
+* Tag repositories with custom labels and filter by them
+* Home screen widget showing repo status and dirty/clean indicator
 * Private key generation and management
 * Import an existing repository from device storage
 * Light/dark mode that follows the system, with a choice between a fixed brand color or wallpaper-based Material You dynamic color
@@ -72,6 +88,13 @@ Gitling doesn't include an internal text editor -- to edit files, you'll need an
 1. Tap the `+` button to add a new repository
 2. Choose `Init Local` to create a local repository
 3. Enter a name when prompted
+
+### Self-hosted Forgejo / Gitea
+
+1. Go to **Settings → Accounts** and tap **Add account**
+2. Choose **Custom** as the account type
+3. Enter your username, a personal access token, and your instance URL (e.g. `https://forgejo.example.com`)
+4. Credentials are applied automatically on clone, fetch, and pull from that host
 
 ### URL formats
 
