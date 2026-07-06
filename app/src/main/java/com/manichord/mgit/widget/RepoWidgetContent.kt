@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionRunCallback
@@ -32,6 +33,9 @@ import androidx.compose.runtime.Composable
 @Composable
 @GlanceComposable
 fun RepoWidgetContent(repos: List<RepoWidgetEntry>) {
+    // Hide commit message and branch when the widget is too short to show them legibly.
+    // A 1-cell-high widget is ~58dp; two lines per repo need at least ~80dp total height.
+    val compact = LocalSize.current.height < 80.dp
     GlanceTheme {
         Column(
             modifier = GlanceModifier
@@ -74,7 +78,7 @@ fun RepoWidgetContent(repos: List<RepoWidgetEntry>) {
             } else {
                 LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                     items(repos, itemId = { it.id.toLong() }) { repo ->
-                        RepoWidgetRow(repo)
+                        RepoWidgetRow(repo, compact = compact)
                     }
                 }
             }
@@ -84,11 +88,11 @@ fun RepoWidgetContent(repos: List<RepoWidgetEntry>) {
 
 @Composable
 @GlanceComposable
-private fun RepoWidgetRow(repo: RepoWidgetEntry) {
+private fun RepoWidgetRow(repo: RepoWidgetEntry, compact: Boolean) {
     Column(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .padding(vertical = 7.dp)
+            .padding(vertical = if (compact) 4.dp else 7.dp)
             .clickable(
                 actionRunCallback<OpenRepoWidgetAction>(
                     actionParametersOf(RepoIdParamKey to repo.id)
@@ -123,22 +127,24 @@ private fun RepoWidgetRow(repo: RepoWidgetEntry) {
                 modifier = GlanceModifier.defaultWeight()
             )
 
-            // Branch name — right-aligned
-            repo.branchName?.let { branch ->
-                Spacer(modifier = GlanceModifier.width(6.dp))
-                Text(
-                    text = branch,
-                    style = TextStyle(
-                        color = GlanceTheme.colors.secondary,
-                        fontSize = 11.sp
-                    ),
-                    maxLines = 1
-                )
+            // Branch name — right-aligned; hidden in compact mode to save horizontal space
+            if (!compact) {
+                repo.branchName?.let { branch ->
+                    Spacer(modifier = GlanceModifier.width(6.dp))
+                    Text(
+                        text = branch,
+                        style = TextStyle(
+                            color = GlanceTheme.colors.secondary,
+                            fontSize = 11.sp
+                        ),
+                        maxLines = 1
+                    )
+                }
             }
         }
 
-        // Last commit message, indented to align under the repo name
-        if (!repo.lastCommitMsg.isNullOrBlank()) {
+        // Last commit message — hidden in compact mode (not enough vertical space)
+        if (!compact && !repo.lastCommitMsg.isNullOrBlank()) {
             Row(modifier = GlanceModifier.fillMaxWidth()) {
                 Spacer(modifier = GlanceModifier.width(20.dp))
                 Text(
