@@ -147,7 +147,12 @@ class ViewFileActivity : SheimiFragmentActivity() {
     }
 
     private fun setupWebView(view: WebView) {
-        if (webView != null) return // AndroidView's factory should only run once; guard anyway
+        // Guard on the view instance itself: Compose can re-create the AndroidView node when
+        // switching away from the File tab and back, delivering a new WebView instance while
+        // the Activity-level `webView` field still holds the old (disposed) one. Guarding on
+        // `webView != null` caused the new instance to be skipped entirely, leaving a blank page.
+        if (view.getTag(R.id.tag_webview_initialized) == true) return
+        view.setTag(R.id.tag_webview_initialized, true)
         webView = view
         view.addJavascriptInterface(CodeLoader(), JS_INTERFACE)
         view.settings.javaScriptEnabled = true
