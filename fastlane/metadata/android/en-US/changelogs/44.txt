@@ -1,0 +1,1 @@
+Self-hosted Forgejo and Gitea support — add a Custom account type with your instance URL, and Gitling will apply your credentials automatically on clone, fetch, and pull.

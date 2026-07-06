@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 44,
+            versionName = "1.0.44",
+            highlights = listOf(
+                "Self-hosted Forgejo and Gitea support — add a Custom account with your instance URL and credentials are applied automatically on clone, fetch, and pull"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 43,
             versionName = "1.0.43",
             highlights = listOf(

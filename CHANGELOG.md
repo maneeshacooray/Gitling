@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.44 - 2026-07-06
+- Self-hosted Forgejo and Gitea support — add a Custom account type with your instance URL and credentials are applied automatically on clone, fetch, and pull.
+
 ## 1.0.43 - 2026-07-06
 - Fixed blank File tab after switching to Blame and back — file content now stays visible when returning to the File tab.
 
