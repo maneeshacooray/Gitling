@@ -35,6 +35,8 @@ private val QUICK_COMMANDS = listOf(
     "stash list",
     "stash push",
     "stash pop",
+    "fetch",
+    "pull",
 )
 
 @Composable

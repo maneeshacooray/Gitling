@@ -1,11 +1,15 @@
 package com.manichord.mgit.repodetail
 
+import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.database.models.Repo
+import me.sheimi.sgit.ssh.SgitTransportCallback
 import org.eclipse.jgit.api.ListBranchCommand
+import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.diff.RawTextComparator
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -29,6 +33,8 @@ object GitCommandEngine {
                 "diff" -> runDiff(repo, parts.drop(1))
                 "branch" -> runBranch(repo, parts.drop(1))
                 "stash" -> runStash(repo, parts.drop(1))
+                "fetch" -> runFetch(repo, parts.drop(1))
+                "pull" -> runPull(repo, parts.drop(1))
                 "help", "--help", "-h" -> helpText()
                 else -> "unknown command: ${parts[0]}\n\n${helpText()}"
             }
@@ -196,6 +202,69 @@ object GitCommandEngine {
         }
     }
 
+    private fun runFetch(repo: Repo, args: List<String>): String {
+        val remote = args.firstOrNull { !it.startsWith("-") } ?: "origin"
+        val git = repo.getGit()
+        val cmd = git.fetch()
+            .setRemote(remote)
+            .setTransportConfigCallback(SgitTransportCallback())
+        applyCredentials(repo, cmd)
+        val result = cmd.call()
+        val updates = result.trackingRefUpdates
+        if (updates.isEmpty()) return "Already up to date."
+        val sb = StringBuilder("From $remote\n")
+        updates.forEach { u ->
+            val branch = u.localName.removePrefix("refs/remotes/$remote/")
+            val oldSha = u.oldObjectId?.name?.take(7) ?: "0000000"
+            val newSha = u.newObjectId.name.take(7)
+            sb.appendLine("   $oldSha..$newSha  $branch -> $remote/$branch")
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun runPull(repo: Repo, args: List<String>): String {
+        val remote = args.firstOrNull { !it.startsWith("-") } ?: "origin"
+        val git = repo.getGit()
+        val cmd = git.pull()
+            .setRemote(remote)
+            .setTransportConfigCallback(SgitTransportCallback())
+        applyCredentials(repo, cmd)
+        val result = cmd.call()
+        if (!result.isSuccessful) {
+            val status = result.mergeResult?.mergeStatus?.toString()
+                ?: result.rebaseResult?.status?.toString()
+                ?: "unknown"
+            return "pull failed: $status"
+        }
+        val updates = result.fetchResult?.trackingRefUpdates
+        if (updates.isNullOrEmpty()) return "Already up to date."
+        val sb = StringBuilder()
+        updates.forEach { u ->
+            val branch = u.localName.removePrefix("refs/remotes/$remote/")
+            val oldSha = u.oldObjectId?.name?.take(7) ?: "0000000"
+            val newSha = u.newObjectId.name.take(7)
+            sb.appendLine("   $oldSha..$newSha  $branch")
+        }
+        sb.append("Fast-forward")
+        return sb.toString().trimEnd()
+    }
+
+    private fun applyCredentials(repo: Repo, cmd: TransportCommand<*, *>) {
+        var username = repo.getUsername()
+        var password = repo.getPassword()
+        if (username.isNullOrBlank() || password.isNullOrBlank()) {
+            val account = MGitApplication.getContext().accountManager
+                ?.findAccountForRemoteUrl(repo.getRemoteURL())
+            if (account != null) {
+                username = account.username
+                password = account.token
+            }
+        }
+        if (!username.isNullOrBlank() && !password.isNullOrBlank()) {
+            cmd.setCredentialsProvider(UsernamePasswordCredentialsProvider(username, password))
+        }
+    }
+
     private fun helpText() = """
 supported commands:
   status              show working tree status
@@ -214,6 +283,8 @@ supported commands:
     push              save working tree to stash
     pop               apply and drop stash@{0}
     drop [stash@{n}]  drop a specific stash entry
+  fetch [remote]      fetch from remote (default: origin)
+  pull [remote]       fetch + merge into current branch (default: origin)
   help                show this help
     """.trimIndent()
 
