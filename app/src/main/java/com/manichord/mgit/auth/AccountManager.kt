@@ -37,7 +37,8 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
                         name = jsonObj.getString("name"),
                         username = jsonObj.getString("username"),
                         token = jsonObj.getString("token"),
-                        type = AccountType.valueOf(jsonObj.getString("type"))
+                        type = AccountType.valueOf(jsonObj.getString("type")),
+                        baseUrl = jsonObj.optString("baseUrl").takeIf { it.isNotBlank() }
                     )
                 )
             }
@@ -70,13 +71,23 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
             null
         } ?: return null
 
-        val type = when {
+        val accounts = getAccounts()
+        val knownType = when {
             host.endsWith("github.com") -> AccountType.GITHUB
             host.endsWith("gitlab.com") -> AccountType.GITLAB
             host.endsWith("bitbucket.org") -> AccountType.BITBUCKET
-            else -> return null
+            else -> null
         }
-        return getAccounts().firstOrNull { it.type == type }
+        if (knownType != null) {
+            return accounts.firstOrNull { it.type == knownType }
+        }
+        // For custom/self-hosted instances (e.g. Forgejo, Gitea), match by comparing the
+        // remote's host against the host stored in the account's baseUrl.
+        return accounts.firstOrNull { account ->
+            if (account.baseUrl.isNullOrBlank()) return@firstOrNull false
+            val accountHost = try { java.net.URI(account.baseUrl).host } catch (e: Exception) { null }
+            accountHost != null && host.equals(accountHost, ignoreCase = true)
+        }
     }
 
     fun updateAccount(updatedAccount: Account) {
@@ -96,6 +107,7 @@ class AccountManager(private val securePrefsHelper: SecurePrefsHelper) {
             jsonObj.put("username", account.username)
             jsonObj.put("token", account.token)
             jsonObj.put("type", account.type.name)
+            if (!account.baseUrl.isNullOrBlank()) jsonObj.put("baseUrl", account.baseUrl)
             jsonArray.put(jsonObj)
         }
         securePrefsHelper.set(KEY_ACCOUNTS, jsonArray.toString())

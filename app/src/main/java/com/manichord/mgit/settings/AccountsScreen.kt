@@ -259,6 +259,7 @@ fun AddAccountDialog(
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var token by remember { mutableStateOf("") }
+    var baseUrl by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(AccountType.GITHUB) }
     var expanded by remember { mutableStateOf(false) }
     var tokenVisible by remember { mutableStateOf(false) }
@@ -312,7 +313,19 @@ fun AddAccountDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (type == AccountType.GITHUB || type == AccountType.GITLAB || type == AccountType.BITBUCKET) {
+                if (type == AccountType.CUSTOM) {
+                    OutlinedTextField(
+                        value = baseUrl,
+                        onValueChange = { baseUrl = it },
+                        label = { Text("Instance URL (e.g. https://forgejo.example.com)") },
+                        singleLine = true,
+                        isError = showErrors && baseUrl.isBlank(),
+                        supportingText = if (showErrors && baseUrl.isBlank()) {
+                            { Text("Required for custom instances") }
+                        } else null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
                     val tokenUrl = when (type) {
                         AccountType.GITHUB -> "https://github.com/settings/tokens/new?scopes=repo,user"
                         AccountType.GITLAB -> "https://gitlab.com/-/user_settings/personal_access_tokens"
@@ -363,10 +376,17 @@ fun AddAccountDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (name.isBlank() || username.isBlank() || token.isBlank()) {
+                    val customUrlMissing = type == AccountType.CUSTOM && baseUrl.isBlank()
+                    if (name.isBlank() || username.isBlank() || token.isBlank() || customUrlMissing) {
                         showErrors = true
                     } else {
-                        onConfirm(Account(name = name, username = username, token = token, type = type))
+                        onConfirm(Account(
+                            name = name,
+                            username = username,
+                            token = token,
+                            type = type,
+                            baseUrl = baseUrl.takeIf { type == AccountType.CUSTOM && it.isNotBlank() }
+                        ))
                     }
                 }
             ) {
