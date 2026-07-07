@@ -1,0 +1,1 @@
+Redesigned home screen widget — new Material 3 look with a title bar, always-visible branch and last commit message at every size, and a bigger minimum size for easier reading.

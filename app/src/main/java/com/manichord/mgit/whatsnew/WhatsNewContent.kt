@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 48,
+            versionName = "1.0.48",
+            highlights = listOf(
+                "Redesigned home screen widget — new Material 3 look with a title bar, always-visible branch and last commit message at every size, and a bigger minimum size for easier reading"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 47,
             versionName = "1.0.47",
             highlights = listOf(

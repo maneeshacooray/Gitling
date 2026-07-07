@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.48 - 2026-07-07
+- Redesigned home screen widget — new Material 3 look with a title bar, always-visible branch and last commit message at every size, and a bigger minimum size for easier reading.
+
 ## 1.0.47 - 2026-07-06
 - Stage All and Unstage All on the Status screen — bulk-stage or unstage every file in one tap.
 
