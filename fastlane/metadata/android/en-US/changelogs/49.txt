@@ -1,0 +1,1 @@
+Housekeeping release: corrects the What's New entry for 1.0.48, which shipped without it. No functional changes.

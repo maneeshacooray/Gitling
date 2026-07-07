@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 49,
+            versionName = "1.0.49",
+            highlights = listOf(
+                "Housekeeping release — no functional changes; corrects the What's New notes for 1.0.48, which shipped without them"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 48,
             versionName = "1.0.48",
             highlights = listOf(
