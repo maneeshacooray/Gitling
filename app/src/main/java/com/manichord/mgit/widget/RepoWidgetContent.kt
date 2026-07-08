@@ -45,7 +45,8 @@ fun RepoWidgetContent(repos: List<RepoWidgetEntry>) {
                         CircleIconButton(
                             imageProvider = ImageProvider(R.drawable.ic_sync),
                             contentDescription = "Refresh",
-                            onClick = actionRunCallback<RefreshWidgetAction>()
+                            onClick = actionRunCallback<RefreshWidgetAction>(),
+                            modifier = GlanceModifier.padding(end = 4.dp, top = 4.dp)
                         )
                     }
                 )
