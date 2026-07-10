@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 51,
+            versionName = "1.0.51",
+            highlights = listOf(
+                "Properly fixed the widget's refresh button crowding the top-right corner — the 1.0.50 fix didn't actually move it"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 50,
             versionName = "1.0.50",
             highlights = listOf(

@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.51 - 2026-07-10
+- Properly fixed the widget's refresh button crowding the top-right corner — the 1.0.50 fix didn't actually move it.
+
 ## 1.0.50 - 2026-07-08
 - Fixed the widget's refresh button crowding the top-right corner.
 - Fixed the keyboard covering the Remote URL and Local Path fields when cloning a repository.
