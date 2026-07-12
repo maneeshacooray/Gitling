@@ -112,7 +112,7 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun cloneRepo() {
-        if (initLocal.value as Boolean) {
+        if (initLocal.value ?: false) {
             Timber.d("INIT LOCAL %s", localRepoName.value)
             initLocalRepo()
         } else {
@@ -134,9 +134,10 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun validate() : Boolean {
-        return if (initLocal.value as Boolean) {
-            validateLocalName(localRepoName.value as String)
-        } else validateRemoteUrl(remoteUrl) && validateLocalName(localRepoName.value as String)
+        val localName = localRepoName.value ?: ""
+        return if (initLocal.value ?: false) {
+            validateLocalName(localName)
+        } else validateRemoteUrl(remoteUrl) && validateLocalName(localName)
     }
 
     fun initLocalRepo() {
