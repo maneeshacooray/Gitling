@@ -35,7 +35,14 @@ class CheckoutDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         commit = arguments?.getString(BASE_COMMIT) ?: ""
-        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost
+        if (activity == null) {
+            // A DialogFragment can be recreated by the FragmentManager's own state
+            // restoration (e.g. after process death) before Compose has recomposed
+            // "repoDetail" and re-set currentRepoDetailHost -- bail out rather than crash.
+            dismiss()
+            return ComposeView(requireContext())
+        }
         val message = getString(R.string.dialog_comfirm_checkout_commit_msg) +
             " " + Repo.getCommitDisplayName(commit)
 

@@ -42,7 +42,14 @@ class RepoFileOperationDialog : SheimiDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         val filePath = arguments?.getString(FILE_PATH) ?: ""
-        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost
+        if (activity == null) {
+            // A DialogFragment can be recreated by the FragmentManager's own state
+            // restoration (e.g. after process death) before Compose has recomposed
+            // "repoDetail" and re-set currentRepoDetailHost -- bail out rather than crash.
+            dismiss()
+            return ComposeView(requireContext())
+        }
 
         fun showRemoveFileMessageDialog(
             dialogTitle: Int,
