@@ -68,6 +68,9 @@ public class BasicFunctions {
     }
 
     public static void showError(@NonNull @NotNull SheimiFragmentActivity activity, @StringRes final int errorTitleRes, @StringRes final int errorRes) {
+        if (!canShowDialog(activity)) {
+            return;
+        }
         ErrorDialog errorDialog = new ErrorDialog();
         errorDialog.setErrorRes(errorRes);
         errorDialog.setErrorTitleRes(errorTitleRes);
@@ -75,11 +78,27 @@ public class BasicFunctions {
     }
 
     public static void showException(@NonNull @NotNull SheimiFragmentActivity activity, Throwable throwable, @StringRes final int errorTitleRes, @StringRes final int errorRes) {
+        if (!canShowDialog(activity)) {
+            return;
+        }
         ErrorDialog errorDialog = new ErrorDialog();
         errorDialog.setThrowable(throwable);
         errorDialog.setErrorRes(errorRes);
         errorDialog.setErrorTitleRes(errorTitleRes);
         errorDialog.show(activity.getSupportFragmentManager(), "exception-dialog");
+    }
+
+    /**
+     * A RepoOpTask's onPostExecute can fire after the hosting activity has been backgrounded
+     * (e.g. the user hits Home mid-clone) -- the FragmentManager has already saved its state by
+     * then, and committing a new DialogFragment against it throws
+     * "Can not perform this action after onSaveInstanceState" instead of just failing silently.
+     */
+    private static boolean canShowDialog(@NonNull SheimiFragmentActivity activity) {
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return false;
+        }
+        return !activity.getSupportFragmentManager().isStateSaved();
     }
 
 

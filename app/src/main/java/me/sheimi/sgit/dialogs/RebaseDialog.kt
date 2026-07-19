@@ -34,8 +34,15 @@ class RebaseDialog : SheimiDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val repo = arguments?.getSerializable(Repo.TAG) as Repo
-        val activity = (requireActivity() as MainActivity).currentRepoDetailHost!!
+        val repo = arguments?.getSerializable(Repo.TAG) as? Repo
+        val activity = (requireActivity() as MainActivity).currentRepoDetailHost
+        if (repo == null || activity == null) {
+            // A DialogFragment can be recreated by the FragmentManager's own state
+            // restoration (e.g. after process death) before Compose has recomposed
+            // "repoDetail" and re-set currentRepoDetailHost -- bail out rather than crash.
+            dismiss()
+            return ComposeView(requireContext())
+        }
         val currentBranchName = repo.branchName
         val branches = repo.branches.filter { it != currentBranchName }
 
