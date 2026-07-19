@@ -13,6 +13,14 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 53,
+            versionName = "1.0.53",
+            highlights = listOf(
+                "Fixed several rare crashes when reopening a dialog (merge, push, rebase, and others) right after the app restarts",
+                "Fixed a crash showing an error dialog if the app was backgrounded while a clone, pull, or push was still running"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 52,
             versionName = "1.0.52",
             highlights = listOf(

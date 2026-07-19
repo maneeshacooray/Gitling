@@ -1,0 +1,1 @@
+Fixed several rare crashes when reopening a dialog (merge, push, rebase, remove remote, checkout, and file operations) right after the app restarts, and a crash showing an error dialog if the app was backgrounded while a clone, pull, or push was still running.
