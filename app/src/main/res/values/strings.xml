@@ -205,7 +205,7 @@
     <string name="initialising">Initialising … </string>
     <string name="git" translatable="false">git</string>
     <string name="git_extension" translatable="false">.git</string>
-    <string name="ending_with_git" translatable="false">.*\\.git</string>
+    <string name="ending_with_git" translatable="false">/.*\\.git</string>
     <string name="ssh" translatable="false">ssh</string>
     <string name="github.com" translatable="false">github.com</string>
     <string name="gitlab.com" translatable="false">gitlab.com</string>

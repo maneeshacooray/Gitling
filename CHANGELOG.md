@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.55 - 2026-07-20
+- Improved deep-link handling for .git URLs to better match Android's App Links compatibility requirements.
+
 ## 1.0.54 - 2026-07-20
 - Fixed a crash opening or initializing a repository on Android 12 and older (a gap in JGit's compatibility patch for newer InputStream APIs missing on those versions).
 

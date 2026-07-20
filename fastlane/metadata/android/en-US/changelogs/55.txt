@@ -1,0 +1,1 @@
+Improved deep-link handling for .git URLs to better match Android's App Links compatibility requirements.

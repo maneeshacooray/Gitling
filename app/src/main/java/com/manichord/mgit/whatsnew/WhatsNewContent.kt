@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 55,
+            versionName = "1.0.55",
+            highlights = listOf(
+                "Improved deep-link handling for .git URLs"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 54,
             versionName = "1.0.54",
             highlights = listOf(
