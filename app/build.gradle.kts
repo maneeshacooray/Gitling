@@ -7,15 +7,16 @@ plugins {
 // ---------------------------------------------------------------------------
 // JGit Android 12 compatibility — bytecode patch
 //
-// JGit 6.3+ uses InputStream.transferTo() (API 29) and JGit 6.7+ uses
-// InputStream.readNBytes(int) (API 33). Neither is available on Android 12
-// (API 31), and desugar_jdk_libs 2.x does not backport either.
+// JGit 6.3+ uses InputStream.transferTo() (API 29) and JGit 6.7+ uses both
+// InputStream.readNBytes(int) and InputStream.readNBytes(byte[], int, int)
+// (API 33). None of these are available on Android 12 (API 31), and
+// desugar_jdk_libs 2.x does not backport any of them.
 //
-// Solution: at build time, rewrite every INVOKEVIRTUAL call to those two
-// methods inside JGit classes into INVOKESTATIC calls to StreamCompat shims
-// that are Java-8-compatible. The stack layout is identical for both opcodes
-// (object reference is already first on the stack), so no extra bytecode is
-// emitted.  StreamCompat lives in me.sheimi.sgit.compat.
+// Solution: at build time, rewrite every INVOKEVIRTUAL call to those methods
+// inside JGit classes into INVOKESTATIC calls to StreamCompat shims that are
+// Java-8-compatible. The stack layout is identical for both opcodes (object
+// reference is already first on the stack), so no extra bytecode is emitted.
+// StreamCompat lives in me.sheimi.sgit.compat.
 // ---------------------------------------------------------------------------
 
 import com.android.build.api.instrumentation.AsmClassVisitorFactory
@@ -46,7 +47,17 @@ abstract class JGitCompatClassVisitorFactory :
                 opcode: Int, owner: String, name: String,
                 descriptor: String, isInterface: Boolean
             ) {
-                if (opcode == Opcodes.INVOKEVIRTUAL && owner == "java/io/InputStream") {
+                // owner is the *compile-time* static type of the receiver, which for calls made
+                // through JGit's own InputStream subclasses (e.g. SilentFileInputStream) is that
+                // subclass, not java/io/InputStream itself -- matching only the exact JDK owner
+                // silently left those call sites unpatched (see JGit-on-old-Android crash where
+                // IO.readFully(File, int) calls SilentFileInputStream.readNBytes(int) directly).
+                // isInstrumentable() below already restricts this whole visitor to
+                // org.eclipse.jgit.* classes, so it's safe to match by name+descriptor across any
+                // owner in that scope rather than requiring java/io/InputStream exactly.
+                if (opcode == Opcodes.INVOKEVIRTUAL &&
+                    (owner == "java/io/InputStream" || owner.startsWith("org/eclipse/jgit/"))
+                ) {
                     when {
                         name == "readNBytes" && descriptor == "(I)[B" -> {
                             super.visitMethodInsn(
@@ -54,6 +65,16 @@ abstract class JGitCompatClassVisitorFactory :
                                 "me/sheimi/sgit/compat/StreamCompat",
                                 "readNBytes",
                                 "(Ljava/io/InputStream;I)[B",
+                                false
+                            )
+                            return
+                        }
+                        name == "readNBytes" && descriptor == "([BII)I" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/StreamCompat",
+                                "readNBytes",
+                                "(Ljava/io/InputStream;[BII)I",
                                 false
                             )
                             return
