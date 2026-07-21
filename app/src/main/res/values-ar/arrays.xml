@@ -46,8 +46,8 @@
         <item>داكن</item>
     </string-array>
     <string-array name="codemirror_theme_names">
-        <item>افتراضي</item>
-        <item>منتصف الليل</item>
+        <item>default</item>
+        <item>midnight</item>
     </string-array>
     <string-array name="theme_ids">
         <item>0</item>
