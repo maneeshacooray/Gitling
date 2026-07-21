@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="merge_ff_type">
+        <item>تمرير سريع</item>
+        <item>تمرير سريع فقط</item>
+        <item>بدون تمرير سريع</item>
+    </string-array>
+    <string-array name="repo_file_operations">
+        <item>إضافة إلى المرحلة</item>
+        <item>تسجيل خروج (إعادة تعيين التغييرات)</item>
+        <item>حذف</item>
+        <item>إزالة المخزن مؤقتاً من المستودع</item>
+        <item>إزالة بقوة من المستودع</item>
+        <item>جعله قابلاً للتنفيذ</item>
+        <item>جعله غير قابل للتنفيذ</item>
+    </string-array>
+    <string-array name="repo_operation_names">
+        <item>فرع جديد</item>
+        <item>سحب</item>
+        <item>دفع</item>
+        <item>إضافة الكل إلى المرحلة</item>
+        <item>التزام</item>
+        <item>إعادة تعيين (كاملة)</item>
+        <item>دمج</item>
+        <item>جلب</item>
+        <item>إعادة أساس</item>
+        <item>انتقاء</item>
+        <item>فرق</item>
+        <item>ملف جديد</item>
+        <item>مجلد جديد</item>
+        <item>إضافة رابط بعيد</item>
+        <item>إزالة رابط بعيد</item>
+        <item>حذف</item>
+        <item>إعدادات خام</item>
+        <item>إعدادات</item>
+    </string-array>
+    <string-array name="dialog_choose_repo_action_items">
+        <item>إعادة تسمية</item>
+        <item>حذف</item>
+    </string-array>
+
+    <!-- MUST KEY theme_names and theme_ids in SYNC -->
+    <string-array name="theme_names">
+        <item>فاتح</item>
+        <item>داكن</item>
+    </string-array>
+    <string-array name="codemirror_theme_names">
+        <item>افتراضي</item>
+        <item>منتصف الليل</item>
+    </string-array>
+    <string-array name="theme_ids">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+</resources>
