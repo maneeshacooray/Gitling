@@ -13,6 +13,14 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 56,
+            versionName = "1.0.56",
+            highlights = listOf(
+                "Added Arabic language support",
+                "Added Arabic F-Droid store listing"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 55,
             versionName = "1.0.55",
             highlights = listOf(

@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.56 - 2026-07-22
+- Added Arabic language support and Arabic F-Droid store listing, contributed by nemoXdev.
+
 ## 1.0.55 - 2026-07-20
 - Improved deep-link handling for .git URLs to better match Android's App Links compatibility requirements.
 
