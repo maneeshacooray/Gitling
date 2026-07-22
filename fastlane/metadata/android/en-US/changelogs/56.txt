@@ -1,0 +1,1 @@
+Added Arabic language support and Arabic F-Droid store listing, contributed by nemoXdev.

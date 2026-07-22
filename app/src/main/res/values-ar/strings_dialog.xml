@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Cherry Pick -->
+    <string name="dialog_cherrypick_title">انتقاء</string>
+    <string name="dialog_cherrypick_msg_hint">تجزئة الالتزام</string>
+    <string name="dialog_cherrypick_msg_helper">انسخ من قائمة الالتزامات</string>
+    <string name="dialog_label_cherrypick">انتقاء</string>
+    <string name="dialog_rebase_title">اختيار الفرع المنبع</string>
+
+    <!-- Commit -->
+    <string name="dialog_commit_title">الالتزام بالتغييرات</string>
+    <string name="dialog_commit_msg_hint">رسالة الالتزام</string>
+    <string name="dialog_commit_author_hint">مؤلف الالتزام (اختياري)</string>
+    <string name="dialog_commit_is_amend">تعديل الالتزام السابق</string>
+    <string name="dialog_commit_auto_stage">إعداد الملفات المعدلة تلقائياً</string>
+    <string name="dialog_commit_positive_label">التزام</string>
+
+    <!-- Import Repo -->
+    <string name="dialog_import_local_path_hint">المسار المحلي</string>
+    <string name="dialog_import_import_as_external_repo">استيراد كمستودع خارجي</string>
+    <string name="dialog_import_set_local_repo_title">تعيين المسار المحلي</string>
+
+    <!-- Clone Repo -->
+    <string name="dialog_clone_local_path_hint">المسار المحلي</string>
+    <string name="dialog_clone_neutral_label">تهيئة محلياً</string>
+
+    <!-- Init Repo -->
+    <string name="dialog_init_local_path_hint">المسار المحلي</string>
+    <string name="dialog_init_repo_title">المسار المحلي</string>
+    <string name="dialog_init_repo_positive_label">تهيئة</string>
+
+    <!-- Add Remote -->
+    <string name="dialog_add_remote_title">إضافة رابط بعيد</string>
+    <string name="dialog_add_remote_hint_name">اسم الرابط البعيد</string>
+    <string name="dialog_add_remote_hint_url">الرابط البعيد</string>
+    <string name="dialog_add_remote_positive_label">تم</string>
+
+    <!-- Remove Remote -->
+    <string name="dialog_remove_remote_title">إزالة الرابط البعيد</string>
+    <string name="dialog_remove_remote_positive_label">تم</string>
+
+    <!-- Push -->
+    <string name="dialog_push_repo_title">دفع إلى ...</string>
+    <string name="dialog_push_repo_msg">هل أنت متأكد أنك تريد دفع التغييرات المحلية؟</string>
+    <string name="dialog_push_is_push_all">دفع الكل؟</string>
+    <string name="dialog_push_is_force_push">دفع إجباري؟</string>
+    <string name="dialog_push_result">نتيجة الدفع</string>
+
+    <!-- Pull -->
+    <string name="dialog_pull_repo_title">سحب من &#8230;</string>
+    <string name="dialog_pull_is_force_pull">سحب إجباري وإعادة تعيين إلى المسحوب؟</string>
+
+    <!-- Create External -->
+    <string name="dialog_create_external_title">إنشاء مستودع خارجي</string>
+    <string name="dialog_create_external_msg">هل تريد إنشاء مستودع Git في هذا المجلد؟</string>
+    <string name="dialog_create_external_positive_label">إنشاء</string>
+
+    <!-- Fetch Remote -->
+    <string name="dialog_fetch_title">جلب</string>
+    <string name="dialog_fetch_positive_button">جلب</string>
+    <string name="dialog_fetch_all_button">جلب الكل</string>
+
+</resources>

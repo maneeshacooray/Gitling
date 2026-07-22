@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">Gitling</string>
+    <string name="widget_label">مستودعات Gitling</string>
+    <string name="widget_description">يعرض مستودعاتك المستنسخة وما إذا كان لكل منها تغييرات غير ملزمة. اضغط على مستودع لفتحه.</string>
+    <string name="widget_pin_not_supported">مشغل الأجهزة الخاص بك لا يدعم إضافة الأدوات بهذه الطريقة - اضغط مطولاً على الشاشة الرئيسية واختر الأدوات بدلاً من ذلك.</string>
+    <string name="default_text">نص افتراضي</string>
+    <string name="title_clone_repo">استنساخ المستودع</string>
+    <string name="preference_file_key" translatable="false">com.manichord.mgit</string>
+
+    <!-- action -->
+    <string name="action_settings">الإعدادات</string>
+    <string name="action_mode_rename_key">إعادة تسمية المفتاح</string>
+    <string name="action_mode_rename_branch">إعادة تسمية الفرع</string>
+    <string name="action_manage_private_key">المفاتيح الخاصة</string>
+    <string name="action_generate_private_key">إنشاء مفتاح</string>
+    <string name="action_import_private_key">استيراد مفتاح</string>
+    <string name="action_mode_show_private_key">إظهار المفتاح الخاص</string>
+    <string name="action_mode_show_public_key">إظهار المفتاح العام</string>
+    <string name="action_mode_edit_key_password">تعديل كلمة مرور المفتاح</string>
+    <string name="action_feedback">الملاحظات</string>
+    <string name="action_mode_diff">فرق</string>
+    <string name="action_reset">إعادة تعيين</string>
+    <string name="action_toggle_drawer">تبديل الدرج</string>
+    <string name="action_copy_commit_str">نسخ تجزئة الالتزام</string>
+    <string name="action_mode_create_tag">وسم</string>
+    <string name="dialog_create_tag_title">إنشاء وسم</string>
+    <string name="dialog_create_tag_hint">اسم الوسم (مثل v1.0.0)</string>
+    <string name="alert_tag_name_required">اسم الوسم مطلوب</string>
+    <string name="alert_tag_already_exists">يوجد وسم بهذا الاسم بالفعل</string>
+    <string name="success_create_tag">تم إنشاء الوسم</string>
+
+    <!-- label msg -->
+    <string name="label_ok">موافق</string>
+    <string name="label_remote_url">الرابط البعيد</string>
+    <string name="label_cancel">إلغاء</string>
+    <string name="label_clone">استنساخ</string>
+    <string name="label_init">تهيئة</string>
+    <string name="label_delete">حذف</string>
+    <string name="label_generate_key">إنشاء مفتاح</string>
+    <string name="label_dialog_generate_key">إنشاء مفتاح</string>
+    <string name="label_username">اسم المستخدم</string>
+    <string name="label_password">كلمة المرور</string>
+    <string name="label_new_file_name">اسم الملف الجديد</string>
+    <string name="label_key_size">طول المفتاح</string>
+    <string name="label_rename">إعادة تسمية</string>
+    <string name="label_send_feedback">إرسال الملاحظات</string>
+    <string name="label_import">استيراد</string>
+    <string name="label_push">دفع</string>
+    <string name="label_push_all">دفع الكل</string>
+    <string name="label_create">إنشاء</string>
+    <string name="label_checkout">تسجيل خروج</string>
+    <string name="label_git_name">الاسم</string>
+    <string name="label_git_email">البريد الإلكتروني</string>
+    <string name="label_git_name_per_repo">اسم المرسل (هذا المستودع)</string>
+    <string name="label_git_email_per_repo">بريد المرسل الإلكتروني (هذا المستودع)</string>
+    <string name="label_done">تم</string>
+    <string name="label_save">حفظ</string>
+    <string name="label_choose_app_to_open">فتح باستخدام …</string>
+    <string name="label_choose_app_to_edit">تعديل باستخدام …</string>
+    <string name="label_new_branch_name">فرع جديد</string>
+    <string name="label_anonymous_checkout">تسجيل خروج مجهول</string>
+
+    <!-- for title -->
+    <string name="title_activity_repo_detail">المستودع</string>
+    <string name="title_activity_commit_diff">الفرق:   </string>
+    <string name="title_section1">القسم 1</string>
+    <string name="title_section2">القسم 2</string>
+    <string name="title_section3">القسم 3</string>
+    <string name="tab_files_label">الملفات</string>
+    <string name="tab_file_label">ملف</string>
+    <string name="tab_commits_label">الالتزامات</string>
+    <string name="tab_status_label">الحالة</string>
+    <string name="tab_console_label">الطرفية</string>
+
+    <!-- Dialog Msg -->
+    <string name="dialog_choose_branch_title">اختيار فرع</string>
+    <string name="dialog_choose_option">اختيار خيار...</string>
+    <string name="dialog_rename_repo_title">إعادة تسمية المستودع</string>
+    <string name="dialog_rename_repo_hint">اسم المستودع</string>
+    <string name="dialog_delete_repo_title">تأكيد الحذف</string>
+    <string name="dialog_delete_repo_msg">هل أنت متأكد أنك تريد حذف هذا المستودع؟</string>
+    <string name="dialog_rename_key_title">إعادة تسمية</string>
+    <string name="dialog_edit_key_password_title">كلمة مرور المفتاح</string>
+    <string name="dialog_rename_branch_title">إعادة تسمية</string>
+    <string name="dialog_choose_language_title">اختيار اللغة</string>
+    <string name="dialog_comfirm_import_repo_title">استيراد المستودع</string>
+    <string name="dialog_comfirm_import_repo_msg">هل أنت متأكد أنك تريد استيراد هذا المستودع؟</string>
+    <string name="dialog_merge_title">اختيار فرع للدمج</string>
+    <string name="dialog_merge_checkbox">الالتزام بعد الدمج</string>
+    <string name="dialog_file_delete">حذف الملف</string>
+    <string name="dialog_file_delete_msg">هل أنت متأكد أنك تريد حذف هذا الملف أو المجلد من دليل العمل؟</string>
+    <string name="dialog_file_remove_cached">إزالة الملف المخزن مؤقتاً</string>
+    <string name="dialog_file_remove_cached_msg">هل أنت متأكد أنك تريد حذف هذا الملف أو المجلد من الفهرس؟</string>
+    <string name="dialog_file_remove_force">فرض إزالة الملف</string>
+    <string name="dialog_file_remove_force_msg">هل أنت متأكد أنك تريد حذف هذا الملف أو المجلد من دليل العمل والفهرس؟</string>
+    <string name="dialog_key_delete">حذف المفتاح</string>
+    <string name="dialog_key_delete_msg">هل أنت متأكد أنك تريد حذف هذا المفتاح؟</string>
+    <string name="dialog_branch_delete">حذف الفرع</string>
+    <string name="dialog_branch_delete_msg">هل أنت متأكد أنك تريد حذف هذا الفرع؟</string>
+    <string name="dialog_reset_commit_title">إعادة تعيين التغييرات</string>
+    <string name="dialog_reset_commit_msg">هل أنت متأكد أنك تريد تجاهل كل التغييرات؟</string>
+    <string name="dialog_create_dir_title">مجلد جديد</string>
+    <string name="dialog_create_dir_hint">اسم المجلد</string>
+    <string name="dialog_create_file_title">ملف جديد</string>
+    <string name="dialog_create_file_hint">اسم الملف</string>
+    <string name="dialog_comfirm_checkout_commit_title">تأكيد تسجيل الخروج</string>
+    <string name="dialog_comfirm_checkout_commit_msg">تسجيل خروج الفرع</string>
+    <string name="dialog_profile_preferences_title">التفضيلات</string>
+    <string name="dialog_prompt_for_password_title">يتطلب توثيقاً</string>
+    <string name="dialog_prompt_for_password_title_auth_fail">فشل التوثيق</string>
+    <string name="dialog_prompt_for_password_checkbox">حفظ اسم المستخدم وكلمة المرور</string>
+    <string name="dialog_title_you_want_to">ماذا تريد أن …</string>
+    <string name="dialog_create_branch_title">إنشاء فرع جديد</string>
+    <string name="dialog_create_branch_hint">اسم الفرع</string>
+    <string name="dialog_clone_recursive">استنساخ متكرر</string>
+    <string name="dialog_show_unstaged_diff">فرق غير المُستَعد</string>
+    <string name="dialog_show_staged_diff">فرق المُستَعد</string>
+    <string name="dialog_show_invalid_remote">تقرير رابط بعيد غير صالح</string>
+    <string name="dialog_not_supported">غير مدعوم</string>
+    <string name="dialog_not_supported_msg">هذه الميزة غير مدعومة على جهازك، يرجى مراجعة الدليل لمزيد من التفاصيل.</string>
+    <string name="dialog_error_title">حدث خطأ</string>
+    <string name="dialog_error_send_report">إرسال تقرير الخطأ</string>
+    <string name="dialog_error_occurred_msg">حدث خطأ غير متوقع</string>
+    <string name="dialog_keymap_title">مفاتيح الاختصار</string>
+    <string name="dialog_keymap_mesg"> C - الالتزامات\n F- الملفات\n S - الحالة\n ? - المساعدة\n</string>
+    <string name="dialog_open_remote">فتح الرابط البعيد</string>
+    <string name="dialog_open_remote_title">اختيار تطبيق لفتح الرابط البعيد %s</string>
+    <string name="dialog_open_remote_no_app_available">لا توجد تطبيقات متاحة لفتح الرابط</string>
+
+    <!-- Others -->
+    <string name="pull_msg_init">جارٍ السحب … </string>
+    <string name="progress_left_init">0%</string>
+    <string name="progress_right_init">0/0</string>
+    <string name="push_msg_init">جارٍ الدفع … </string>
+    <string name="fetch_msg_init">جارٍ الجلب … </string>
+    <string name="title_activity_private_key_manage">إدارة المفاتيح الخاصة</string>
+    <string name="hello_world">مرحباً بالعالم!</string>
+    <string name="title_activity_explore_file">استعراض الملفات</string>
+    <string name="title_activity_settings">الإعدادات</string>
+    <string name="title_config_repo">إعدادات المستودع</string>
+    <string name="feedback_url" translatable="false">https://github.com/maneeshacooray/Gitling/issues/new</string>
+
+    <!-- toast msg -->
+    <string name="feedback_subject">ملاحظات</string>
+    <string name="cannot_delete_branch">لا يمكن حذف %s</string>
+    <string name="cannot_delete_current_branch">لا يمكن حذف الفرع المُسجَّل خروجه حالياً %s</string>
+
+    <!-- Preferences -->
+
+    <string name="preference_repo_location">موقع التخزين الجذري للمستودعات</string>
+    <string name="pref_category_title_general">عام</string>
+    <string name="pref_key_repo_root_location" translatable="false">repo_root_path</string>
+    <string name="action_select_root_dir">اختيار كمجلد جذري</string>
+    <string name="action_create_new_dir">إنشاء مجلد جديد</string>
+    <string name="pref_category_title_git_profile">ملف Git الشخصي</string>
+    <string name="pref_key_git_user_name" translatable="false">user.name</string>
+    <string name="preference_git_user_name">اسم المستخدم</string>
+    <string name="pref_key_git_user_email" translatable="false">user.email</string>
+    <string name="preference_git_user_email">البريد الإلكتروني للمستخدم</string>
+    <string name="pref_category_title_about">حول</string>
+    <string name="preference_send_feedback">الملاحظات</string>
+    <string name="preference_send_feedback_summary">إرسال ملاحظات عن طريق إنشاء طلب جديد على GitHub</string>
+    <string name="preference_key_app_version" translatable="false">app_version</string>
+    <string name="preference_app_version">الإصدار</string>
+    <string name="preference_manage_ssh_keys_summary">إدارة مفاتيح SSH</string>
+    <string name="preference_manage_ssh_keys">مفاتيح SSH</string>
+    <string name="preference_use_gravatar">استخدام صور Gravatar</string>
+    <string name="preference_use_gravatar_summary">تحميل صور الملف الشخصي من gravatar.com</string>
+    <string name="pref_key_use_gravatar" translatable="false">use.gravatar</string>
+    <string name="pref_category_title_security">الأمان</string>
+    <string name="preference_use_theme">اختيار سمة الألوان</string>
+    <string name="pref_key_use_theme_id" translatable="false">color_theme_id</string>
+    <string name="preference_use_dynamic_color">استخدام ألوان الخلفية</string>
+    <string name="preference_use_dynamic_color_summary">مطابقة ألوان Gitling مع خلفيتك (Material You) بدلاً من ألوانه الافتراضية</string>
+    <string name="pref_key_use_dynamic_color" translatable="false">use_dynamic_color</string>
+    <string name="preference_add_widget">إضافة أداة إلى الشاشة الرئيسية</string>
+    <string name="preference_add_widget_summary">يعرض مستودعاتك وما إذا كان لكل منها تغييرات غير ملزمة</string>
+    <string name="preference_use_shared_media_storage">جعل المستودعات مرئية للتطبيقات الأخرى</string>
+    <string name="preference_use_shared_media_storage_summary">تخزين المستودعات في مكان يمكن للتطبيقات الأخرى (مثل مدير الملفات) الوصول إليه أيضاً، بدلاً من المجلد الخاص بـ Gitling</string>
+    <string name="pref_key_use_shared_media_storage" translatable="false">use_shared_media_storage</string>
+    <string name="preference_app_font">خط التطبيق</string>
+    <string name="pref_key_app_font" translatable="false">app_font</string>
+    <string name="pref_key_last_seen_version_code" translatable="false">last_seen_version_code</string>
+    <string name="pref_key_last_update_check_time" translatable="false">last_update_check_time</string>
+    <string name="pref_key_dismissed_update_version" translatable="false">dismissed_update_version</string>
+    <string name="pref_key_pending_storage_migration_notice" translatable="false">pending_storage_migration_notice</string>
+    <string name="pref_key_github_banner_dismissed" translatable="false">github_banner_dismissed</string>
+    <string name="action_git_profile">ملف Git الشخصي</string>
+    <string name="action_open_in_other_app">فتح في تطبيقات أخرى</string>
+    <string name="action_add_private_key">إضافة مفتاح خاص</string>
+
+    <!-- Crash reporting via ACRA -->
+    <string name="crash_toast_text">خطأ في Gitling - جمع البيانات لإرسال تقرير العطل عبر البريد الإلكتروني</string>
+    <string name="crash_report_email" translatable="false">bmaneeshacooray@gmail.com</string>
+
+    <!-- Intent filters -->
+    <string name="cloning">جارٍ الاستنساخ … </string>
+    <string name="importing">جارٍ الاستيراد … </string>
+    <string name="clone_with_mgit">استنساخ باستخدام Gitling</string>
+    <string name="invalid_url">رابط غير صالح!</string>
+    <string name="https" translatable="false">https</string>
+    <string name="http" translatable="false">http</string>
+    <string name="initialising">جارٍ التهيئة … </string>
+    <string name="git" translatable="false">git</string>
+    <string name="git_extension" translatable="false">.git</string>
+    <string name="ending_with_git" translatable="false">/.*\\.git</string>
+    <string name="ssh" translatable="false">ssh</string>
+    <string name="github.com" translatable="false">github.com</string>
+    <string name="gitlab.com" translatable="false">gitlab.com</string>
+    <string name="bitbucket.com" translatable="false">bitbucket.com</string>
+    <string name="notabug.org" translatable="false">notabug.org</string>
+    <string name="repository_already_present">المستودع موجود بالفعل!</string>
+    <string name="error_no_worktree">هذا مستودع فارغ!</string>
+    <string name="error_invalid_index">فهرس Git غير صالح!</string>
+    <string name="error_file_not_found">الملف غير موجود!</string>
+    <string name="preference_eng_lang">اللغة الإنجليزية</string>
+    <string name="preference_eng_lang_summary">استخدام الإنجليزية بدلاً من اللغة الافتراضية</string>
+    <string name="pref_key_use_english" translatable="false">use.english</string>
+    <string name="toast_submodule_update_success">تم تحديث الوحدات الفرعية</string>
+</resources>
