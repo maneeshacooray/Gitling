@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_invalid_remote">رابط بعيد غير صالح</string>
+    <string name="error_transport">خطأ في النقل</string>
+    <string name="error_clone_failed">فشل الاستنساخ</string>
+    <string name="error_pull_failed_not_on_branch">فشل السحب: ليس على فرع</string>
+    <string name="error_pull_failed">فشل السحب</string>
+    <string name="error_diff_failed">فشل إظهار الفرق</string>
+    <string name="error_out_of_memory">نفاد الذاكرة</string>
+    <string name="error_no_edit_app">لا توجد تطبيقات يمكنها تعديل الملف المصدر</string>
+    <string name="error_no_open_app">لا توجد تطبيقات يمكنها فتح الملف المصدر</string>
+    <string name="error_can_not_edit_file">لا يمكن تعديل هذا الملف على هذا الجهاز.</string>
+    <string name="error_can_not_open_file">لا يمكن فتح هذا الملف على هذا الجهاز.</string>
+    <string name="error_unknown">حدث خطأ غير معروف</string>
+    <string name="error_task_running">مهمة لهذا المستودع قيد التشغيل بالفعل</string>
+    <string name="error_something_wrong">حدث خطأ ما</string>
+    <string name="error_repository_not_found">المستودع غير موجود (قد يكون هناك خطأ في هذا المستودع)</string>
+
+    <string name="error_rename_repo_fail">فشلت إعادة تسمية المستودع</string>
+    <string name="error_invalid_author"><![CDATA[المؤلف ليس بالصيغة الاسم <البريد الإلكتروني>]]></string>
+    <string name="error_no_commit_msg">لم يتم تحديد رسالة التزام</string>
+
+    <string name="error_rebase_abort_failed_in_reset">تعذر إلغاء إعادة الأساس أثناء إعادة تعيين المستودع</string>
+
+    <string name="error_couldnt_display_all_files_permission">تعذر عرض إذن جميع الملفات.</string>
+
+    <!-- alerts -->
+    <string name="alert_too_short_key_size">طول المفتاح صغير جداً (1024 بت على الأقل لـ RSA و DSA)</string>
+    <string name="alert_too_long_key_size">طول المفتاح كبير جداً</string>
+    <string name="alert_dsa_key_size">DSA يدعم فقط أطوال مفاتيح 1024 أو 2048 أو 3072 بت</string>
+    <string name="alert_key_exists">المفتاح موجود بالفعل</string>
+    <string name="alert_field_not_empty">لا يجب أن يكون الحقل فارغاً</string>
+    <string name="alert_remoteurl_required">الرابط البعيد مطلوب</string>
+    <string name="alert_localpath_required">اسم المستودع مطلوب</string>
+    <string name="alert_localpath_format">لا يمكن أن يحتوي اسم المستودع على شرطة مائلة.</string>
+    <string name="alert_localpath_repo_exists">المستودع موجود بالفعل</string>
+    <string name="alert_new_filename_required">اسم الملف مطلوب</string>
+    <string name="alert_new_branchname_required">اسم الفرع مطلوب</string>
+    <string name="alert_file_exists">الملف موجود بالفعل</string>
+    <string name="alert_filename_format">خطأ في تنسيق اسم الملف</string>
+    <string name="alert_choose_two_items">يمكنك اختيار عنصرين فقط</string>
+    <string name="alert_no_items_selected">لم يتم تحديد عناصر</string>
+    <string name="alert_no_older_commits">لا توجد التزامات أقدم للمقارنة</string>
+    <string name="alert_please_wait_previous_op">العملية السابقة لا تزال قيد التشغيل</string>
+    <string name="alert_you_must_choose_one_commit_to_copy">يرجى اختيار التزام واحد بالضبط للنسخ</string>
+    <string name="alert_you_should_input_something">يجب إدخال شيء ما</string>
+    <string name="alert_please_add_a_remote">يرجى إضافة رابط بعيد أولاً</string>
+    <string name="alert_is_already_a_git_repo">هذا المجلد هو بالفعل مستودع Git</string>
+    <string name="alert_save_failed">فشل الحفظ</string>
+    <string name="alert_file_creation_failure">تعذر إنشاء الملف</string>
+    <string name="error_no_repository">لم يتم العثور على مستودع</string>
+    <string name="error_submodule_update_failed">فشل تحديث الوحدة الفرعية</string>
+
+</resources>

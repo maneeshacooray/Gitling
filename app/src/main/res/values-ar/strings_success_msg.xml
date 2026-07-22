@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="success_add_to_stage">تمت إضافة الملف إلى المرحلة</string>
+    <string name="success_remove_from_stage">تمت إزالة الملف من المرحلة</string>
+    <string name="success_remove_file">تمت إزالة الملف</string>
+    <string name="success_commit">تم الالتزام بالتغييرات</string>
+    <string name="success_reset">تم تجاهل التغييرات</string>
+    <string name="success_cherry_pick">تم الانتقاء بنجاح</string>
+    <string name="success_rebase">تمت إعادة الأساس بنجاح</string>
+    <string name="success_checkout_file">تم تسجيل الخروج بنجاح</string>
+    <string name="success_remote_added">تمت إضافة الرابط البعيد</string>
+    <string name="success_remote_removed">تمت إزالة الرابط البعيد</string>
+    <string name="success_save">تم حفظ الملف بنجاح</string>
+    <string name="msg_now_you_can_edit">يمكن تعديل الملف</string>
+    <string name="msg_commit_str_has_copied">تم نسخ تجزئة الالتزام</string>
+
+</resources>
