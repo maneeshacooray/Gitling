@@ -3,6 +3,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Requested lazily (see SheimiFragmentActivity.requestMediaImagesPermission) only when a
+         diff or stage operation actually hits the scoped-storage EACCES this works around
+         (see FsUtils.findEaccesFile). READ_MEDIA_IMAGES is the API 33+ permission; below that,
+         READ_EXTERNAL_STORAGE is the equivalent. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <application android:name=".MGitApplication" android:allowBackup="true" android:largeHeap="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:logo="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme">
         <activity android:name="com.manichord.mgit.MainActivity" android:label="@string/app_name" android:exported="true" android:launchMode="singleTask" android:configChanges="orientation|keyboardHidden|screenSize">

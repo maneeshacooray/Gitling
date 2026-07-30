@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 
@@ -119,6 +121,40 @@ public class FsUtils {
             mDir.mkdirs();
         }
         return mDir;
+    }
+
+    /** Matches the message java.io.FileNotFoundException carries on Android when the underlying
+     * open(2) syscall fails, e.g. "/path/to/file.jpg: open failed: EACCES (Permission denied)". */
+    private static final Pattern EACCES_PATH_PATTERN =
+            Pattern.compile("^(.*): open failed: EACCES");
+
+    /** Walks the cause chain of {@code t} looking for the file an EACCES failure was reported
+     * against, or null if none of the causes match that pattern. On recent Android, MediaProvider
+     * denies raw File access to image/video/audio files -- even ones sitting inside this app's
+     * own Android/media/&lt;pkg&gt; directory (used when "Make repos visible to other apps" is
+     * on) -- unless the app holds READ_MEDIA_IMAGES (or READ_EXTERNAL_STORAGE pre-API 33). JGit's
+     * FileTreeIterator/AddCommand open working-tree files directly via java.io.File, so diffing or
+     * staging such a file throws this before Gitling gets a chance to ask for that permission. */
+    public static File findEaccesFile(Throwable t) {
+        while (t != null) {
+            String msg = t.getMessage();
+            if (msg != null) {
+                Matcher matcher = EACCES_PATH_PATTERN.matcher(msg);
+                if (matcher.find()) {
+                    return new File(matcher.group(1));
+                }
+            }
+            t = t.getCause();
+        }
+        return null;
+    }
+
+    /** Wraps an EACCES failure (see {@link #findEaccesFile}) with a message explaining the likely
+     * cause and next step, in place of JGit's raw "open failed: EACCES" message. */
+    public static Throwable wrapEaccesFile(Throwable cause, File eaccesFile) {
+        String friendly = MGitApplication.getContext()
+                .getString(R.string.error_media_permission_denied, eaccesFile.getName());
+        return new IOException(friendly, cause);
     }
 
     public static String getMimeType(String url) {
