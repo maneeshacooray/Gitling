@@ -1,9 +1,11 @@
 package me.sheimi.android.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -16,7 +18,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
@@ -237,6 +242,53 @@ public class SheimiFragmentActivity extends AppCompatActivity {
         void onClicked(String username, String password, boolean savePassword);
 
         void onCanceled();
+    }
+
+    /**
+     * Callback for {@link #requestMediaImagesPermission}, mirroring the {@link OnPasswordEntered}
+     * pattern used for auth retries -- the caller's failed task is already done by the time this
+     * fires (the permission dialog is async), so onGranted() is expected to start a fresh task
+     * rather than resume the old one.
+     */
+    public static interface OnPermissionResult {
+        void onGranted();
+
+        void onDenied();
+    }
+
+    private OnPermissionResult mPendingMediaPermissionCallback;
+
+    private final ActivityResultLauncher<String> mMediaPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                OnPermissionResult callback = mPendingMediaPermissionCallback;
+                mPendingMediaPermissionCallback = null;
+                if (callback == null) {
+                    return;
+                }
+                if (granted) {
+                    callback.onGranted();
+                } else {
+                    callback.onDenied();
+                }
+            });
+
+    /**
+     * Requests whichever runtime permission is needed to read image/video/audio files on this
+     * Android version (READ_MEDIA_IMAGES on API 33+, READ_EXTERNAL_STORAGE below that) -- see
+     * FsUtils.findEaccesFile for the scoped-storage quirk this works around. Safe to call from a
+     * background thread; the actual request always runs on the UI thread. Calls back immediately,
+     * without showing anything, if the permission is already granted.
+     */
+    public void requestMediaImagesPermission(final OnPermissionResult callback) {
+        final String permission = Build.VERSION.SDK_INT >= 33
+                ? Manifest.permission.READ_MEDIA_IMAGES
+                : Manifest.permission.READ_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            callback.onGranted();
+            return;
+        }
+        mPendingMediaPermissionCallback = callback;
+        runOnUiThread(() -> mMediaPermissionLauncher.launch(permission));
     }
 
     /* View Utils End */

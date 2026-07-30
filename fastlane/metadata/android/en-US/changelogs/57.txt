@@ -1,0 +1,1 @@
+Fixed a crash diffing or staging an image when repos are stored in the shared media folder (Settings > Make repos visible to other apps).

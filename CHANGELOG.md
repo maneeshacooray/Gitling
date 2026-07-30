@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.57 - 2026-07-30
+- Fixed a crash diffing or staging an image when repos are stored in the shared media folder (Settings > Make repos visible to other apps).
+
 ## 1.0.56 - 2026-07-22
 - Added Arabic language support and Arabic F-Droid store listing, contributed by nemoXdev.
 

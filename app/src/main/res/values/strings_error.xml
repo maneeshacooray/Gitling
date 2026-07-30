@@ -51,5 +51,6 @@
     <string name="alert_file_creation_failure">Couldn\'t create file</string>
     <string name="error_no_repository">No repository found</string>
     <string name="error_submodule_update_failed">Submodule update failed</string>
+    <string name="error_media_permission_denied">Android blocked access to \"%1$s\" because Gitling doesn\'t have permission to read media files yet. Allow it if prompted, or enable photo and video access for Gitling in Android Settings, then try again.</string>
 
 </resources>

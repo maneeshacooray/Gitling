@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 57,
+            versionName = "1.0.57",
+            highlights = listOf(
+                "Fixed a crash diffing or staging an image when repos are stored in the shared media folder"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 56,
             versionName = "1.0.56",
             highlights = listOf(
