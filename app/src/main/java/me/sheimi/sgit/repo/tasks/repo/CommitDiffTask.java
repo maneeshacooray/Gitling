@@ -1,11 +1,15 @@
 package me.sheimi.sgit.repo.tasks.repo;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.sheimi.android.activities.SheimiFragmentActivity;
+import me.sheimi.android.utils.BasicFunctions;
+import me.sheimi.android.utils.FsUtils;
 import me.sheimi.sgit.R;
 import me.sheimi.sgit.database.models.Repo;
 import me.sheimi.sgit.exception.StopTaskException;
@@ -36,6 +40,7 @@ public class CommitDiffTask extends RepoOpTask {
     private Iterable<RevCommit> mCommits;
     private DiffFormatter mDiffFormatter;
     private ByteArrayOutputStream mDiffOutput;
+    private final boolean mIsMediaPermissionRetry;
 
     public interface CommitDiffResult {
         public void pushResult(List<DiffEntry> diffEntries,
@@ -44,11 +49,22 @@ public class CommitDiffTask extends RepoOpTask {
 
     public CommitDiffTask(Repo repo, String oldCommit, String newCommit,
                           CommitDiffResult callback, boolean showDescription) {
+        this(repo, oldCommit, newCommit, callback, showDescription, false);
+    }
+
+    /** @param isMediaPermissionRetry true only for the single retry instance
+     * handleDiffIOException constructs -- caps that retry at one attempt (see
+     * AddToStageTask's counterpart for why a hard cap, not just checking the permission again,
+     * is required). */
+    private CommitDiffTask(Repo repo, String oldCommit, String newCommit,
+                          CommitDiffResult callback, boolean showDescription,
+                          boolean isMediaPermissionRetry) {
         super(repo, false);
         mOldCommit = oldCommit;
         mNewCommit = newCommit;
         mCallback = callback;
         mShowDescription = showDescription;
+        mIsMediaPermissionRetry = isMediaPermissionRetry;
     }
 
     @Override
@@ -132,7 +148,7 @@ public class CommitDiffTask extends RepoOpTask {
         } catch (AmbiguousObjectException e) {
             setException(e, R.string.error_diff_failed);
         } catch (IOException e) {
-            setException(e, R.string.error_diff_failed);
+            handleDiffIOException(e);
         } catch (IllegalStateException e) {
             setException(e, R.string.error_diff_failed);
         } catch (NullPointerException e) {
@@ -153,9 +169,45 @@ public class CommitDiffTask extends RepoOpTask {
             setException(e, R.string.error_diff_failed);
             throw new StopTaskException();
         } catch (IOException e) {
-            setException(e, R.string.error_diff_failed);
+            handleDiffIOException(e);
             throw new StopTaskException();
         }
+    }
+
+    /** See FsUtils.findEaccesFile -- if this IOException is that scoped-storage EACCES, asks for
+     * the runtime permission it's actually about and reruns the whole diff from scratch if
+     * granted, mirroring how RepoRemoteOpTask retries after an auth prompt. Suppresses this
+     * attempt's own error dialog while a request is in flight (see AddToStageTask's counterpart
+     * for why) -- falls back to the normal dialog if there's no active activity to ask from, if
+     * this is already the one retry attempt allowed (see mIsMediaPermissionRetry), or directly
+     * raises one if the user ends up declining. */
+    private void handleDiffIOException(final IOException e) {
+        final File eaccesFile = FsUtils.findEaccesFile(e);
+        if (eaccesFile == null) {
+            setException(e, R.string.error_diff_failed);
+            return;
+        }
+        SheimiFragmentActivity activity = BasicFunctions.getActiveActivity();
+        if (mIsMediaPermissionRetry || activity == null) {
+            setException(FsUtils.wrapEaccesFile(e, eaccesFile), R.string.error_diff_failed);
+            return;
+        }
+        cancelTask();
+        activity.requestMediaImagesPermission(new SheimiFragmentActivity.OnPermissionResult() {
+            @Override
+            public void onGranted() {
+                new CommitDiffTask(mRepo, mOldCommit, mNewCommit, mCallback, mShowDescription, true).executeTask();
+            }
+
+            @Override
+            public void onDenied() {
+                SheimiFragmentActivity activity = BasicFunctions.getActiveActivity();
+                if (activity != null) {
+                    BasicFunctions.showException(activity, FsUtils.wrapEaccesFile(e, eaccesFile),
+                            R.string.error_diff_failed, R.string.dialog_error_title);
+                }
+            }
+        });
     }
 
     public void executeTask() {
