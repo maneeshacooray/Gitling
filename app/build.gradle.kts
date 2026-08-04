@@ -7,10 +7,16 @@ plugins {
 // ---------------------------------------------------------------------------
 // JGit Android 12 compatibility — bytecode patch
 //
-// JGit 6.3+ uses InputStream.transferTo() (API 29) and JGit 6.7+ uses both
-// InputStream.readNBytes(int) and InputStream.readNBytes(byte[], int, int)
-// (API 33). None of these are available on Android 12 (API 31), and
-// desugar_jdk_libs 2.x does not backport any of them.
+// JGit 6.3+ uses InputStream.transferTo() (API 29) and JGit 6.7+ uses
+// InputStream.readNBytes(int), readNBytes(byte[], int, int), and
+// readAllBytes() (all API 33). None of these are available on Android 12
+// (API 31) or older, and desugar_jdk_libs 2.x does not backport any of them.
+// readAllBytes() specifically is reached from AddCommand.call() ->
+// WorkingTreeIterator.getEntryContentLength() -> possiblyFilteredLength() ->
+// IO.readWholeStream() whenever a staged file is <= 64KB and either has a
+// .gitattributes clean filter or needs EOL conversion -- confirmed by
+// decompiling org.eclipse.jgit:org.eclipse.jgit:7.3.0 with javap and
+// reproduced live on an API 29 emulator (see issue #52).
 //
 // Solution: at build time, rewrite every INVOKEVIRTUAL call to those methods
 // inside JGit classes into INVOKESTATIC calls to StreamCompat shims that are
@@ -59,6 +65,16 @@ abstract class JGitCompatClassVisitorFactory :
                     (owner == "java/io/InputStream" || owner.startsWith("org/eclipse/jgit/"))
                 ) {
                     when {
+                        name == "readAllBytes" && descriptor == "()[B" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/StreamCompat",
+                                "readAllBytes",
+                                "(Ljava/io/InputStream;)[B",
+                                false
+                            )
+                            return
+                        }
                         name == "readNBytes" && descriptor == "(I)[B" -> {
                             super.visitMethodInsn(
                                 Opcodes.INVOKESTATIC,
