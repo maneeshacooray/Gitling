@@ -1,0 +1,1 @@
+Fixed a crash staging certain files (small text files with a .gitattributes filter or needing line-ending conversion) on Android 12 and older.

@@ -5,6 +5,9 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.58 - 2026-08-04
+- Fixed a crash staging certain files (small text files with a .gitattributes filter or needing line-ending conversion) on Android 12 and older.
+
 ## 1.0.57 - 2026-07-30
 - Fixed a crash diffing or staging an image when repos are stored in the shared media folder (Settings > Make repos visible to other apps).
 
