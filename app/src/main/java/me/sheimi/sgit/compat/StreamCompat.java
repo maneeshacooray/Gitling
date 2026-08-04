@@ -64,6 +64,14 @@ public final class StreamCompat {
         return combined;
     }
 
+    // Replacement for InputStream.readAllBytes() — available natively only on API 33+.
+    // The real JDK defines this as readNBytes(Integer.MAX_VALUE) (see java.io.InputStream
+    // source), so delegate to the existing bounded-chunk implementation above rather than
+    // duplicating it.
+    public static byte[] readAllBytes(InputStream in) throws IOException {
+        return readNBytes(in, Integer.MAX_VALUE);
+    }
+
     // Replacement for InputStream.readNBytes(byte[], int, int) — available natively only on API 33+.
     public static int readNBytes(InputStream in, byte[] b, int off, int len) throws IOException {
         if (off < 0 || len < 0 || off + len > b.length || off + len < 0) {
