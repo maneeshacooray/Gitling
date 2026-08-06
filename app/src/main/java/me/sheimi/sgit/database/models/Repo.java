@@ -235,6 +235,13 @@ public class Repo implements Comparable<Repo>, Serializable {
         mRepoTasks.remove(getID());
     }
 
+    /** Whether this repo's exclusive-task slot (see addTask) is currently held. Used by
+     * GitlingDocumentsProvider to refuse external writes while a git operation (checkout,
+     * pull, merge, ...) may be rewriting the working tree. */
+    public boolean hasOngoingTask() {
+        return mRepoTasks.get(getID()) != null;
+    }
+
     public void updateStatus(String status) {
         ContentValues values = new ContentValues();
         mRepoStatus = status;
