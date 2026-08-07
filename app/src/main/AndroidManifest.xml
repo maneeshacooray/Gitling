@@ -46,6 +46,18 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
         </provider>
 
+        <!-- Exposes repos as a browsable "Gitling" location in the Files app and SAF pickers
+             (issue #49). android:permission="android.permission.MANAGE_DOCUMENTS" is the
+             standard DocumentsProvider protection: only the system's DocumentsUI holds that
+             permission, so despite exported="true" no third-party app can talk to this
+             provider directly; everything goes through the system picker and the per-document
+             grants the user makes there. -->
+        <provider android:name="com.manichord.mgit.documents.GitlingDocumentsProvider" android:authorities="com.maneeshacooray.gitling.documents" android:exported="true" android:grantUriPermissions="true" android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+
         <receiver android:name="com.manichord.mgit.widget.RepoListWidgetReceiver" android:exported="false" android:label="@string/widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
