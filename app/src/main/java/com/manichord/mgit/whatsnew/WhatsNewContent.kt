@@ -13,6 +13,13 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 59,
+            versionName = "1.0.59",
+            highlights = listOf(
+                "Your repos now show up as a \"Gitling\" location in the system Files app and any file picker, so other apps can browse and edit them directly"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 58,
             versionName = "1.0.58",
             highlights = listOf(
