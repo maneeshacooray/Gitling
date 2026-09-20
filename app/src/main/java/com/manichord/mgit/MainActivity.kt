@@ -232,6 +232,9 @@ class MainActivity : SheimiFragmentActivity() {
                             RepoDetailScreen(
                                 viewModel = host.viewModel,
                                 onBackClick = { navController.popBackStack() },
+                                onNavigateUp = {
+                                    host.getFilesFragment()?.onBackClickListener?.onClick() ?: false
+                                },
                                 onBranchClick = { openBranchChooser(host.repo) },
                                 onOperationClick = { index ->
                                     host.getRepoDelegate().executeAction(index)

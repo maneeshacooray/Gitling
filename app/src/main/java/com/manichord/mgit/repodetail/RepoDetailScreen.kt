@@ -1,5 +1,6 @@
 package com.manichord.mgit.repodetail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -38,6 +39,7 @@ private const val TAB_CONSOLE = 3
 fun RepoDetailScreen(
     viewModel: RepoDetailViewModel,
     onBackClick: () -> Unit,
+    onNavigateUp: () -> Boolean,
     onBranchClick: () -> Unit,
     onOperationClick: (index: Int) -> Unit,
     filesContent: @Composable () -> Unit,
@@ -68,11 +70,23 @@ fun RepoDetailScreen(
         TabItem(stringResource(R.string.tab_status_label), Icons.Default.Assessment),
         TabItem(stringResource(R.string.tab_console_label), Icons.Outlined.Terminal)
     )
-
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val searchFocusRequester = remember { FocusRequester() }
+
+    BackHandler {
+        when {
+            isSearchActive -> {
+                isSearchActive = false
+                searchQuery = ""
+                onFilesSearchQueryChange("")
+                onCommitsSearchQueryChange("")
+            }
+            pagerState.currentPage == TAB_FILES && onNavigateUp() -> Unit
+            else -> onBackClick()
+        }
+    }
 
     // Each tab's search is independent -- switching tabs while searching would otherwise leave
     // a stale query applied to whichever tab the user navigated away from, so just exit search.
