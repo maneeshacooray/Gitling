@@ -17,21 +17,34 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import java.io.File
+
+import me.sheimi.sgit.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,8 +106,41 @@ fun FileListContent(
      * root) as a subtitle beneath its name -- used for flat, cross-directory results (e.g. a
      * recursive filename search) where the bare name alone wouldn't disambiguate same-named
      * files in different folders. */
-    displayPath: ((File) -> String)? = null
+    displayPath: ((File) -> String)? = null,
+    onPathSubmit: ((String) -> Unit)? = null
 ) {
+    var showPathDialog by remember { mutableStateOf(false) }
+    var pathDraft by remember { mutableStateOf(currentPath) }
+
+    if (showPathDialog) {
+        AlertDialog(
+            onDismissRequest = { showPathDialog = false },
+            title = { Text(stringResource(R.string.dialog_path_title)) },
+            text = {
+                OutlinedTextField(
+                    value = pathDraft,
+                    onValueChange = { pathDraft = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.dialog_path_label)) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPathDialog = false
+                    onPathSubmit?.invoke(pathDraft)
+                }) {
+                    Text(stringResource(R.string.label_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPathDialog = false }) {
+                    Text(stringResource(R.string.label_cancel))
+                }
+            }
+        )
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -105,6 +151,12 @@ fun FileListContent(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                    if (onPathSubmit != null) {
+                        pathDraft = currentPath
+                        showPathDialog = true
+                    }
+                }
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         )
         HorizontalDivider()

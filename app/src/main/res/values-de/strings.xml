@@ -25,6 +25,8 @@
     <string name="label_ok">OK</string>
     <string name="label_remote_url">Entfernte Adresse</string>
     <string name="label_cancel">Abbrechen</string>
+    <string name="dialog_path_title">Pfad</string>
+    <string name="dialog_path_label">Verzeichnispfad (relativ zum Repository-Stammverzeichnis)</string>
     <string name="label_clone">Klonen</string>
     <string name="label_delete">Löschen</string>
     <string name="label_username">Benutzername</string>

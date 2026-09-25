@@ -25,6 +25,8 @@
     <string name="label_ok">OK</string>
     <string name="label_remote_url">リモートURL</string>
     <string name="label_cancel">キャンセル</string>
+    <string name="dialog_path_title">パス</string>
+    <string name="dialog_path_label">ディレクトリのパス（リポジトリのルートからの相対パス）</string>
     <string name="label_clone">クローン</string>
     <string name="label_delete">削除</string>
     <string name="label_username">ユーザー名</string>

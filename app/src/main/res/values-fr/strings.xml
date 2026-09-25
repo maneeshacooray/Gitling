@@ -36,6 +36,8 @@
     <string name="label_ok">OK</string>
     <string name="label_remote_url">URL distante</string>
     <string name="label_cancel">Annuler</string>
+    <string name="dialog_path_title">Chemin</string>
+    <string name="dialog_path_label">Chemin du répertoire (relatif à la racine du dépôt)</string>
     <string name="label_clone">Cloner</string>
     <string name="label_delete">Supprimer</string>
     <string name="label_generate_key">Générer clé</string>

@@ -20,6 +20,8 @@
   <string name="label_ok">אישור</string>
   <string name="label_remote_url">URL שרת</string>
   <string name="label_cancel">ביטול</string>
+  <string name="dialog_path_title">נתיב</string>
+  <string name="dialog_path_label">נתיב התיקייה (יחסית לשורש המאגר)</string>
   <string name="label_clone">מיזוג</string>
   <string name="label_delete">מחיקה</string>
   <string name="label_username">שם משתמש</string>

@@ -35,6 +35,8 @@
     <string name="label_ok">موافق</string>
     <string name="label_remote_url">الرابط البعيد</string>
     <string name="label_cancel">إلغاء</string>
+    <string name="dialog_path_title">المسار</string>
+    <string name="dialog_path_label">مسار الدليل (نسبةً إلى جذر المستودع)</string>
     <string name="label_clone">استنساخ</string>
     <string name="label_init">تهيئة</string>
     <string name="label_delete">حذف</string>

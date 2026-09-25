@@ -34,6 +34,8 @@
     <string name="label_ok">확인</string>
     <string name="label_remote_url">원격 URL</string>
     <string name="label_cancel">취소</string>
+    <string name="dialog_path_title">경로</string>
+    <string name="dialog_path_label">디렉터리 경로(리포지터리 루트 기준 상대 경로)</string>
     <string name="label_clone">Clone</string>
     <string name="label_delete">지우기</string>
     <string name="label_generate_key">Key 생성</string>

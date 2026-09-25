@@ -36,6 +36,8 @@
     <string name="label_ok">确定</string>
     <string name="label_remote_url">远程地址</string>
     <string name="label_cancel">取消</string>
+    <string name="dialog_path_title">路径</string>
+    <string name="dialog_path_label">目录路径（相对仓库根目录）</string>
     <string name="label_clone">克隆</string>
     <string name="label_init">Init</string>
     <string name="label_delete">删除</string>

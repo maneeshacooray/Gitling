@@ -36,6 +36,8 @@
     <string name="label_ok">OK</string>
     <string name="label_remote_url">Удаленный URL</string>
     <string name="label_cancel">Отмена</string>
+    <string name="dialog_path_title">Путь</string>
+    <string name="dialog_path_label">Путь к каталогу (относительно корня репозитория)</string>
     <string name="label_clone">Клонировать</string>
     <string name="label_init">Init</string>
     <string name="label_delete">Удалить</string>

@@ -87,7 +87,17 @@ class FilesFragment : RepoDetailFragment() {
                         onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
                         onItemClick = ::onFileClicked,
                         onItemLongClick = ::onFileLongClicked,
-                        displayPath = if (query != null) ::relativePath else null
+                        displayPath = if (query != null) ::relativePath else null,
+                        onPathSubmit = { input ->
+                            val root = rootDir
+                            if (root != null) {
+                                val target = File(root, input)
+                                if (target.exists() && target.isDirectory) {
+                                    searchQuery = null
+                                    setCurrentDir(target)
+                                }
+                            }
+                        }
                     )
                 }
             }
