@@ -87,7 +87,40 @@ class FilesFragment : RepoDetailFragment() {
                         onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
                         onItemClick = ::onFileClicked,
                         onItemLongClick = ::onFileLongClicked,
-                        displayPath = if (query != null) ::relativePath else null
+                        displayPath = if (query != null) ::relativePath else null,
+                        pathEditable = query == null,
+                        onPathSubmit = { input ->
+                            val root = rootDir
+                            if (root != null) {
+                                val target = File(root, input)
+                                val canonicalRoot = root.canonicalFile
+                                val canonicalTarget = target.canonicalFile
+                                val rootPath = canonicalRoot.path.trimEnd(File.separatorChar)
+                                val targetPath = canonicalTarget.path
+                                val isInside = canonicalTarget == canonicalRoot ||
+                                    targetPath.startsWith(rootPath + File.separator)
+                                val relative = if (isInside && canonicalTarget != canonicalRoot) {
+                                    targetPath.substring(rootPath.length + 1)
+                                } else {
+                                    ""
+                                }
+                                val firstSegment = relative.replace('\\', '/').substringBefore('/')
+                                when {
+                                    !canonicalTarget.exists() || !canonicalTarget.isDirectory ->
+                                        showToastMessage(me.sheimi.sgit.R.string.dialog_path_invalid)
+                                    // Shared storage is case-insensitive, so ".GIT" is the same dir
+                                    !isInside || firstSegment.equals(".git", ignoreCase = true) ->
+                                        showToastMessage(me.sheimi.sgit.R.string.dialog_path_out_of_repo)
+                                    else -> {
+                                        searchQuery = null
+                                        // Rebuild from rootDir rather than using the canonical path,
+                                        // so the Up row and path bar still recognise the repo root
+                                        // when rootDir itself goes through a symlink
+                                        setCurrentDir(if (relative.isEmpty()) root else File(root, relative))
+                                    }
+                                }
+                            }
+                        }
                     )
                 }
             }
