@@ -108,11 +108,15 @@ class FilesFragment : RepoDetailFragment() {
                                 when {
                                     !canonicalTarget.exists() || !canonicalTarget.isDirectory ->
                                         showToastMessage(me.sheimi.sgit.R.string.dialog_path_invalid)
-                                    !isInside || firstSegment == ".git" ->
+                                    // Shared storage is case-insensitive, so ".GIT" is the same dir
+                                    !isInside || firstSegment.equals(".git", ignoreCase = true) ->
                                         showToastMessage(me.sheimi.sgit.R.string.dialog_path_out_of_repo)
                                     else -> {
                                         searchQuery = null
-                                        setCurrentDir(canonicalTarget)
+                                        // Rebuild from rootDir rather than using the canonical path,
+                                        // so the Up row and path bar still recognise the repo root
+                                        // when rootDir itself goes through a symlink
+                                        setCurrentDir(if (relative.isEmpty()) root else File(root, relative))
                                     }
                                 }
                             }
