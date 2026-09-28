@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -53,7 +56,8 @@ fun RepoListScreen(
     onConnectGitHubClick: () -> Unit
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    val searchState = rememberTextFieldState()
+    val searchQuery = searchState.text.toString()
     var selectedTag by remember { mutableStateOf<String?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
 
@@ -80,13 +84,12 @@ fun RepoListScreen(
                         val focusRequester = searchFocusRequester
                         LaunchedEffect(Unit) { focusRequester.requestFocus() }
                         TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
+                            state = searchState,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             placeholder = { Text("Search repositories") },
-                            singleLine = true,
+                            lineLimits = TextFieldLineLimits.SingleLine,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
@@ -103,7 +106,7 @@ fun RepoListScreen(
                     if (isSearchActive) {
                         IconButton(onClick = {
                             isSearchActive = false
-                            searchQuery = ""
+                            searchState.clearText()
                         }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close search")
                         }
@@ -112,7 +115,7 @@ fun RepoListScreen(
                 actions = {
                     if (isSearchActive) {
                         if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
+                            IconButton(onClick = { searchState.clearText() }) {
                                 Icon(Icons.Default.Clear, contentDescription = "Clear search")
                             }
                         }

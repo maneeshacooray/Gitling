@@ -2,14 +2,12 @@ package com.manichord.mgit.dialogs
 
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.ui.theme.AppTheme
@@ -27,8 +25,8 @@ object AddRemoteDialog {
         fun close() = container.removeView(composeView)
 
         composeView.setContent {
-            var name by remember { mutableStateOf("") }
-            var url by remember { mutableStateOf("") }
+            val name = rememberTextFieldState()
+            val url = rememberTextFieldState()
 
             AppTheme {
                 AlertDialog(
@@ -37,23 +35,21 @@ object AddRemoteDialog {
                     text = {
                         Column {
                             OutlinedTextField(
-                                value = name,
-                                onValueChange = { name = it },
+                                state = name,
                                 label = { Text(stringResource(R.string.dialog_add_remote_hint_name)) },
-                                singleLine = true
+                                lineLimits = TextFieldLineLimits.SingleLine
                             )
                             OutlinedTextField(
-                                value = url,
-                                onValueChange = { url = it },
+                                state = url,
                                 label = { Text(stringResource(R.string.dialog_add_remote_hint_url)) },
-                                singleLine = true
+                                lineLimits = TextFieldLineLimits.SingleLine
                             )
                         }
                     },
                     confirmButton = {
                         TextButton(onClick = {
                             try {
-                                repo.setRemote(name, url)
+                                repo.setRemote(name.text.toString(), url.text.toString())
                                 repo.updateRemote()
                                 activity.showToastMessage(R.string.success_remote_added)
                             } catch (e: IOException) {

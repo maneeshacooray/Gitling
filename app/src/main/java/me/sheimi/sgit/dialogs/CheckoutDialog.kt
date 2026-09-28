@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.ui.theme.AppTheme
@@ -48,7 +46,7 @@ class CheckoutDialog : SheimiDialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                var newBranchName by remember { mutableStateOf("") }
+                val newBranchName = rememberTextFieldState()
 
                 AppTheme {
                     AlertDialog(
@@ -58,16 +56,15 @@ class CheckoutDialog : SheimiDialogFragment() {
                             Column {
                                 Text(message)
                                 OutlinedTextField(
-                                    value = newBranchName,
-                                    onValueChange = { newBranchName = it },
+                                    state = newBranchName,
                                     label = { Text(stringResource(R.string.label_new_branch_name)) },
-                                    singleLine = true
+                                    lineLimits = TextFieldLineLimits.SingleLine
                                 )
                             }
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                activity.getRepoDelegate().checkoutCommit(commit, newBranchName.trim())
+                                activity.getRepoDelegate().checkoutCommit(commit, newBranchName.text.toString().trim())
                                 dismiss()
                             }) {
                                 Text(stringResource(R.string.label_checkout))

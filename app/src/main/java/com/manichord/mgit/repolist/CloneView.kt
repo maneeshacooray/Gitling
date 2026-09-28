@@ -3,6 +3,8 @@ package com.manichord.mgit.repolist
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -232,7 +234,8 @@ fun GitHubRepoBrowser(
 ) {
     val repos by viewModel.githubRepos.collectAsState()
     val isLoading by viewModel.isLoadingRepos.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchState = rememberTextFieldState()
+    val searchQuery = searchState.text.toString()
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -242,13 +245,12 @@ fun GitHubRepoBrowser(
         )
 
         OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+            state = searchState,
             placeholder = { Text("Search your repos...") },
             leadingIcon = { Icon(Icons.Default.Search, null) },
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            lineLimits = TextFieldLineLimits.SingleLine
         )
 
         if (isLoading) {

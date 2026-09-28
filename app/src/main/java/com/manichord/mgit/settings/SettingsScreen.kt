@@ -3,6 +3,9 @@ package com.manichord.mgit.settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -302,14 +305,14 @@ fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
 @Composable
 fun SettingsEditTextItem(title: String, value: String, onValueChange: (String) -> Unit, icon: androidx.compose.ui.graphics.vector.ImageVector) {
     var showDialog by remember { mutableStateOf(false) }
-    var tempValue by remember { mutableStateOf(value) }
+    val tempValue = rememberTextFieldState(value)
 
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = { Text(value.ifEmpty { "Not set" }) },
         leadingContent = { Icon(icon, null) },
         modifier = Modifier.clickable {
-            tempValue = value
+            tempValue.setTextAndPlaceCursorAtEnd(value)
             showDialog = true
         }
     )
@@ -320,15 +323,14 @@ fun SettingsEditTextItem(title: String, value: String, onValueChange: (String) -
             title = { Text(title) },
             text = {
                 OutlinedTextField(
-                    value = tempValue,
-                    onValueChange = { tempValue = it },
-                    singleLine = true,
+                    state = tempValue,
+                    lineLimits = TextFieldLineLimits.SingleLine,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
                 TextButton(onClick = {
-                    onValueChange(tempValue)
+                    onValueChange(tempValue.text.toString())
                     showDialog = false
                 }) {
                     Text(stringResource(R.string.label_done))
