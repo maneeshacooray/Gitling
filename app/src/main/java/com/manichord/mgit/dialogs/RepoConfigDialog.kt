@@ -2,16 +2,15 @@ package com.manichord.mgit.dialogs
 
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.GitConfig
@@ -29,8 +28,8 @@ object RepoConfigDialog {
         fun close() = container.removeView(composeView)
 
         composeView.setContent {
-            var userName by remember { mutableStateOf(gitConfig.userName ?: "") }
-            var userEmail by remember { mutableStateOf(gitConfig.userEmail ?: "") }
+            val userName = rememberTextFieldState(gitConfig.userName ?: "")
+            val userEmail = rememberTextFieldState(gitConfig.userEmail ?: "")
 
             AppTheme {
                 AlertDialog(
@@ -38,22 +37,16 @@ object RepoConfigDialog {
                     text = {
                         Column {
                             OutlinedTextField(
-                                value = userName,
-                                onValueChange = {
-                                    userName = it
-                                    gitConfig.userName = it
-                                },
+                                state = userName,
+                                inputTransformation = onUserTextChange { gitConfig.userName = it },
                                 label = { Text(stringResource(R.string.label_git_name_per_repo)) },
-                                singleLine = true
+                                lineLimits = TextFieldLineLimits.SingleLine
                             )
                             OutlinedTextField(
-                                value = userEmail,
-                                onValueChange = {
-                                    userEmail = it
-                                    gitConfig.userEmail = it
-                                },
+                                state = userEmail,
+                                inputTransformation = onUserTextChange { gitConfig.userEmail = it },
                                 label = { Text(stringResource(R.string.label_git_email_per_repo)) },
-                                singleLine = true
+                                lineLimits = TextFieldLineLimits.SingleLine
                             )
                         }
                     },

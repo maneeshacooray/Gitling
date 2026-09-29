@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -112,24 +114,23 @@ fun FileListContent(
     pathEditable: Boolean = true
 ) {
     var showPathDialog by remember { mutableStateOf(false) }
-    var pathDraft by remember { mutableStateOf(currentPath) }
+    val pathDraft = rememberTextFieldState(currentPath)
 
     if (showPathDialog) {
         val submit: () -> Unit = {
             showPathDialog = false
-            onPathSubmit?.invoke(pathDraft)
+            onPathSubmit?.invoke(pathDraft.text.toString())
         }
         AlertDialog(
             onDismissRequest = { showPathDialog = false },
             title = { Text(stringResource(R.string.dialog_path_title)) },
             text = {
                 OutlinedTextField(
-                    value = pathDraft,
-                    onValueChange = { pathDraft = it },
-                    singleLine = true,
+                    state = pathDraft,
+                    lineLimits = TextFieldLineLimits.SingleLine,
                     label = { Text(stringResource(R.string.dialog_path_label)) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { submit() })
+                    onKeyboardAction = { submit() }
                 )
             },
             confirmButton = {
@@ -156,7 +157,7 @@ fun FileListContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(enabled = onPathSubmit != null && pathEditable) {
-                    pathDraft = currentPath
+                    pathDraft.setTextAndPlaceCursorAtEnd(currentPath)
                     showPathDialog = true
                 }
                 .padding(horizontal = 16.dp, vertical = 10.dp)

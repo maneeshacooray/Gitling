@@ -3,6 +3,9 @@ package me.sheimi.sgit.dialogs
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -17,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.utils.Profile
 import me.sheimi.sgit.R
@@ -71,8 +75,10 @@ object CommitDialog {
         val authorList = authors.toList().sortedWith(compareBy({ it.name }, { it.email }))
 
         composeView.setContent {
-            var commitMsg by remember { mutableStateOf("") }
-            var authorText by remember { mutableStateOf("") }
+            val commitMsgState = rememberTextFieldState()
+            val authorState = rememberTextFieldState()
+            val commitMsg = commitMsgState.text.toString()
+            val authorText = authorState.text.toString()
             var isAmend by remember { mutableStateOf(false) }
             var autoStage by remember { mutableStateOf(true) }
             var authorMenuExpanded by remember { mutableStateOf(false) }
@@ -88,24 +94,20 @@ object CommitDialog {
                     text = {
                         Column {
                             OutlinedTextField(
-                                value = commitMsg,
-                                onValueChange = {
-                                    commitMsg = it
-                                    commitMsgError = null
-                                },
+                                state = commitMsgState,
+                                inputTransformation = onUserTextChange { commitMsgError = null },
                                 label = { Text(stringResource(R.string.dialog_commit_msg_hint)) },
                                 isError = commitMsgError != null,
                                 supportingText = commitMsgError?.let { msg -> { Text(msg) } }
                             )
                             OutlinedTextField(
-                                value = authorText,
-                                onValueChange = {
-                                    authorText = it
+                                state = authorState,
+                                inputTransformation = onUserTextChange {
                                     authorError = null
                                     authorMenuExpanded = true
                                 },
                                 label = { Text(stringResource(R.string.dialog_commit_author_hint)) },
-                                singleLine = true,
+                                lineLimits = TextFieldLineLimits.SingleLine,
                                 isError = authorError != null,
                                 supportingText = authorError?.let { msg -> { Text(msg) } }
                             )
@@ -117,7 +119,7 @@ object CommitDialog {
                                     DropdownMenuItem(
                                         text = { Text(author.displayString()) },
                                         onClick = {
-                                            authorText = author.displayString()
+                                            authorState.setTextAndPlaceCursorAtEnd(author.displayString())
                                             authorMenuExpanded = false
                                         }
                                     )
@@ -132,7 +134,7 @@ object CommitDialog {
                                     checked = isAmend,
                                     onCheckedChange = {
                                         isAmend = it
-                                        commitMsg = if (it) repo.lastCommitFullMsg ?: "" else ""
+                                        commitMsgState.setTextAndPlaceCursorAtEnd(if (it) repo.lastCommitFullMsg ?: "" else "")
                                     }
                                 )
                                 Text(stringResource(R.string.dialog_commit_is_amend))

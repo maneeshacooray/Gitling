@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -30,6 +33,7 @@ import me.sheimi.sgit.database.models.Repo
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import com.manichord.mgit.ui.components.onUserTextChange
 
 private const val TAB_FILES = 0
 private const val TAB_COMMITS = 1
@@ -74,14 +78,15 @@ fun RepoDetailScreen(
     )
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var isSearchActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    val searchState = rememberTextFieldState()
+    val searchQuery = searchState.text.toString()
     val searchFocusRequester = remember { FocusRequester() }
 
     BackHandler {
         when {
             isSearchActive -> {
                 isSearchActive = false
-                searchQuery = ""
+                searchState.clearText()
                 onFilesSearchQueryChange("")
                 onCommitsSearchQueryChange("")
             }
@@ -95,7 +100,7 @@ fun RepoDetailScreen(
     LaunchedEffect(pagerState.currentPage) {
         if (isSearchActive) {
             isSearchActive = false
-            searchQuery = ""
+            searchState.clearText()
             onFilesSearchQueryChange("")
             onCommitsSearchQueryChange("")
         }
@@ -147,9 +152,8 @@ fun RepoDetailScreen(
                         if (isSearchActive) {
                             LaunchedEffect(Unit) { searchFocusRequester.requestFocus() }
                             TextField(
-                                value = searchQuery,
-                                onValueChange = { query ->
-                                    searchQuery = query
+                                state = searchState,
+                                inputTransformation = onUserTextChange { query ->
                                     when (pagerState.currentPage) {
                                         TAB_FILES -> onFilesSearchQueryChange(query)
                                         TAB_COMMITS -> onCommitsSearchQueryChange(query)
@@ -164,7 +168,7 @@ fun RepoDetailScreen(
                                         else "Search commits"
                                     )
                                 },
-                                singleLine = true,
+                                lineLimits = TextFieldLineLimits.SingleLine,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
@@ -200,7 +204,7 @@ fun RepoDetailScreen(
                         if (isSearchActive) {
                             IconButton(onClick = {
                                 isSearchActive = false
-                                searchQuery = ""
+                                searchState.clearText()
                                 when (pagerState.currentPage) {
                                     TAB_FILES -> onFilesSearchQueryChange("")
                                     TAB_COMMITS -> onCommitsSearchQueryChange("")
@@ -218,7 +222,7 @@ fun RepoDetailScreen(
                         if (isSearchActive) {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = {
-                                    searchQuery = ""
+                                    searchState.clearText()
                                     when (pagerState.currentPage) {
                                         TAB_FILES -> onFilesSearchQueryChange("")
                                         TAB_COMMITS -> onCommitsSearchQueryChange("")
