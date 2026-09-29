@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -18,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity.OnPasswordEntered
@@ -47,8 +49,8 @@ object PasswordPromptDialog {
         }
 
         composeView.setContent {
-            var username by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
+            val username = rememberTextFieldState()
+            val password = rememberTextFieldState()
             var savePassword by remember { mutableStateOf(false) }
 
             AppTheme {
@@ -61,18 +63,14 @@ object PasswordPromptDialog {
                     text = {
                         Column {
                             OutlinedTextField(
-                                value = username,
-                                onValueChange = { username = it },
+                                state = username,
                                 label = { Text(stringResource(R.string.label_username)) },
-                                singleLine = true
+                                lineLimits = TextFieldLineLimits.SingleLine
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text(stringResource(R.string.label_password)) },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation()
+                            OutlinedSecureTextField(
+                                state = password,
+                                label = { Text(stringResource(R.string.label_password)) }
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(checked = savePassword, onCheckedChange = { savePassword = it })
@@ -83,7 +81,7 @@ object PasswordPromptDialog {
                     confirmButton = {
                         TextButton(onClick = {
                             close()
-                            callback.onClicked(username, password, savePassword)
+                            callback.onClicked(username.text.toString(), password.text.toString(), savePassword)
                         }) {
                             Text(stringResource(R.string.label_done))
                         }

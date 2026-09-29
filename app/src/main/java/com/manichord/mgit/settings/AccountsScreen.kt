@@ -6,9 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextObfuscationMode
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -16,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.manichord.mgit.models.Account
@@ -256,10 +258,10 @@ fun AddAccountDialog(
     onConfirm: (Account) -> Unit
 ) {
     val context = LocalContext.current
-    var name by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var token by remember { mutableStateOf("") }
-    var baseUrl by remember { mutableStateOf("") }
+    val name = rememberTextFieldState()
+    val username = rememberTextFieldState()
+    val token = rememberTextFieldState()
+    val baseUrl = rememberTextFieldState()
     var type by remember { mutableStateOf(AccountType.GITHUB) }
     var expanded by remember { mutableStateOf(false) }
     var tokenVisible by remember { mutableStateOf(false) }
@@ -271,37 +273,33 @@ fun AddAccountDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    state = name,
                     label = { Text("Account label (e.g. Work GitHub)") },
-                    singleLine = true,
-                    isError = showErrors && name.isBlank(),
-                    supportingText = if (showErrors && name.isBlank()) {
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    isError = showErrors && name.text.isBlank(),
+                    supportingText = if (showErrors && name.text.isBlank()) {
                         { Text("Required") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
+                    state = username,
                     label = { Text("Username") },
-                    singleLine = true,
-                    isError = showErrors && username.isBlank(),
-                    supportingText = if (showErrors && username.isBlank()) {
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    isError = showErrors && username.text.isBlank(),
+                    supportingText = if (showErrors && username.text.isBlank()) {
                         { Text("Required") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = token,
-                    onValueChange = { token = it },
+                OutlinedSecureTextField(
+                    state = token,
                     label = { Text("Personal Access Token / Password") },
-                    singleLine = true,
-                    isError = showErrors && token.isBlank(),
-                    supportingText = if (showErrors && token.isBlank()) {
+                    isError = showErrors && token.text.isBlank(),
+                    supportingText = if (showErrors && token.text.isBlank()) {
                         { Text("Required") }
                     } else null,
-                    visualTransformation = if (tokenVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    textObfuscationMode = if (tokenVisible) TextObfuscationMode.Visible else TextObfuscationMode.RevealLastTyped,
                     trailingIcon = {
                         IconButton(onClick = { tokenVisible = !tokenVisible }) {
                             Icon(
@@ -315,12 +313,11 @@ fun AddAccountDialog(
 
                 if (type == AccountType.CUSTOM) {
                     OutlinedTextField(
-                        value = baseUrl,
-                        onValueChange = { baseUrl = it },
+                        state = baseUrl,
                         label = { Text("Instance URL (e.g. https://forgejo.example.com)") },
-                        singleLine = true,
-                        isError = showErrors && baseUrl.isBlank(),
-                        supportingText = if (showErrors && baseUrl.isBlank()) {
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        isError = showErrors && baseUrl.text.isBlank(),
+                        supportingText = if (showErrors && baseUrl.text.isBlank()) {
                             { Text("Required for custom instances") }
                         } else null,
                         modifier = Modifier.fillMaxWidth()
@@ -376,16 +373,16 @@ fun AddAccountDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val customUrlMissing = type == AccountType.CUSTOM && baseUrl.isBlank()
-                    if (name.isBlank() || username.isBlank() || token.isBlank() || customUrlMissing) {
+                    val customUrlMissing = type == AccountType.CUSTOM && baseUrl.text.isBlank()
+                    if (name.text.isBlank() || username.text.isBlank() || token.text.isBlank() || customUrlMissing) {
                         showErrors = true
                     } else {
                         onConfirm(Account(
-                            name = name,
-                            username = username,
-                            token = token,
+                            name = name.text.toString(),
+                            username = username.text.toString(),
+                            token = token.text.toString(),
                             type = type,
-                            baseUrl = baseUrl.takeIf { type == AccountType.CUSTOM && it.isNotBlank() }
+                            baseUrl = baseUrl.text.toString().takeIf { type == AccountType.CUSTOM && it.isNotBlank() }
                         ))
                     }
                 }
