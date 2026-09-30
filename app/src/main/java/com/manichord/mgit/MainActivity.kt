@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,6 +42,9 @@ import com.manichord.mgit.transport.MGitHttpConnectionFactory
 import com.manichord.mgit.ui.components.FragmentHost
 import com.manichord.mgit.ui.theme.AppTheme
 import com.manichord.mgit.ui.theme.FontOption
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
@@ -511,20 +515,31 @@ class MainActivity : SheimiFragmentActivity() {
 
     private fun deleteBranch(repo: Repo, commitName: String) {
         val commitType = Repo.getCommitType(commitName)
-        try {
-            when (commitType) {
-                Repo.COMMIT_TYPE_HEAD -> {
-                    repo.git?.branchDelete()?.setBranchNames(commitName)?.setForce(true)?.call()
-                }
-                Repo.COMMIT_TYPE_TAG -> {
-                    repo.git?.tagDelete()?.setTags(commitName)?.call()
+        // Off the main thread, like RenameBranchDialog's rename: JGit ref updates can need a
+        // default reflog ident, built from a hostname lookup Android forbids on the main thread.
+        lifecycleScope.launch {
+            val deleted = withContext(Dispatchers.IO) {
+                try {
+                    when (commitType) {
+                        Repo.COMMIT_TYPE_HEAD -> {
+                            repo.git?.branchDelete()?.setBranchNames(commitName)?.setForce(true)?.call()
+                        }
+                        Repo.COMMIT_TYPE_TAG -> {
+                            repo.git?.tagDelete()?.setTags(commitName)?.call()
+                        }
+                    }
+                    true
+                } catch (e: Exception) {
+                    false
                 }
             }
-            currentBranchChooserViewModel?.refreshList()
-        } catch (e: Exception) {
-            android.widget.Toast.makeText(
-                this, getString(R.string.cannot_delete_branch, commitName), android.widget.Toast.LENGTH_LONG
-            ).show()
+            if (deleted) {
+                currentBranchChooserViewModel?.refreshList()
+            } else {
+                android.widget.Toast.makeText(
+                    this@MainActivity, getString(R.string.cannot_delete_branch, commitName), android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
