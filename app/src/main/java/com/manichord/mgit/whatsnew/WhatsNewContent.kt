@@ -13,6 +13,19 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 62,
+            versionName = "1.0.62",
+            highlights = listOf(
+                "Tap the path bar on the Files tab to jump straight to a folder (contributed by BugeStudioTeam)",
+                "You can now drag and drop text from other apps into any text field",
+                "Fixed a crash when renaming a branch or tag, which could leave the repository pointing at a missing branch",
+                "Fixed a crash when searching commits quickly",
+                "Fixed typing in the commit author field being interrupted by the suggestion list",
+                "Clearer error message when cherry-picking a commit that doesn't exist",
+                "The git console now keeps a separate history for each repository"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 61,
             versionName = "1.0.61",
             highlights = listOf(
