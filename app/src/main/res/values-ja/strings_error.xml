@@ -35,4 +35,5 @@
     <string name="alert_is_already_a_git_repo">このディレクトリには既にGitリポジトリが作成されています。</string>
     <string name="alert_save_failed">保存に失敗</string>
 
+    <string name="error_unknown_commit">コミットが見つかりません。コミットハッシュを確認してください。</string>
 </resources>

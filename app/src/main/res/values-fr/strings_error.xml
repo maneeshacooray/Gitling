@@ -20,6 +20,7 @@
     <string name="error_rename_repo_fail">Renommage du dépôt échoué</string>
     <string name="error_invalid_author">Auteur n\'est pas de format Nom &lt;Email&gt;</string>
     <string name="error_no_commit_msg">Il manque un message de commit</string>
+    <string name="error_unknown_commit">Commit introuvable. Vérifiez le hash du commit.</string>
 
     <string name="error_rebase_abort_failed_in_reset">Impossible d\'abandonner un rebase lors  d\'un reset du dépôt</string>
 

@@ -20,6 +20,7 @@
     <string name="error_rename_repo_fail">Renaming repository failed</string>
     <string name="error_invalid_author"><![CDATA[Author is not of the form Name <Email>]]></string>
     <string name="error_no_commit_msg">No commit message specified</string>
+    <string name="error_unknown_commit">Commit not found. Check the commit hash.</string>
 
     <string name="error_rebase_abort_failed_in_reset">Could not abort rebase while resetting repo</string>
 
