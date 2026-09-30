@@ -22,6 +22,8 @@ class RepoDetailViewModel : ViewModel() {
 
     fun setRepo(repo: Repo) {
         _repo.value = repo
+        _consoleEntries.value = consoleEntriesByRepo[repo.id].orEmpty()
+        _consoleRunning.value = repo.id in consoleRunningRepos
     }
 
     fun setSelectedTab(index: Int) {
@@ -52,8 +54,13 @@ class RepoDetailViewModel : ViewModel() {
         _progressState.value = _progressState.value?.copy(visible = false)
     }
 
-    // Console state
+    // Console state. Kept per repo: this ViewModel is activity-scoped (MainActivity) and shared
+    // by every repo opened, so a single list showed one repo's console output in another's.
+    // consoleEntries/consoleRunning always reflect the current repo.
     data class ConsoleEntry(val command: String, val output: String)
+
+    private val consoleEntriesByRepo = mutableMapOf<Int, List<ConsoleEntry>>()
+    private val consoleRunningRepos = mutableSetOf<Int>()
 
     private val _consoleEntries = MutableLiveData<List<ConsoleEntry>>(emptyList())
     val consoleEntries: LiveData<List<ConsoleEntry>> = _consoleEntries
@@ -62,19 +69,28 @@ class RepoDetailViewModel : ViewModel() {
     val consoleRunning: LiveData<Boolean> = _consoleRunning
 
     fun runConsoleCommand(repo: Repo, command: String) {
-        if (_consoleRunning.value == true) return
-        _consoleRunning.value = true
+        val repoId = repo.id
+        if (repoId in consoleRunningRepos) return
+        consoleRunningRepos += repoId
+        if (_repo.value?.id == repoId) _consoleRunning.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val output = GitCommandEngine.execute(repo, command)
             withContext(Dispatchers.Main) {
-                val current = _consoleEntries.value.orEmpty()
-                _consoleEntries.value = current + ConsoleEntry(command, output)
-                _consoleRunning.value = false
+                // The user may have switched repos while the command ran: file the output under
+                // the repo that ran it, and only show it if that repo is still the current one
+                val entries = consoleEntriesByRepo[repoId].orEmpty() + ConsoleEntry(command, output)
+                consoleEntriesByRepo[repoId] = entries
+                consoleRunningRepos -= repoId
+                if (_repo.value?.id == repoId) {
+                    _consoleEntries.value = entries
+                    _consoleRunning.value = false
+                }
             }
         }
     }
 
     fun clearConsole() {
+        _repo.value?.let { consoleEntriesByRepo.remove(it.id) }
         _consoleEntries.value = emptyList()
     }
 }
