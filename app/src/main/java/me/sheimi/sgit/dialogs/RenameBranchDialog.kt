@@ -27,10 +27,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
-import me.sheimi.sgit.exception.StopTaskException
-import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.revwalk.RevTag
 import org.eclipse.jgit.revwalk.RevWalk
+import timber.log.Timber
 
 class RenameBranchDialog : DialogFragment() {
 
@@ -121,16 +120,23 @@ class RenameBranchDialog : DialogFragment() {
                 }
                 Repo.COMMIT_TYPE_TAG -> {
                     val refs = repo.git.tagList().call()
-                    val tagRef = refs.firstOrNull { it.name == fromCommit }
-                    val tag = tagRef?.let {
-                        RevWalk(repo.git.repository).lookupTag(it.objectId)
-                    } ?: return false
-                    repo.git.tag()
-                        .setMessage(tag.fullMessage)
-                        .setName(newName)
-                        .setObjectId(tag.`object`)
-                        .setTagger(tag.taggerIdent)
-                        .call()
+                    val tagRef = refs.firstOrNull { it.name == fromCommit } ?: return false
+                    // parseAny, not lookupTag: lookupTag returns an unparsed tag whose
+                    // getFullMessage() threw a NullPointerException, and a lightweight tag
+                    // points straight at a commit rather than a tag object
+                    val target = RevWalk(repo.git.repository).use { it.parseAny(tagRef.objectId) }
+                    val tagCommand = repo.git.tag().setName(newName)
+                    if (target is RevTag) {
+                        tagCommand
+                            .setMessage(target.fullMessage)
+                            .setObjectId(target.`object`)
+                            .setTagger(target.taggerIdent)
+                    } else {
+                        tagCommand
+                            .setAnnotated(false)
+                            .setObjectId(target)
+                    }
+                    tagCommand.call()
                     repo.git.tagDelete()
                         .setTags(fromCommit)
                         .call()
@@ -138,9 +144,9 @@ class RenameBranchDialog : DialogFragment() {
                 }
                 else -> true
             }
-        } catch (e: StopTaskException) {
-            false
-        } catch (e: GitAPIException) {
+        } catch (e: Exception) {
+            // Runs on a background coroutine, where anything uncaught crashes the app
+            Timber.e(e, "Failed to rename %s", fromCommit)
             false
         }
     }
