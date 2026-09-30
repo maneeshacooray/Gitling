@@ -47,7 +47,15 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         mRepo.removeTask(this);
         if (!isSuccess && !isTaskCanceled()) {
             if (mException == null) {
-                BasicFunctions.showError(BasicFunctions.getActiveActivity(), mErrorRes, getErrorTitleRes());
+                if (mErrorRes != 0) {
+                    // showError takes the title first; passing mErrorRes first put the specific
+                    // message in the dialog title and "Error occurred" in its body
+                    BasicFunctions.showError(BasicFunctions.getActiveActivity(), getErrorTitleRes(), mErrorRes);
+                } else {
+                    // No specific message: show the task's error title as the body under the
+                    // default title (ErrorDialog can't load a 0 message resource)
+                    BasicFunctions.showError(BasicFunctions.getActiveActivity(), 0, getErrorTitleRes());
+                }
             } else {
                 BasicFunctions.showException(BasicFunctions.getActiveActivity(), mException, mErrorRes,
                         getErrorTitleRes());

@@ -35,6 +35,12 @@ public class CherryPickTask extends RepoOpTask {
         try {
             ObjectId commit = mRepo.getGit().getRepository()
                     .resolve(mCommitStr);
+            if (commit == null) {
+                // resolve() returns null for a hash that isn't in the repo; passing that on
+                // made JGit fail with a raw NullPointerException message in the error dialog
+                setError(R.string.error_unknown_commit);
+                return false;
+            }
             mRepo.getGit().cherryPick().include(commit).call();
         } catch (StopTaskException e) {
             return false;

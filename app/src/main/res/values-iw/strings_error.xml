@@ -31,4 +31,5 @@
   <string name="alert_please_add_a_remote">הוסף שרת קודם</string>
   <string name="alert_is_already_a_git_repo">תיקייה זו כבר מאגר git.</string>
   <string name="alert_save_failed">שמירה נכשלה</string>
+  <string name="error_unknown_commit">הקומיט לא נמצא. בדקו את מזהה הקומיט.</string>
 </resources>

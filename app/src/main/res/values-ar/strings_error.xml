@@ -20,6 +20,7 @@
     <string name="error_rename_repo_fail">فشلت إعادة تسمية المستودع</string>
     <string name="error_invalid_author"><![CDATA[المؤلف ليس بالصيغة الاسم <البريد الإلكتروني>]]></string>
     <string name="error_no_commit_msg">لم يتم تحديد رسالة التزام</string>
+    <string name="error_unknown_commit">لم يتم العثور على الالتزام. تحقق من معرّف الالتزام.</string>
 
     <string name="error_rebase_abort_failed_in_reset">تعذر إلغاء إعادة الأساس أثناء إعادة تعيين المستودع</string>
 
