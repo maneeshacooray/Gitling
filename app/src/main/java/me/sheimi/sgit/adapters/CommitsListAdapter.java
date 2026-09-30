@@ -66,35 +66,64 @@ public class CommitsListAdapter extends BaseAdapter {
      */
     private boolean mAllBranches = false;
 
+    /**
+     * Bumped by {@link #stopFiltering()} every time the filter or commit list changes. A worker
+     * (or an update it posted) from an older generation must not touch the current results:
+     * cancel() only interrupts, so a superseded worker could keep adding indices to the new
+     * mFiltered, and a stale postUpdate() could start a second worker for the new filter --
+     * either way the same commit ended up listed twice, which crashed the Compose commit list
+     * ("Key ... was already used") when searching quickly.
+     */
+    private int mGeneration;
+
     private void startFilteringWorker() {
+        final int generation = mGeneration;
+        final String filter = mFilter;
+        final ArrayList<RevCommit> all = mAll;
+        final ArrayList<Integer> filtered = mFiltered;
+        final int start = mProgressCursor;
         mFilterFuture = mExecutor.submit(() -> {
-            for (int i = mProgressCursor; i < mAll.size(); i++) {
+            for (int i = start; i < all.size(); i++) {
                 if (Thread.currentThread().isInterrupted()) {
                     return;
                 }
-                if (mFiltered.size() != mPosted && System.nanoTime() > mPostAtTime) {
-                    synchronized (mProgressLock) {
-                        mProgressCursor = i;
-                        mPosted = mFiltered.size();
+                synchronized (mProgressLock) {
+                    if (generation != mGeneration) {
+                        return;
                     }
-                    postUpdate();
-                    return;
+                    if (filtered.size() != mPosted && System.nanoTime() > mPostAtTime) {
+                        mProgressCursor = i;
+                        mPosted = filtered.size();
+                        postUpdate(generation);
+                        return;
+                    }
                 }
-                if (isAccepted(mAll.get(i))) {
-                    mFiltered.add(i);
+                if (isAccepted(all.get(i), filter)) {
+                    synchronized (mProgressLock) {
+                        if (generation != mGeneration) {
+                            return;
+                        }
+                        filtered.add(i);
+                    }
                 }
             }
             synchronized (mProgressLock) {
-                mPosted = mFiltered.size();
+                if (generation != mGeneration) {
+                    return;
+                }
+                mPosted = filtered.size();
                 mIsIncomplete = false;
             }
-            postUpdate();
+            postUpdate(generation);
         });
     }
 
-    private void postUpdate() {
+    private void postUpdate(int generation) {
         mMainHandler.post(() -> {
             synchronized (mProgressLock) {
+                if (generation != mGeneration) {
+                    return;
+                }
                 notifyDataSetChanged();
                 if (mIsIncomplete) {
                     // Updates after 1 s
@@ -118,28 +147,29 @@ public class CommitsListAdapter extends BaseAdapter {
         mCommitDateFormatter = android.text.format.DateFormat.getDateFormat(mContext);
     }
 
-    private boolean isAccepted(RevCommit in) {
-        if (mFilter == null) {
+    private static boolean isAccepted(RevCommit in, String filter) {
+        if (filter == null) {
             return true;
         }
-        if (in.getId().toString().startsWith("commit " + mFilter.toLowerCase(Locale.ROOT))) {
+        if (in.getId().toString().startsWith("commit " + filter.toLowerCase(Locale.ROOT))) {
             return true;
         }
         /* Search in raw buffer is fast but it may find the string in
          * e.g. parents field or as part of keyword. So first search in
          * raw buffer and then look in parsed components if raw buffer
          * contains needle. */
-        if (!new String(in.getRawBuffer()).contains(mFilter)) {
+        if (!new String(in.getRawBuffer()).contains(filter)) {
             return false;
         }
-        return (in.getAuthorIdent().getName().contains(mFilter)
-                || in.getAuthorIdent().getEmailAddress().contains(mFilter)
-                || in.getCommitterIdent().getName().contains(mFilter)
-                || in.getCommitterIdent().getEmailAddress().contains(mFilter)
-                || in.getFullMessage().contains(mFilter));
+        return (in.getAuthorIdent().getName().contains(filter)
+                || in.getAuthorIdent().getEmailAddress().contains(filter)
+                || in.getCommitterIdent().getName().contains(filter)
+                || in.getCommitterIdent().getEmailAddress().contains(filter)
+                || in.getFullMessage().contains(filter));
     }
 
     private void stopFiltering() {
+        mGeneration++;
         try {
             if (mFilterFuture != null) {
                 mFilterFuture.cancel(true);
