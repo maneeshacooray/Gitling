@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -23,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.KeyPair
 import com.manichord.mgit.MainActivity
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
@@ -43,8 +46,8 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                var filename by remember { mutableStateOf("") }
-                var keySize by remember { mutableStateOf("4096") }
+                val filename = rememberTextFieldState()
+                val keySize = rememberTextFieldState("4096")
                 var isDsa by remember { mutableStateOf(false) }
                 var errorRes by remember { mutableStateOf<Int?>(null) }
 
@@ -55,21 +58,17 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
                         text = {
                             Column {
                                 OutlinedTextField(
-                                    value = filename,
-                                    onValueChange = {
-                                        filename = it
-                                        errorRes = null
-                                    },
+                                    state = filename,
+                                    inputTransformation = onUserTextChange { errorRes = null },
                                     label = { Text(stringResource(R.string.label_new_file_name)) },
-                                    singleLine = true,
+                                    lineLimits = TextFieldLineLimits.SingleLine,
                                     isError = errorRes != null,
                                     supportingText = errorRes?.let { res -> { Text(stringResource(res)) } }
                                 )
                                 OutlinedTextField(
-                                    value = keySize,
-                                    onValueChange = { keySize = it },
+                                    state = keySize,
                                     label = { Text(stringResource(R.string.label_key_size)) },
-                                    singleLine = true
+                                    lineLimits = TextFieldLineLimits.SingleLine
                                 )
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RadioButton(
@@ -95,8 +94,8 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                val newFilename = filename.trim()
-                                val size = keySize.toIntOrNull() ?: 0
+                                val newFilename = filename.text.toString().trim()
+                                val size = keySize.text.toString().toIntOrNull() ?: 0
                                 when {
                                     newFilename.isEmpty() -> {
                                         errorRes = R.string.alert_new_filename_required

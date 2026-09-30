@@ -3,6 +3,8 @@ package com.manichord.mgit.repolist
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +22,8 @@ import com.manichord.mgit.clone.CloneViewModel
 import com.manichord.mgit.models.Account
 import com.manichord.mgit.models.AccountType
 import com.manichord.mgit.models.GitHubRepo
+import com.manichord.mgit.ui.components.onUserTextChange
+import com.manichord.mgit.ui.components.rememberTextFieldStateFor
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,9 +37,11 @@ fun CloneView(
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Sync remoteUrl from VM to local state
-    var remoteUrl by remember(viewModel.remoteUrl) { mutableStateOf(viewModel.remoteUrl) }
+    // The VM owns both values; they also change from outside the fields (a picked GitHub repo,
+    // a .git link, the local name auto-filling from the URL), so the field states mirror them
+    val remoteUrlState = rememberTextFieldStateFor(viewModel.remoteUrl)
     val localRepoName by viewModel.localRepoName.observeAsState("")
+    val localRepoNameState = rememberTextFieldStateFor(localRepoName)
     val initLocal by viewModel.initLocal.observeAsState(false)
     var cloneRecursively by remember { mutableStateOf(viewModel.cloneRecursively) }
 
@@ -122,11 +128,8 @@ fun CloneView(
             }
 
             OutlinedTextField(
-                value = remoteUrl,
-                onValueChange = {
-                    remoteUrl = it
-                    viewModel.remoteUrl = it  // sync to VM
-                },
+                state = remoteUrlState,
+                inputTransformation = onUserTextChange { viewModel.remoteUrl = it },
                 label = { Text(stringResource(id = R.string.label_remote_url)) },
                 placeholder = { Text("https://github.com/user/repo.git") },
                 modifier = Modifier.fillMaxWidth(),
@@ -140,15 +143,15 @@ fun CloneView(
                     keyboardType = KeyboardType.Uri,
                     imeAction = ImeAction.Next
                 ),
-                singleLine = true,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 shape = MaterialTheme.shapes.medium
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
 
         OutlinedTextField(
-            value = localRepoName,
-            onValueChange = { viewModel.localRepoName.value = it },
+            state = localRepoNameState,
+            inputTransformation = onUserTextChange { viewModel.localRepoName.value = it },
             label = { Text(stringResource(id = R.string.dialog_clone_local_path_hint)) },
             modifier = Modifier.fillMaxWidth(),
             isError = !localRepoNameError.isNullOrEmpty(),
@@ -162,7 +165,7 @@ fun CloneView(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done
             ),
-            singleLine = true,
+            lineLimits = TextFieldLineLimits.SingleLine,
             shape = MaterialTheme.shapes.medium
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -232,7 +235,8 @@ fun GitHubRepoBrowser(
 ) {
     val repos by viewModel.githubRepos.collectAsState()
     val isLoading by viewModel.isLoadingRepos.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchState = rememberTextFieldState()
+    val searchQuery = searchState.text.toString()
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -242,13 +246,12 @@ fun GitHubRepoBrowser(
         )
 
         OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+            state = searchState,
             placeholder = { Text("Search your repos...") },
             leadingIcon = { Icon(Icons.Default.Search, null) },
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            lineLimits = TextFieldLineLimits.SingleLine
         )
 
         if (isLoading) {

@@ -1,6 +1,8 @@
 package com.manichord.mgit.dialogs
 
 import android.view.ViewGroup
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -10,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.activities.SheimiFragmentActivity.OnEditTextDialogClicked
 
@@ -35,7 +38,7 @@ object EditTextDialog {
         fun close() = container.removeView(composeView)
 
         composeView.setContent {
-            var text by remember { mutableStateOf("") }
+            val text = rememberTextFieldState()
             var showError by remember { mutableStateOf(false) }
 
             AppTheme {
@@ -44,13 +47,10 @@ object EditTextDialog {
                     title = { Text(title) },
                     text = {
                         OutlinedTextField(
-                            value = text,
-                            onValueChange = {
-                                text = it
-                                showError = false
-                            },
+                            state = text,
+                            inputTransformation = onUserTextChange { showError = false },
                             label = { Text(hint) },
-                            singleLine = true,
+                            lineLimits = TextFieldLineLimits.SingleLine,
                             isError = showError,
                             // Long guidance text (e.g. cherry-pick's "copy from commit list")
                             // belongs here, not in the label -- Material3's floating label is
@@ -67,11 +67,11 @@ object EditTextDialog {
                     },
                     confirmButton = {
                         TextButton(onClick = {
-                            if (text.isBlank()) {
+                            if (text.text.isBlank()) {
                                 showError = true
                             } else {
                                 close()
-                                positiveListener.onClicked(text)
+                                positiveListener.onClicked(text.text.toString())
                             }
                         }) {
                             Text(positiveButtonText)

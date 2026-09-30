@@ -4,17 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
@@ -42,26 +38,23 @@ class EditKeyPasswordDialog : SheimiDialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                var password by remember { mutableStateOf("") }
+                val password = rememberTextFieldState()
 
                 AppTheme {
                     AlertDialog(
                         onDismissRequest = { dismiss() },
                         title = { Text(stringResource(R.string.dialog_edit_key_password_title)) },
                         text = {
-                            OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text(stringResource(R.string.label_password)) },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation()
+                            OutlinedSecureTextField(
+                                state = password,
+                                label = { Text(stringResource(R.string.label_password)) }
                             )
                         },
                         confirmButton = {
                             TextButton(onClick = {
                                 try {
                                     (activity.applicationContext as MGitApplication)
-                                        .securePrefsHelper?.set(keyFile.name, password.trim())
+                                        .securePrefsHelper?.set(keyFile.name, password.text.toString().trim())
                                 } catch (e: Exception) {
                                     Timber.e(e)
                                 }

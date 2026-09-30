@@ -2,6 +2,9 @@ package com.manichord.mgit.repolist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -296,7 +299,7 @@ private fun TagEditorDialog(
     onConfirm: (Set<String>) -> Unit
 ) {
     var selected by remember { mutableStateOf<Set<String>>(HashSet<String>(repo.labels)) }
-    var newTagText by remember { mutableStateOf("") }
+    val newTagText = rememberTextFieldState()
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -329,21 +332,20 @@ private fun TagEditorDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = newTagText,
-                        onValueChange = { newTagText = it },
+                        state = newTagText,
                         placeholder = { Text("New tag") },
                         modifier = Modifier.weight(1f),
-                        singleLine = true
+                        lineLimits = TextFieldLineLimits.SingleLine
                     )
                     IconButton(
                         onClick = {
-                            val tag = newTagText.trim().lowercase()
+                            val tag = newTagText.text.trim().toString().lowercase()
                             if (tag.isNotEmpty()) {
                                 selected = selected + tag
-                                newTagText = ""
+                                newTagText.clearText()
                             }
                         },
-                        enabled = newTagText.isNotBlank()
+                        enabled = newTagText.text.isNotBlank()
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Add tag")
                     }
@@ -365,20 +367,19 @@ private fun RenameRepoDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
-    var name by remember { mutableStateOf(initialName) }
+    val name = rememberTextFieldState(initialName)
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(stringResource(R.string.dialog_rename_repo_title)) },
         text = {
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                state = name,
                 label = { Text(stringResource(R.string.dialog_rename_repo_hint)) },
-                singleLine = true
+                lineLimits = TextFieldLineLimits.SingleLine
             )
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(name) }, enabled = name.isNotBlank()) {
+            TextButton(onClick = { onConfirm(name.text.toString()) }, enabled = name.text.isNotBlank()) {
                 Text(stringResource(R.string.label_rename))
             }
         },

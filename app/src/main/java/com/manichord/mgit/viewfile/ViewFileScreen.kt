@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
@@ -30,6 +31,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import com.manichord.mgit.ui.components.onUserTextChange
+import com.manichord.mgit.ui.components.rememberTextFieldStateFor
 
 const val TAG_MODE_SSH_KEY: Short = 1
 
@@ -59,11 +62,12 @@ fun ViewFileScreen(
             if (searchActive && currentTab == 1) {
                 TopAppBar(
                     title = {
+                        val searchState = rememberTextFieldStateFor(searchQuery)
                         TextField(
-                            value = searchQuery,
-                            onValueChange = onSearchQueryChange,
+                            state = searchState,
+                            inputTransformation = onUserTextChange(onSearchQueryChange),
                             placeholder = { Text("Search commits") },
-                            singleLine = true,
+                            lineLimits = TextFieldLineLimits.SingleLine,
                             modifier = Modifier.fillMaxWidth()
                         )
                     },

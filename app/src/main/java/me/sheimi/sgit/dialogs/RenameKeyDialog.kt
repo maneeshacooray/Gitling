@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -15,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import com.manichord.mgit.MainActivity
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.views.SheimiDialogFragment
 import me.sheimi.sgit.R
@@ -41,7 +44,7 @@ class RenameKeyDialog : SheimiDialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                var filename by remember { mutableStateOf(fromFile.name) }
+                val filename = rememberTextFieldState(fromFile.name)
                 var errorRes by remember { mutableStateOf<Int?>(null) }
 
                 AppTheme {
@@ -50,20 +53,17 @@ class RenameKeyDialog : SheimiDialogFragment() {
                         title = { Text(stringResource(R.string.dialog_rename_key_title)) },
                         text = {
                             OutlinedTextField(
-                                value = filename,
-                                onValueChange = {
-                                    filename = it
-                                    errorRes = null
-                                },
+                                state = filename,
+                                inputTransformation = onUserTextChange { errorRes = null },
                                 label = { Text(stringResource(R.string.label_new_file_name)) },
-                                singleLine = true,
+                                lineLimits = TextFieldLineLimits.SingleLine,
                                 isError = errorRes != null,
                                 supportingText = errorRes?.let { res -> { Text(stringResource(res)) } }
                             )
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                val newFilename = filename.trim()
+                                val newFilename = filename.text.toString().trim()
                                 when {
                                     newFilename.isEmpty() -> {
                                         errorRes = R.string.alert_new_filename_required

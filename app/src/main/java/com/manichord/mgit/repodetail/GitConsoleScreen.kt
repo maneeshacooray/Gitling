@@ -7,8 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Send
@@ -23,6 +26,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.sheimi.sgit.database.models.Repo
+import com.manichord.mgit.ui.components.onUserTextChange
 
 private val QUICK_COMMANDS = listOf(
     "status",
@@ -47,7 +51,8 @@ fun GitConsoleScreen(
 ) {
     val entries by viewModel.consoleEntries.observeAsState(emptyList())
     val running by viewModel.consoleRunning.observeAsState(false)
-    var inputText by remember { mutableStateOf("") }
+    val input = rememberTextFieldState()
+    val inputText = input.text.toString()
     val commandHistory = remember { mutableStateListOf<String>() }
     var historyIndex by remember { mutableIntStateOf(-1) }
     val listState = rememberLazyListState()
@@ -63,7 +68,7 @@ fun GitConsoleScreen(
             commandHistory.add(trimmed)
         }
         historyIndex = -1
-        inputText = ""
+        input.clearText()
         viewModel.runConsoleCommand(repo, trimmed)
     }
 
@@ -135,7 +140,7 @@ fun GitConsoleScreen(
                 onClick = {
                     if (commandHistory.isEmpty()) return@IconButton
                     historyIndex = (historyIndex + 1).coerceAtMost(commandHistory.size - 1)
-                    inputText = commandHistory[commandHistory.size - 1 - historyIndex]
+                    input.setTextAndPlaceCursorAtEnd(commandHistory[commandHistory.size - 1 - historyIndex])
                 },
                 modifier = Modifier.size(36.dp),
                 enabled = commandHistory.isNotEmpty()
@@ -144,8 +149,8 @@ fun GitConsoleScreen(
             }
             IconButton(
                 onClick = {
-                    if (historyIndex <= 0) { historyIndex = -1; inputText = "" }
-                    else { historyIndex--; inputText = commandHistory[commandHistory.size - 1 - historyIndex] }
+                    if (historyIndex <= 0) { historyIndex = -1; input.clearText() }
+                    else { historyIndex--; input.setTextAndPlaceCursorAtEnd(commandHistory[commandHistory.size - 1 - historyIndex]) }
                 },
                 modifier = Modifier.size(36.dp),
                 enabled = historyIndex >= 0
@@ -154,18 +159,18 @@ fun GitConsoleScreen(
             }
 
             OutlinedTextField(
-                value = inputText,
-                onValueChange = { inputText = it; historyIndex = -1 },
+                state = input,
+                inputTransformation = onUserTextChange { historyIndex = -1 },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("git status, log, diff…", fontSize = 13.sp, fontFamily = FontFamily.Monospace) },
-                singleLine = true,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(onSend = { submit(inputText) }),
+                onKeyboardAction = { submit(input.text.toString()) },
                 enabled = !running,
                 trailingIcon = {
                     if (inputText.isNotEmpty()) {
-                        IconButton(onClick = { inputText = "" }) {
+                        IconButton(onClick = { input.clearText() }) {
                             Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(18.dp))
                         }
                     }

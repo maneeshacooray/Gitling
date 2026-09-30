@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.DialogFragment
 import com.manichord.mgit.MainActivity
+import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
@@ -47,7 +50,7 @@ class RenameBranchDialog : DialogFragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                var branchName by remember { mutableStateOf(Repo.getCommitDisplayName(fromCommit)) }
+                val branchName = rememberTextFieldState(Repo.getCommitDisplayName(fromCommit))
                 var errorRes by remember { mutableStateOf<Int?>(null) }
                 val context = LocalContext.current
 
@@ -57,20 +60,17 @@ class RenameBranchDialog : DialogFragment() {
                         title = { Text(stringResource(R.string.dialog_rename_branch_title)) },
                         text = {
                             OutlinedTextField(
-                                value = branchName,
-                                onValueChange = {
-                                    branchName = it
-                                    errorRes = null
-                                },
+                                state = branchName,
+                                inputTransformation = onUserTextChange { errorRes = null },
                                 label = { Text(stringResource(R.string.dialog_create_branch_hint)) },
-                                singleLine = true,
+                                lineLimits = TextFieldLineLimits.SingleLine,
                                 isError = errorRes != null,
                                 supportingText = errorRes?.let { res -> { Text(stringResource(res)) } }
                             )
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                val newName = branchName.trim()
+                                val newName = branchName.text.toString().trim()
                                 if (newName.isEmpty()) {
                                     errorRes = R.string.alert_new_branchname_required
                                     return@TextButton
