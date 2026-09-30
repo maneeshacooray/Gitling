@@ -5,6 +5,15 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.62 - 2026-09-30
+- Tap the path bar on the Files tab to jump straight to a folder (contributed by BugeStudioTeam).
+- You can now drag and drop text from other apps into any text field.
+- Fixed a crash when renaming a branch or tag, which could leave the repository pointing at a missing branch.
+- Fixed a crash when searching commits quickly.
+- Fixed typing in the commit author field being interrupted by the suggestion list.
+- Clearer error message when cherry-picking a commit that doesn't exist.
+- The git console now keeps a separate history for each repository.
+
 ## 1.0.61 - 2026-09-23
 - Updated a core security library to include upstream compatibility improvements for newer Android devices with 16 KB memory pages.
 
