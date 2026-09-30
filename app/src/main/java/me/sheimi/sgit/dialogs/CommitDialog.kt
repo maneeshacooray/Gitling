@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.PopupProperties
 import com.manichord.mgit.ui.components.onUserTextChange
 import com.manichord.mgit.ui.theme.AppTheme
 import me.sheimi.android.utils.Profile
@@ -113,7 +114,11 @@ object CommitDialog {
                             )
                             DropdownMenu(
                                 expanded = authorMenuExpanded && filteredAuthors.isNotEmpty(),
-                                onDismissRequest = { authorMenuExpanded = false }
+                                onDismissRequest = { authorMenuExpanded = false },
+                                // Suggestions shown while typing: a focusable popup takes input
+                                // focus from the author field, so further keys went to the menu
+                                // (a space could even pick the highlighted author)
+                                properties = PopupProperties(focusable = false)
                             ) {
                                 filteredAuthors.forEach { author ->
                                     DropdownMenuItem(
