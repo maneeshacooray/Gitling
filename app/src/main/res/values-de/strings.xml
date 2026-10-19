@@ -246,4 +246,15 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">Vorgemerkte Änderungen</string>
     <string name="label_diff_working_tree">Arbeitsverzeichnis</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_more_operations">Weitere Aktionen</string>
+    <string name="label_pull_options">Pull-Optionen</string>
+    <string name="label_push_options">Push-Optionen</string>
+    <string name="menu_force_pull">Force-Pull</string>
+    <string name="menu_force_push">Force-Push</string>
+    <string name="menu_push_all">Alle Branches pushen</string>
+    <string name="menu_choose_remote">Remote wählen…</string>
+    <string name="dialog_force_pull_msg">Von origin pullen und diesen Branch darauf zurücksetzen. Lokale Commits und Änderungen, die nicht auf dem Remote sind, gehen verloren.</string>
+    <string name="dialog_force_push_msg">Zu origin pushen und dessen Branch mit deinem überschreiben. Commits auf dem Remote, die du nicht hast, gehen verloren.</string>
 </resources>

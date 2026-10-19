@@ -245,4 +245,15 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">Modifications indexées</string>
     <string name="label_diff_working_tree">Arbre de travail</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_more_operations">Plus d\'opérations</string>
+    <string name="label_pull_options">Options de pull</string>
+    <string name="label_push_options">Options de push</string>
+    <string name="menu_force_pull">Pull forcé</string>
+    <string name="menu_force_push">Push forcé</string>
+    <string name="menu_push_all">Pousser toutes les branches</string>
+    <string name="menu_choose_remote">Choisir le dépôt distant…</string>
+    <string name="dialog_force_pull_msg">Récupérer depuis origin et réinitialiser cette branche dessus. Les commits et modifications locaux absents du dépôt distant seront perdus.</string>
+    <string name="dialog_force_push_msg">Pousser vers origin et écraser sa branche avec la vôtre. Les commits du dépôt distant que vous n\'avez pas seront perdus.</string>
 </resources>

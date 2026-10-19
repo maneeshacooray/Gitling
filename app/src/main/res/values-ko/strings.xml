@@ -227,4 +227,15 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">스테이징된 변경사항</string>
     <string name="label_diff_working_tree">작업 트리</string>
+    <string name="label_pull">풀</string>
+    <string name="label_commit">커밋</string>
+    <string name="label_more_operations">기타 작업</string>
+    <string name="label_pull_options">풀 옵션</string>
+    <string name="label_push_options">푸시 옵션</string>
+    <string name="menu_force_pull">강제 풀</string>
+    <string name="menu_force_push">강제 푸시</string>
+    <string name="menu_push_all">모든 브랜치 푸시</string>
+    <string name="menu_choose_remote">원격 선택…</string>
+    <string name="dialog_force_pull_msg">origin에서 풀하고 이 브랜치를 그 상태로 재설정합니다. 원격에 없는 로컬 커밋과 변경사항은 사라집니다.</string>
+    <string name="dialog_force_push_msg">origin에 푸시하고 그 브랜치를 내 것으로 덮어씁니다. 내게 없는 원격 커밋은 사라집니다.</string>
 </resources>
