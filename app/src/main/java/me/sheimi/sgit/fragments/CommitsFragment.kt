@@ -1,5 +1,6 @@
 package me.sheimi.sgit.fragments
 
+import androidx.compose.runtime.Composable
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -70,15 +71,23 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    /** Compose state: true once [setUp] has run, so [Content] knows the fragment is ready. */
+    private var isSetUp by mutableStateOf(false)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setUp(savedInstanceState)
+    }
+
+    /** The fragment's non-view setup, done once. The repo screen hosts this fragment headless and
+     * draws [Content] in its own composition (so scrolling reaches its collapsing top bar); the
+     * file viewer still hosts it as a view, through [onCreateView]. */
+    private fun setUp(savedInstanceState: Bundle?) {
+        if (isSetUp) return
         (rawActivity as? MainActivity)?.currentRepoDetailHost?.setCommitsFragment(this)
 
-        val bundle = arguments ?: return ComposeView(requireContext())
-        val repo = bundle.getSerializable(Repo.TAG) as? Repo ?: return ComposeView(requireContext())
+        val bundle = arguments ?: return
+        val repo = bundle.getSerializable(Repo.TAG) as? Repo ?: return
         this.repo = repo
         file = bundle.getString(FILE)
         clipboard = rawActivity.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
@@ -91,24 +100,42 @@ class CommitsFragment : BaseFragment(), ActionMode.Callback {
         commitsListAdapter = adapter
         allBranches = adapter.isAllBranches
         reset()
+        isSetUp = true
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setUp(savedInstanceState)
+        // Added headless (no container): the repo screen draws Content() itself
+        if (container == null) return null
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    CommitsListContent(
-                        rows = rows,
-                        onItemClick = ::onItemClicked,
-                        onItemLongClick = ::onItemLongClicked,
-                        showBranchScopeToggle = adapter.supportsGraphMode(),
-                        allBranches = allBranches,
-                        onAllBranchesChange = { value ->
-                            allBranches = value
-                            commitsListAdapter?.setAllBranches(value)
-                        }
-                    )
+                    // Qualified: inside ComposeView.apply, a bare Content() is the view's own
+                    // Content(), which recurses
+                    this@CommitsFragment.Content()
                 }
             }
         }
+    }
+
+    @Composable
+    fun Content() {
+        if (!isSetUp) return
+        CommitsListContent(
+            rows = rows,
+            onItemClick = ::onItemClicked,
+            onItemLongClick = ::onItemLongClicked,
+            showBranchScopeToggle = commitsListAdapter?.supportsGraphMode() == true,
+            allBranches = allBranches,
+            onAllBranchesChange = { value ->
+                allBranches = value
+                commitsListAdapter?.setAllBranches(value)
+            }
+        )
     }
 
     private fun onItemClicked(position: Int) {
