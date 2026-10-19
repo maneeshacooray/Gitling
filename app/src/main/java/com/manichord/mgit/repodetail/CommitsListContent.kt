@@ -210,7 +210,7 @@ private fun CommitRow(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = commit.shortMessage,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMediumEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
