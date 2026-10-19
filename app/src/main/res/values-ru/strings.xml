@@ -245,4 +245,15 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">Индексированные изменения</string>
     <string name="label_diff_working_tree">Рабочая копия</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Коммит</string>
+    <string name="label_more_operations">Другие действия</string>
+    <string name="label_pull_options">Параметры pull</string>
+    <string name="label_push_options">Параметры push</string>
+    <string name="menu_force_pull">Принудительный pull</string>
+    <string name="menu_force_push">Принудительный push</string>
+    <string name="menu_push_all">Отправить все ветки</string>
+    <string name="menu_choose_remote">Выбрать удалённый…</string>
+    <string name="dialog_force_pull_msg">Получить изменения из origin и сбросить эту ветку к ним. Локальные коммиты и изменения, которых нет на удалённом, будут потеряны.</string>
+    <string name="dialog_force_push_msg">Отправить в origin и перезаписать его ветку вашей. Коммиты на удалённом, которых у вас нет, будут потеряны.</string>
 </resources>

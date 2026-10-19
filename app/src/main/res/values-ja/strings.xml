@@ -244,4 +244,15 @@
     <string name="label_diff">差分</string>
     <string name="label_diff_staged">ステージ済みの変更</string>
     <string name="label_diff_working_tree">作業ツリー</string>
+    <string name="label_pull">プル</string>
+    <string name="label_commit">コミット</string>
+    <string name="label_more_operations">その他の操作</string>
+    <string name="label_pull_options">プルのオプション</string>
+    <string name="label_push_options">プッシュのオプション</string>
+    <string name="menu_force_pull">強制プル</string>
+    <string name="menu_force_push">強制プッシュ</string>
+    <string name="menu_push_all">すべてのブランチをプッシュ</string>
+    <string name="menu_choose_remote">リモートを選択…</string>
+    <string name="dialog_force_pull_msg">origin からプルしてこのブランチをそれにリセットします。リモートにないローカルのコミットと変更は失われます。</string>
+    <string name="dialog_force_push_msg">origin にプッシュしてそのブランチをあなたのもので上書きします。あなたが持っていないリモートのコミットは失われます。</string>
 </resources>

@@ -245,4 +245,15 @@
     <string name="label_diff">差异</string>
     <string name="label_diff_staged">已暂存的更改</string>
     <string name="label_diff_working_tree">工作区</string>
+    <string name="label_pull">拉取</string>
+    <string name="label_commit">提交</string>
+    <string name="label_more_operations">更多操作</string>
+    <string name="label_pull_options">拉取选项</string>
+    <string name="label_push_options">推送选项</string>
+    <string name="menu_force_pull">强制拉取</string>
+    <string name="menu_force_push">强制推送</string>
+    <string name="menu_push_all">推送所有分支</string>
+    <string name="menu_choose_remote">选择远程…</string>
+    <string name="dialog_force_pull_msg">从 origin 拉取并将此分支重置到远程状态。远程上没有的本地提交和更改将会丢失。</string>
+    <string name="dialog_force_push_msg">推送到 origin 并用你的分支覆盖远程分支。你没有的远程提交将会丢失。</string>
 </resources>

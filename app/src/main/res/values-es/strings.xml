@@ -244,4 +244,15 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">Cambios preparados</string>
     <string name="label_diff_working_tree">Directorio de trabajo</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_more_operations">Más operaciones</string>
+    <string name="label_pull_options">Opciones de pull</string>
+    <string name="label_push_options">Opciones de push</string>
+    <string name="menu_force_pull">Pull forzado</string>
+    <string name="menu_force_push">Push forzado</string>
+    <string name="menu_push_all">Hacer push de todas las ramas</string>
+    <string name="menu_choose_remote">Elegir remoto…</string>
+    <string name="dialog_force_pull_msg">Hacer pull de origin y restablecer esta rama a él. Se perderán los commits y cambios locales que no estén en el remoto.</string>
+    <string name="dialog_force_push_msg">Hacer push a origin y sobrescribir su rama con la tuya. Se perderán los commits del remoto que no tengas.</string>
 </resources>

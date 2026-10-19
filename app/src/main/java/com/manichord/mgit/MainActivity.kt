@@ -1,5 +1,7 @@
 package com.manichord.mgit
 
+import me.sheimi.sgit.activities.delegate.RepoOperationDelegate
+import com.manichord.mgit.repodetail.RepoToolbarActions
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.DialogInterface
@@ -247,6 +249,14 @@ class MainActivity : SheimiFragmentActivity() {
                                 onOperationClick = { index ->
                                     host.getRepoDelegate().executeAction(index)
                                 },
+                                toolbarActions = RepoToolbarActions(
+                                    pull = { force -> host.getRepoDelegate().quickPull(force) },
+                                    push = { all, force -> host.getRepoDelegate().quickPush(all, force) },
+                                    choosePullRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PULL) },
+                                    choosePushRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PUSH) },
+                                    commit = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_COMMIT) },
+                                    more = { host.viewModel.setDrawerOpen(true) }
+                                ),
                                 filesContent = { FragmentHost(supportFragmentManager, filesFragment) },
                                 commitsContent = { FragmentHost(supportFragmentManager, commitsFragment) },
                                 statusContent = { FragmentHost(supportFragmentManager, statusFragment) },

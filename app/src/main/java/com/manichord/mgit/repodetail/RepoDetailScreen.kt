@@ -54,6 +54,7 @@ fun RepoDetailScreen(
     onNavigateUp: () -> Boolean,
     onBranchClick: () -> Unit,
     onOperationClick: (index: Int) -> Unit,
+    toolbarActions: RepoToolbarActions? = null,
     filesContent: @Composable () -> Unit,
     commitsContent: @Composable () -> Unit,
     statusContent: @Composable () -> Unit,
@@ -90,6 +91,8 @@ fun RepoDetailScreen(
 
     BackHandler {
         when {
+            // The operations drawer first: Back used to leave the repo with the drawer still open
+            isDrawerOpen -> viewModel.setDrawerOpen(false)
             isSearchActive -> {
                 isSearchActive = false
                 searchState.clearText()
@@ -200,6 +203,12 @@ fun RepoDetailScreen(
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Scaffold(
+            // Hidden on the Console tab, whose command input sits at the bottom, and while searching
+            bottomBar = {
+                if (toolbarActions != null && pagerState.currentPage != TAB_CONSOLE && !isSearchActive) {
+                    RepoToolbar(toolbarActions)
+                }
+            },
             topBar = {
                 if (isSearchActive) {
                     TopAppBar(

@@ -235,4 +235,15 @@
   <string name="label_diff">הבדלים</string>
   <string name="label_diff_staged">שינויים שהוכנו</string>
   <string name="label_diff_working_tree">עץ העבודה</string>
+  <string name="label_pull">משיכה</string>
+  <string name="label_commit">קומיט</string>
+  <string name="label_more_operations">פעולות נוספות</string>
+  <string name="label_pull_options">אפשרויות משיכה</string>
+  <string name="label_push_options">אפשרויות דחיפה</string>
+  <string name="menu_force_pull">משיכה בכוח</string>
+  <string name="menu_force_push">דחיפה בכוח</string>
+  <string name="menu_push_all">דחיפת כל הענפים</string>
+  <string name="menu_choose_remote">בחירת מאגר מרוחק…</string>
+  <string name="dialog_force_pull_msg">משיכה מ-origin ואיפוס הענף הזה אליו. קומיטים ושינויים מקומיים שאינם במאגר המרוחק יאבדו.</string>
+  <string name="dialog_force_push_msg">דחיפה ל-origin ודריסת הענף שלו בענף שלך. קומיטים במאגר המרוחק שאין לך יאבדו.</string>
 </resources>
