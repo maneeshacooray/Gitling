@@ -1,5 +1,6 @@
 package com.manichord.mgit
 
+import com.manichord.mgit.ui.components.HeadlessFragment
 import me.sheimi.sgit.activities.delegate.RepoOperationDelegate
 import com.manichord.mgit.repodetail.RepoToolbarActions
 import android.appwidget.AppWidgetManager
@@ -257,9 +258,9 @@ class MainActivity : SheimiFragmentActivity() {
                                     commit = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_COMMIT) },
                                     more = { host.viewModel.setDrawerOpen(true) }
                                 ),
-                                filesContent = { FragmentHost(supportFragmentManager, filesFragment) },
-                                commitsContent = { FragmentHost(supportFragmentManager, commitsFragment) },
-                                statusContent = { FragmentHost(supportFragmentManager, statusFragment) },
+                                filesContent = { HeadlessFragment(supportFragmentManager, filesFragment, "repo-files") { filesFragment.Content() } },
+                                commitsContent = { HeadlessFragment(supportFragmentManager, commitsFragment, "repo-commits") { commitsFragment.Content() } },
+                                statusContent = { HeadlessFragment(supportFragmentManager, statusFragment, "repo-status") { statusFragment.Content() } },
                                 consoleContent = { GitConsoleScreen(viewModel = host.viewModel, repo = host.repo) },
                                 onFilesSearchQueryChange = { query -> host.searchFiles(query) },
                                 onCommitsSearchQueryChange = { query -> host.searchCommits(query) }

@@ -2,6 +2,7 @@
 
 package com.manichord.mgit.repodetail
 
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
@@ -115,6 +116,7 @@ fun RepoDetailScreen(
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navigationIcon: @Composable () -> Unit = {
         if (isSearchActive) {
             IconButton(onClick = {
@@ -203,6 +205,7 @@ fun RepoDetailScreen(
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             // Hidden on the Console tab, whose command input sits at the bottom, and while searching
             bottomBar = {
                 if (toolbarActions != null && pagerState.currentPage != TAB_CONSOLE && !isSearchActive) {
@@ -245,11 +248,10 @@ fun RepoDetailScreen(
                         actions = topBarActions
                     )
                 } else {
-                    // Expressive top bar with the branch as a subtitle. Not the collapsing
-                    // flexible bar: the Files, Commits and Status tabs are fragments, and their
-                    // scrolling doesn't reach this Scaffold through the AndroidView boundary (not
-                    // even with rememberNestedScrollInteropConnection), so it would stay expanded
-                    TopAppBar(
+                    // Expressive flexible bar: the repo name large with the branch underneath,
+                    // collapsing as the tab content scrolls. The tabs draw their content directly
+                    // in this composition (see HeadlessFragment), so their scrolling reaches it
+                    MediumFlexibleTopAppBar(
                         title = {
                             Text(
                                 text = repo?.diaplayName ?: "Loading...",
@@ -263,7 +265,8 @@ fun RepoDetailScreen(
                             }
                         },
                         navigationIcon = navigationIcon,
-                        actions = topBarActions
+                        actions = topBarActions,
+                        scrollBehavior = scrollBehavior
                     )
                 }
             }

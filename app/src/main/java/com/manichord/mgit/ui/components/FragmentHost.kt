@@ -42,3 +42,30 @@ fun FragmentHost(fragmentManager: FragmentManager, fragment: Fragment) {
         }
     )
 }
+
+/**
+ * Keeps [fragment] added to [fragmentManager] without a view, for the lifetime of this
+ * composition, and draws its Compose [content] directly here instead of inside an AndroidView.
+ * Unlike [FragmentHost], scrolling inside the content then reaches the screen around it (e.g. a
+ * collapsing top bar). The fragment still does everything else a fragment does: its git tasks,
+ * dialogs and action mode.
+ */
+@Composable
+fun HeadlessFragment(fragmentManager: FragmentManager, fragment: Fragment, tag: String, content: @Composable () -> Unit) {
+    androidx.compose.runtime.DisposableEffect(fragment) {
+        // A copy restored by the FragmentManager after the Activity was recreated is stale: this
+        // composition made its own instance
+        fragmentManager.findFragmentByTag(tag)?.takeIf { it !== fragment }?.let {
+            fragmentManager.beginTransaction().remove(it).commitNowAllowingStateLoss()
+        }
+        if (!fragment.isAdded) {
+            fragmentManager.beginTransaction().add(fragment, tag).commitNowAllowingStateLoss()
+        }
+        onDispose {
+            if (fragment.isAdded && !fragmentManager.isDestroyed) {
+                fragmentManager.beginTransaction().remove(fragment).commitNowAllowingStateLoss()
+            }
+        }
+    }
+    content()
+}
