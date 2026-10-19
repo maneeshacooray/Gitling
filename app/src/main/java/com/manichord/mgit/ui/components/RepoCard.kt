@@ -2,6 +2,12 @@
 
 package com.manichord.mgit.ui.components
 
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -55,18 +61,12 @@ fun RepoCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = Icons.Default.Storage,
-                    contentDescription = null,
-                    tint = if (isProcessing) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
+                RepoBadge(name = repo.getDiaplayName() ?: "?", dimmed = isProcessing)
+                Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = repo.getDiaplayName() ?: "Unknown Repository",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMediumEmphasized,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -102,17 +102,31 @@ fun RepoCard(
 
             if (isProcessing) {
                 Spacer(modifier = Modifier.height(12.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    LoadingIndicator(
-                        modifier = Modifier.size(28.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
+                val status = repo.getRepoStatus()
+                val percent = statusPercent(status)
+                if (percent != null) {
+                    // A known percentage (clone, fetch, pull report one): show how far along it is
                     Text(
-                        text = repo.getRepoStatus(),
+                        text = status,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val progress by animateFloatAsState(percent / 100f, label = "repo progress")
+                    LinearWavyProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        LoadingIndicator(
+                            modifier = Modifier.size(28.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = status,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             } else {
                 Spacer(modifier = Modifier.height(12.dp))
@@ -136,7 +150,7 @@ fun RepoCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = repo.getLastCommitMsg() ?: "No commits yet",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMediumEmphasized,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -169,5 +183,48 @@ fun RepoCard(
                 }
             }
         }
+    }
+}
+
+/** The "(35%)" at the end of a task's status text (see CloneTask's progress monitor), if any. */
+private fun statusPercent(status: String): Int? =
+    Regex("""\((\d{1,3})%\)\s*$""").find(status)?.groupValues?.get(1)?.toIntOrNull()?.coerceIn(0, 100)
+
+/** Hues spread around the color wheel so neighbouring repos rarely look alike. */
+private val badgeHues = listOf(140f, 210f, 30f, 280f, 175f, 350f, 55f, 245f)
+
+private val badgeShapes = listOf(
+    MaterialShapes.Cookie6Sided, MaterialShapes.Clover4Leaf, MaterialShapes.Sunny,
+    MaterialShapes.Pentagon, MaterialShapes.Gem, MaterialShapes.SoftBurst,
+    MaterialShapes.Flower, MaterialShapes.PuffyDiamond, MaterialShapes.Cookie4Sided, MaterialShapes.Arch
+)
+
+/**
+ * The repo's initial in an Expressive shape. Shape and color come from the name, so a repo looks
+ * the same every time and repos are easy to tell apart. Colors are the theme's container colors,
+ * so it follows light/dark mode and wallpaper colors.
+ */
+@Composable
+private fun RepoBadge(name: String, dimmed: Boolean) {
+    val key = name.lowercase().hashCode().let { if (it == Int.MIN_VALUE) 0 else kotlin.math.abs(it) }
+    val scheme = MaterialTheme.colorScheme
+    // The theme's container colors are all close in hue with the brand palette, so badges use
+    // their own set of distinct hues, tuned for light or dark surfaces
+    val dark = scheme.surface.luminance() < 0.5f
+    val hue = badgeHues[key % badgeHues.size]
+    val (container, content) = when {
+        dimmed -> scheme.surfaceVariant to scheme.outline
+        dark -> Color.hsl(hue, 0.35f, 0.30f) to Color.hsl(hue, 0.70f, 0.88f)
+        else -> Color.hsl(hue, 0.60f, 0.88f) to Color.hsl(hue, 0.65f, 0.25f)
+    }
+    val initial = name.trim().firstOrNull { it.isLetterOrDigit() }?.uppercaseChar()?.toString() ?: "#"
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(44.dp)
+            .clip(badgeShapes[(key / badgeHues.size) % badgeShapes.size].toShape())
+            .background(container)
+    ) {
+        Text(initial, style = MaterialTheme.typography.titleMediumEmphasized, color = content)
     }
 }
