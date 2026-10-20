@@ -95,6 +95,7 @@ class RenameFileDialog : SheimiDialogFragment() {
                                         // navigates back to the repo root rather than staying in
                                         // the current directory, which would be surprising here.
                                         activity.getFilesFragment()?.setCurrentDir(parent)
+                                        activity.viewModel.refreshSyncCounts(activity.repo)
                                         dismiss()
                                     }
                                 }

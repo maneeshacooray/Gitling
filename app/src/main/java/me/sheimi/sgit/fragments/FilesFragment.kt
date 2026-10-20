@@ -198,6 +198,8 @@ class FilesFragment : RepoDetailFragment() {
             setCurrentDir(file)
             return
         }
+        // The viewer or another app may edit it: recount when the repo screen comes back
+        (rawActivity as? MainActivity)?.currentRepoDetailHost?.viewModel?.markSyncCountsStale()
         val mime = FsUtils.getMimeType(file)
         if (FsUtils.isTextMimeType(mime)) {
             val intent = Intent(activity, ViewFileActivity::class.java)
@@ -252,6 +254,12 @@ class FilesFragment : RepoDetailFragment() {
         resetCurrentDir()
     }
 
+    /** File changes made here directly (not through a git task) don't reset the repo screen. */
+    private fun recountSyncCounts() {
+        val host = (rawActivity as? MainActivity)?.currentRepoDetailHost ?: return
+        host.viewModel.refreshSyncCounts(host.repo)
+    }
+
     fun newDir(name: String) {
         val dir = currentDir ?: return
         val file = File(dir, name)
@@ -261,6 +269,7 @@ class FilesFragment : RepoDetailFragment() {
         }
         file.mkdir()
         setCurrentDir(dir)
+        recountSyncCounts()
     }
 
     /** Create a new file within the currently displayed directory */
@@ -274,6 +283,7 @@ class FilesFragment : RepoDetailFragment() {
         }
         file.createNewFile()
         setCurrentDir(dir)
+        recountSyncCounts()
     }
 
     override fun getOnBackClickListener(): OnBackClickListener {

@@ -232,10 +232,11 @@ class MainActivity : SheimiFragmentActivity() {
                         val commitsFragment = remember(host) { CommitsFragment.newInstance(host.repo, null) }
                         val statusFragment = remember(host) { StatusFragment.newInstance(host.repo) }
 
-                        // Recount the toolbar's numbers whenever the screen comes back (e.g. after
-                        // editing a file in the viewer, or changing the repo from another app)
+                        // Recount the toolbar's numbers when the screen comes back (e.g. after
+                        // editing a file in the viewer, or changing the repo from another app),
+                        // unless they were counted in the last minute and nothing was opened
                         LifecycleResumeEffect(host) {
-                            host.viewModel.refreshSyncCounts(host.repo)
+                            host.viewModel.refreshSyncCounts(host.repo, onlyIfStale = true)
                             onPauseOrDispose { }
                         }
 
