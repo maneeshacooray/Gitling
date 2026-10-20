@@ -246,4 +246,12 @@
     <plurals name="toolbar_commit_count">
         <item quantity="other">커밋, 변경된 파일 %d개</item>
     </plurals>
+    <string name="drawer_group_sync">동기화</string>
+    <string name="drawer_group_changes">변경사항</string>
+    <string name="drawer_group_branches">브랜치</string>
+    <string name="drawer_group_files">파일</string>
+    <string name="drawer_group_remotes">원격</string>
+    <string name="drawer_group_repository">저장소</string>
+    <string name="menu_submodule_update">서브모듈 업데이트</string>
+    <string name="menu_delete_repo">저장소 삭제</string>
 </resources>

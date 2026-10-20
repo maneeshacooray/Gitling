@@ -296,4 +296,12 @@
         <item quantity="one">Commit, %d changed file</item>
         <item quantity="other">Commit, %d changed files</item>
     </plurals>
+    <string name="drawer_group_sync">Sync</string>
+    <string name="drawer_group_changes">Changes</string>
+    <string name="drawer_group_branches">Branches</string>
+    <string name="drawer_group_files">Files</string>
+    <string name="drawer_group_remotes">Remotes</string>
+    <string name="drawer_group_repository">Repository</string>
+    <string name="menu_submodule_update">Update submodules</string>
+    <string name="menu_delete_repo">Delete repository</string>
 </resources>

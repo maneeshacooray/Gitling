@@ -2,6 +2,8 @@
 
 package com.manichord.mgit.repodetail
 
+import androidx.compose.foundation.background
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -89,6 +91,16 @@ fun RepoDetailScreen(
         TabItem(stringResource(R.string.tab_console_label), Icons.Outlined.Terminal)
     )
     val pagerState = rememberPagerState(pageCount = { tabs.size })
+    // The view model's selected tab and the pager follow each other: operations switch tabs
+    // through the view model (Diff opens Commits), and swiping keeps it current so the next
+    // switch is always a change it can see
+    val selectedTab by viewModel.selectedTab.observeAsState(0)
+    LaunchedEffect(selectedTab) {
+        if (selectedTab != pagerState.currentPage) pagerState.animateScrollToPage(selectedTab)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.setSelectedTab(pagerState.currentPage)
+    }
     var isSearchActive by remember { mutableStateOf(false) }
     val searchState = rememberTextFieldState()
     val searchQuery = searchState.text.toString()
@@ -191,18 +203,14 @@ fun RepoDetailScreen(
         drawerContent = {
             CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             ModalDrawerSheet {
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    stringResource(R.string.action_toggle_drawer),
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium
+                RepoOperationList(
+                    repoName = repo?.diaplayName,
+                    branch = repo?.branchName,
+                    onOperationClick = {
+                        onOperationClick(it)
+                        scope.launch { drawerState.close() }
+                    }
                 )
-                Divider()
-                // Repository Operations List
-                RepoOperationList(onOperationClick = {
-                    onOperationClick(it)
-                    scope.launch { drawerState.close() }
-                })
             }
             }
         }
@@ -386,43 +394,164 @@ fun RepoDetailScreen(
     }
 }
 
-@Composable
-fun RepoOperationList(onOperationClick: (index: Int) -> Unit) {
-    // These names/icons match me.sheimi.sgit.activities.delegate.RepoOperationDelegate's
-    // mActions order -- index is what gets passed back to onOperationClick.
-    val operations = listOf(
-        "New Branch" to Icons.Default.AccountTree,
-        "Pull" to Icons.Default.CloudDownload,
-        "Push" to Icons.Default.CloudUpload,
-        "Add All" to Icons.Default.PlaylistAddCheck,
-        "Commit" to Icons.Default.Save,
-        "Reset" to Icons.Default.RestartAlt,
-        "Merge" to Icons.Default.CallMerge,
-        "Fetch" to Icons.Default.Sync,
-        "Rebase" to Icons.Default.Timeline,
-        "Cherry Pick" to Icons.Default.ContentCopy,
-        "Diff" to Icons.Default.Difference,
-        "New File" to Icons.Default.NoteAdd,
-        "New Directory" to Icons.Default.CreateNewFolder,
-        "Add Remote" to Icons.Default.AddLink,
-        "Remove Remote" to Icons.Default.LinkOff,
-        "Delete" to Icons.Default.Delete,
-        "Raw Config" to Icons.Default.Code,
-        "Options" to Icons.Default.Settings,
-        "Submodule Update" to Icons.Default.AccountTree
-    )
+// Indexes into RepoOperationDelegate's mActions: what onOperationClick passes back
+private const val OP_NEW_BRANCH = 0
+private const val OP_PULL = 1
+private const val OP_PUSH = 2
+private const val OP_ADD_ALL = 3
+private const val OP_COMMIT = 4
+private const val OP_RESET = 5
+private const val OP_MERGE = 6
+private const val OP_FETCH = 7
+private const val OP_REBASE = 8
+private const val OP_CHERRY_PICK = 9
+private const val OP_DIFF = 10
+private const val OP_NEW_FILE = 11
+private const val OP_NEW_DIR = 12
+private const val OP_ADD_REMOTE = 13
+private const val OP_REMOVE_REMOTE = 14
+private const val OP_DELETE = 15
+private const val OP_RAW_CONFIG = 16
+private const val OP_OPTIONS = 17
+private const val OP_SUBMODULE_UPDATE = 18
 
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        operations.forEachIndexed { index, (op, icon) ->
-            NavigationDrawerItem(
-                label = { Text(op) },
-                icon = { Icon(icon, contentDescription = null) },
-                selected = false,
-                onClick = { onOperationClick(index) },
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
-                shape = MaterialTheme.shapes.medium
+/** The drawer's operations by what they're for, in the same rounded groups as Settings. */
+private val operationGroups = listOf(
+    R.string.drawer_group_sync to listOf(OP_FETCH, OP_PULL, OP_PUSH, OP_SUBMODULE_UPDATE),
+    R.string.drawer_group_changes to listOf(OP_ADD_ALL, OP_COMMIT, OP_DIFF, OP_RESET),
+    R.string.drawer_group_branches to listOf(OP_NEW_BRANCH, OP_MERGE, OP_REBASE, OP_CHERRY_PICK),
+    R.string.drawer_group_files to listOf(OP_NEW_FILE, OP_NEW_DIR),
+    R.string.drawer_group_remotes to listOf(OP_ADD_REMOTE, OP_REMOVE_REMOTE),
+    R.string.drawer_group_repository to listOf(OP_RAW_CONFIG, OP_OPTIONS)
+)
+
+private fun operationIcon(op: Int): ImageVector = when (op) {
+    OP_NEW_BRANCH -> Icons.Default.AccountTree
+    OP_PULL -> Icons.Default.CloudDownload
+    OP_PUSH -> Icons.Default.CloudUpload
+    OP_ADD_ALL -> Icons.Default.PlaylistAddCheck
+    OP_COMMIT -> Icons.Default.Commit
+    OP_RESET -> Icons.Default.RestartAlt
+    OP_MERGE -> Icons.Default.CallMerge
+    OP_FETCH -> Icons.Default.Sync
+    OP_REBASE -> Icons.Default.Timeline
+    OP_CHERRY_PICK -> Icons.Default.ContentCopy
+    OP_DIFF -> Icons.Default.Difference
+    OP_NEW_FILE -> Icons.Default.NoteAdd
+    OP_NEW_DIR -> Icons.Default.CreateNewFolder
+    OP_ADD_REMOTE -> Icons.Default.AddLink
+    OP_REMOVE_REMOTE -> Icons.Default.LinkOff
+    OP_DELETE -> Icons.Default.Delete
+    OP_RAW_CONFIG -> Icons.Default.Code
+    OP_OPTIONS -> Icons.Default.Settings
+    else -> Icons.Default.Layers // OP_SUBMODULE_UPDATE
+}
+
+/**
+ * The operations drawer: the repo and its branch on top, then every operation grouped by what
+ * it's for. Delete sits apart at the bottom, in the error colors, so it isn't hit by mistake.
+ */
+@Composable
+fun RepoOperationList(repoName: String?, branch: String?, onOperationClick: (index: Int) -> Unit) {
+    // Translated names, in mActions order; the last two entries come from their own strings
+    val names = stringArrayResource(R.array.repo_operation_names)
+    val submoduleLabel = stringResource(R.string.menu_submodule_update)
+    val deleteLabel = stringResource(R.string.menu_delete_repo)
+    fun label(op: Int) = when (op) {
+        OP_SUBMODULE_UPDATE -> submoduleLabel
+        OP_DELETE -> deleteLabel
+        else -> names.getOrElse(op) { "" }
+    }
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+            Text(
+                repoName.orEmpty(),
+                style = MaterialTheme.typography.headlineSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+            if (!branch.isNullOrEmpty()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.AccountTree,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        branch.removePrefix("refs/heads/"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         }
+        operationGroups.forEach { (title, ops) ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                OperationGroup(MaterialTheme.colorScheme.surfaceContainerHigh) {
+                    ops.forEachIndexed { i, op ->
+                        if (i > 0) {
+                            Spacer(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                            )
+                        }
+                        OperationRow(label(op), operationIcon(op), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onSurface) {
+                            onOperationClick(op)
+                        }
+                    }
+                }
+            }
+        }
+        OperationGroup(MaterialTheme.colorScheme.errorContainer) {
+            OperationRow(
+                label(OP_DELETE),
+                operationIcon(OP_DELETE),
+                MaterialTheme.colorScheme.error,
+                MaterialTheme.colorScheme.onErrorContainer
+            ) { onOperationClick(OP_DELETE) }
+        }
+    }
+}
+
+@Composable
+private fun OperationGroup(color: Color, content: @Composable ColumnScope.() -> Unit) {
+    Surface(color = color, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(content = content)
+    }
+}
+
+@Composable
+private fun OperationRow(label: String, icon: ImageVector, iconTint: Color, textColor: Color, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 52.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = iconTint)
+        Spacer(Modifier.width(16.dp))
+        Text(label, style = MaterialTheme.typography.bodyLarge, color = textColor)
     }
 }
 
