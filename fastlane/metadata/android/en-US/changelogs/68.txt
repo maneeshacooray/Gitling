@@ -1,0 +1,1 @@
+A refreshed look built on Material 3 Expressive. Pull, Commit and Push are one tap away on the repo screen, with counts of what's waiting. The operations menu is grouped and translated. Fixed SSH logins with a username and password, executable files showing as modified after moving repos between storage locations, and Diff not opening the Commits tab.

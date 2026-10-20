@@ -13,6 +13,18 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 68,
+            versionName = "1.0.65",
+            highlights = listOf(
+                "A refreshed look built on Material 3 Expressive across the repo list, repo screen, settings and home screen widget",
+                "Pull, Commit and Push are now one tap away on the repo screen, with counts of what's waiting to pull, push and commit",
+                "The operations menu is grouped into sections and translated, with Delete repository set apart",
+                "Fixed cloning, pulling and pushing over SSH with a username and password",
+                "Fixed executable files showing as modified after moving repos to or from shared storage",
+                "Fixed Diff in the operations menu not opening the Commits tab"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 64,
             versionName = "1.0.64",
             highlights = listOf(
