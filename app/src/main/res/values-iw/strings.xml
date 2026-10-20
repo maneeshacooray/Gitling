@@ -237,7 +237,6 @@
   <string name="label_diff_working_tree">עץ העבודה</string>
   <string name="label_pull">משיכה</string>
   <string name="label_commit">קומיט</string>
-  <string name="label_more_operations">פעולות נוספות</string>
   <string name="label_pull_options">אפשרויות משיכה</string>
   <string name="label_push_options">אפשרויות דחיפה</string>
   <string name="menu_force_pull">משיכה בכוח</string>
@@ -246,4 +245,16 @@
   <string name="menu_choose_remote">בחירת מאגר מרוחק…</string>
   <string name="dialog_force_pull_msg">משיכה מ-origin ואיפוס הענף הזה אליו. קומיטים ושינויים מקומיים שאינם במאגר המרוחק יאבדו.</string>
   <string name="dialog_force_push_msg">דחיפה ל-origin ודריסת הענף שלו בענף שלך. קומיטים במאגר המרוחק שאין לך יאבדו.</string>
+  <plurals name="toolbar_pull_count">
+    <item quantity="one">משיכה, קומיט חדש אחד במאגר המרוחק</item>
+    <item quantity="other">משיכה, %d קומיטים חדשים במאגר המרוחק</item>
+  </plurals>
+  <plurals name="toolbar_push_count">
+    <item quantity="one">דחיפה, קומיט אחד שעוד לא נדחף</item>
+    <item quantity="other">דחיפה, %d קומיטים שעוד לא נדחפו</item>
+  </plurals>
+  <plurals name="toolbar_commit_count">
+    <item quantity="one">קומיט, קובץ אחד שהשתנה</item>
+    <item quantity="other">קומיט, %d קבצים שהשתנו</item>
+  </plurals>
 </resources>

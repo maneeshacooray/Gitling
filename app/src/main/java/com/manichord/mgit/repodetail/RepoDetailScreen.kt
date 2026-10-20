@@ -66,6 +66,7 @@ fun RepoDetailScreen(
     val repo by viewModel.repo.observeAsState()
     val isDrawerOpen by viewModel.isDrawerOpen.observeAsState(false)
     val progressState by viewModel.progressState.observeAsState()
+    val syncCounts by viewModel.syncCounts.observeAsState()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -209,7 +210,7 @@ fun RepoDetailScreen(
             // Hidden on the Console tab, whose command input sits at the bottom, and while searching
             bottomBar = {
                 if (toolbarActions != null && pagerState.currentPage != TAB_CONSOLE && !isSearchActive) {
-                    RepoToolbar(toolbarActions)
+                    RepoToolbar(toolbarActions, syncCounts)
                 }
             },
             topBar = {

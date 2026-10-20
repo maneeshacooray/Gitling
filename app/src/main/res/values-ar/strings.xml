@@ -279,7 +279,6 @@
     <string name="label_diff_working_tree">شجرة العمل</string>
     <string name="label_pull">سحب</string>
     <string name="label_commit">إيداع</string>
-    <string name="label_more_operations">عمليات أخرى</string>
     <string name="label_pull_options">خيارات السحب</string>
     <string name="label_push_options">خيارات الدفع</string>
     <string name="menu_force_pull">سحب إجباري</string>
@@ -288,4 +287,13 @@
     <string name="menu_choose_remote">اختيار المستودع البعيد…</string>
     <string name="dialog_force_pull_msg">السحب من origin وإعادة تعيين هذا الفرع إليه. ستُفقد الإيداعات والتغييرات المحلية غير الموجودة في المستودع البعيد.</string>
     <string name="dialog_force_push_msg">الدفع إلى origin والكتابة فوق فرعه بفرعك. ستُفقد إيداعات المستودع البعيد غير الموجودة لديك.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="other">سحب، إيداعات جديدة على المستودع البعيد: %d</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="other">دفع، إيداعات لم تُدفع بعد: %d</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="other">إيداع، ملفات متغيرة: %d</item>
+    </plurals>
 </resources>

@@ -247,7 +247,6 @@
     <string name="label_diff_working_tree">工作区</string>
     <string name="label_pull">拉取</string>
     <string name="label_commit">提交</string>
-    <string name="label_more_operations">更多操作</string>
     <string name="label_pull_options">拉取选项</string>
     <string name="label_push_options">推送选项</string>
     <string name="menu_force_pull">强制拉取</string>
@@ -256,4 +255,13 @@
     <string name="menu_choose_remote">选择远程…</string>
     <string name="dialog_force_pull_msg">从 origin 拉取并将此分支重置到远程状态。远程上没有的本地提交和更改将会丢失。</string>
     <string name="dialog_force_push_msg">推送到 origin 并用你的分支覆盖远程分支。你没有的远程提交将会丢失。</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="other">拉取，远程有 %d 个新提交</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="other">推送，%d 个提交尚未推送</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="other">提交，%d 个文件已更改</item>
+    </plurals>
 </resources>

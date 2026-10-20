@@ -53,7 +53,7 @@
     <string name="label_rename">Cambiar de nombre</string>
     <string name="label_send_feedback">Enviar Feedback</string>
     <string name="label_import">Importar</string>
-    <string name="label_push">Tirar</string>
+    <string name="label_push">Push</string>
     <string name="label_push_all">Tirar Todo</string>
     <string name="label_create">Creer</string>
     <string name="label_checkout">Checkout</string>
@@ -246,7 +246,6 @@
     <string name="label_diff_working_tree">Directorio de trabajo</string>
     <string name="label_pull">Pull</string>
     <string name="label_commit">Commit</string>
-    <string name="label_more_operations">Más operaciones</string>
     <string name="label_pull_options">Opciones de pull</string>
     <string name="label_push_options">Opciones de push</string>
     <string name="menu_force_pull">Pull forzado</string>
@@ -255,4 +254,16 @@
     <string name="menu_choose_remote">Elegir remoto…</string>
     <string name="dialog_force_pull_msg">Hacer pull de origin y restablecer esta rama a él. Se perderán los commits y cambios locales que no estén en el remoto.</string>
     <string name="dialog_force_push_msg">Hacer push a origin y sobrescribir su rama con la tuya. Se perderán los commits del remoto que no tengas.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d commit nuevo en el remoto</item>
+        <item quantity="other">Pull, %d commits nuevos en el remoto</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d commit sin enviar</item>
+        <item quantity="other">Push, %d commits sin enviar</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d archivo modificado</item>
+        <item quantity="other">Commit, %d archivos modificados</item>
+    </plurals>
 </resources>
