@@ -1,5 +1,7 @@
 package com.manichord.mgit.repodetail
 
+import kotlinx.coroutines.Job
+import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,33 +43,74 @@ class RepoDetailViewModel : ViewModel() {
     private val _syncCounts = MutableLiveData<SyncCounts?>(null)
     val syncCounts: LiveData<SyncCounts?> = _syncCounts
 
-    /** Recounts [syncCounts] off the main thread; cheap enough to call after every operation. */
-    fun refreshSyncCounts(repo: Repo) {
+    // Counting walks the whole working tree (git status): about 2 s for a 20,000-file repo. All
+    // of the bookkeeping below is only touched on the main thread.
+    private var countJob: Job? = null
+    private var recountAfter: Repo? = null
+    private var lastCountedRepoId = -1
+    private var lastCountedAt = 0L
+    private var countStartedAt = 0L
+    private var countsStale = false
+
+    /**
+     * Recounts [syncCounts] off the main thread. Call after anything that can change them (git
+     * operations, file edits). With [onlyIfStale] (coming back to the screen), a count of the
+     * same repo from the last minute is kept, unless [markSyncCountsStale] was called since:
+     * switching apps rarely changes anything, and recounting a big repo on every return is
+     * wasted disk work. Never runs two counts at once: a request during a count runs once it's
+     * done, so the result is still current.
+     */
+    @JvmOverloads
+    fun refreshSyncCounts(repo: Repo, onlyIfStale: Boolean = false) {
+        if (onlyIfStale && !countsStale && repo.id == lastCountedRepoId &&
+            SystemClock.elapsedRealtime() - lastCountedAt < RECOUNT_AFTER_MS
+        ) return
+        if (countJob?.isActive == true) {
+            // A request right after the count started is already covered by it (e.g. the
+            // screen's refresh and the finished task both asking after the same operation);
+            // a later one may follow a change the running count has already walked past
+            if (SystemClock.elapsedRealtime() - countStartedAt > ALREADY_COVERED_MS) recountAfter = repo
+            return
+        }
+        countsStale = false
+        countStartedAt = SystemClock.elapsedRealtime()
         val repoId = repo.id
-        viewModelScope.launch(Dispatchers.IO) {
-            val counts = try {
-                // Its own Git instance, not repo.git: that one's Repository is shared with the
-                // tasks and screens running at the same time, and reading its config from here
-                // while they use it sometimes came back without the branch's upstream
-                Git.open(repo.dir).use { git ->
-                    val repository = git.repository
-                    val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
-                    val status = git.status().call()
-                    SyncCounts(
-                        behind = tracking?.behindCount,
-                        ahead = tracking?.aheadCount,
-                        changes = (status.uncommittedChanges + status.untracked).size
-                    )
-                }
-            } catch (e: Exception) {
-                Timber.w(e, "Couldn't count sync state")
-                null
-            }
-            withContext(Dispatchers.Main) {
-                // Only if the user is still on the repo that was counted
-                if (_repo.value?.id == repoId) _syncCounts.value = counts
+        countJob = viewModelScope.launch {
+            val counts = withContext(Dispatchers.IO) { countSync(repo) }
+            lastCountedRepoId = repoId
+            lastCountedAt = SystemClock.elapsedRealtime()
+            // Only if the user is still on the repo that was counted
+            if (_repo.value?.id == repoId) _syncCounts.value = counts
+            recountAfter?.let {
+                recountAfter = null
+                refreshSyncCounts(it)
             }
         }
+    }
+
+    /** Something may have changed files without a git operation (e.g. a file opened for
+     * editing): the next return to the screen recounts even within the minute. */
+    fun markSyncCountsStale() {
+        countsStale = true
+    }
+
+    private fun countSync(repo: Repo): SyncCounts? = try {
+        // Its own Git instance, not repo.git: that one's Repository is shared with the tasks
+        // and screens running at the same time, and reading its config from here while they use
+        // it sometimes came back without the branch's upstream
+        Git.open(repo.dir).use { git ->
+            val repository = git.repository
+            val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
+            val status = git.status().call()
+            SyncCounts(
+                behind = tracking?.behindCount,
+                ahead = tracking?.aheadCount,
+                changes = (status.uncommittedChanges + status.untracked).size
+            )
+        }
+    } catch (e: Exception) {
+        Timber.w(e, "Couldn't count sync state")
+        null
     }
 
     fun setSelectedTab(index: Int) {
@@ -138,3 +181,9 @@ class RepoDetailViewModel : ViewModel() {
         _consoleEntries.value = emptyList()
     }
 }
+
+/** How long a count stays good enough to skip recounting when coming back to the screen. */
+private const val RECOUNT_AFTER_MS = 60_000L
+
+/** How soon after a count starts a new request still counts as asking for the same state. */
+private const val ALREADY_COVERED_MS = 500L
