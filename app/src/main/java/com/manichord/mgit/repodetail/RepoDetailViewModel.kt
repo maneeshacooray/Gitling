@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.sheimi.sgit.database.models.Repo
+import org.eclipse.jgit.lib.BranchTrackingStatus
+import timber.log.Timber
 
 class RepoDetailViewModel : ViewModel() {
 
@@ -21,9 +23,46 @@ class RepoDetailViewModel : ViewModel() {
     val isDrawerOpen: LiveData<Boolean> = _isDrawerOpen
 
     fun setRepo(repo: Repo) {
+        if (_repo.value?.id != repo.id) _syncCounts.value = null
         _repo.value = repo
         _consoleEntries.value = consoleEntriesByRepo[repo.id].orEmpty()
         _consoleRunning.value = repo.id in consoleRunningRepos
+    }
+
+    /**
+     * What the toolbar's buttons have waiting: commits on the remote branch not pulled yet
+     * ([behind]), local commits not pushed yet ([ahead]), and changed files ([changes]).
+     * [behind] and [ahead] compare with the remote branch as of the last fetch or pull (like
+     * `git status`), and are null when the branch has no remote branch to compare with.
+     */
+    data class SyncCounts(val behind: Int?, val ahead: Int?, val changes: Int)
+
+    private val _syncCounts = MutableLiveData<SyncCounts?>(null)
+    val syncCounts: LiveData<SyncCounts?> = _syncCounts
+
+    /** Recounts [syncCounts] off the main thread; cheap enough to call after every operation. */
+    fun refreshSyncCounts(repo: Repo) {
+        val repoId = repo.id
+        viewModelScope.launch(Dispatchers.IO) {
+            val counts = try {
+                val git = repo.git
+                val repository = git.repository
+                val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
+                val status = git.status().call()
+                SyncCounts(
+                    behind = tracking?.behindCount,
+                    ahead = tracking?.aheadCount,
+                    changes = (status.uncommittedChanges + status.untracked).size
+                )
+            } catch (e: Exception) {
+                Timber.w(e, "Couldn't count sync state")
+                null
+            }
+            withContext(Dispatchers.Main) {
+                // Only if the user is still on the repo that was counted
+                if (_repo.value?.id == repoId) _syncCounts.value = counts
+            }
+        }
     }
 
     fun setSelectedTab(index: Int) {

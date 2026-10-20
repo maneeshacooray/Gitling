@@ -276,7 +276,6 @@
     <string name="label_diff_working_tree">Working tree</string>
     <string name="label_pull">Pull</string>
     <string name="label_commit">Commit</string>
-    <string name="label_more_operations">More operations</string>
     <string name="label_pull_options">Pull options</string>
     <string name="label_push_options">Push options</string>
     <string name="menu_force_pull">Force pull</string>
@@ -285,4 +284,16 @@
     <string name="menu_choose_remote">Choose remote…</string>
     <string name="dialog_force_pull_msg">Pull from origin and reset this branch to it. Local commits and changes that aren\'t on the remote will be lost.</string>
     <string name="dialog_force_push_msg">Push to origin and overwrite its branch with yours. Commits on the remote that you don\'t have will be lost.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d new commit on the remote</item>
+        <item quantity="other">Pull, %d new commits on the remote</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d commit not pushed yet</item>
+        <item quantity="other">Push, %d commits not pushed yet</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d changed file</item>
+        <item quantity="other">Commit, %d changed files</item>
+    </plurals>
 </resources>

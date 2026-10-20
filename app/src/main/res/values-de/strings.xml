@@ -37,7 +37,7 @@
     <string name="label_rename">Umbenennen</string>
     <string name="label_send_feedback">Feedback senden</string>
     <string name="label_import">Importieren</string>
-    <string name="label_push">Änderungen hochladen</string>
+    <string name="label_push">Push</string>
     <string name="label_push_all">Alle Änderungen hochladen</string>
     <string name="label_create">Erzeugen</string>
     <string name="label_checkout">Auschecken</string>
@@ -248,7 +248,6 @@
     <string name="label_diff_working_tree">Arbeitsverzeichnis</string>
     <string name="label_pull">Pull</string>
     <string name="label_commit">Commit</string>
-    <string name="label_more_operations">Weitere Aktionen</string>
     <string name="label_pull_options">Pull-Optionen</string>
     <string name="label_push_options">Push-Optionen</string>
     <string name="menu_force_pull">Force-Pull</string>
@@ -257,4 +256,16 @@
     <string name="menu_choose_remote">Remote wählen…</string>
     <string name="dialog_force_pull_msg">Von origin pullen und diesen Branch darauf zurücksetzen. Lokale Commits und Änderungen, die nicht auf dem Remote sind, gehen verloren.</string>
     <string name="dialog_force_push_msg">Zu origin pushen und dessen Branch mit deinem überschreiben. Commits auf dem Remote, die du nicht hast, gehen verloren.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d neuer Commit auf dem Remote</item>
+        <item quantity="other">Pull, %d neue Commits auf dem Remote</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d Commit noch nicht gepusht</item>
+        <item quantity="other">Push, %d Commits noch nicht gepusht</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d geänderte Datei</item>
+        <item quantity="other">Commit, %d geänderte Dateien</item>
+    </plurals>
 </resources>

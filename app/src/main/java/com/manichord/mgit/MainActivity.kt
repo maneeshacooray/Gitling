@@ -1,5 +1,6 @@
 package com.manichord.mgit
 
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.manichord.mgit.ui.components.HeadlessFragment
 import me.sheimi.sgit.activities.delegate.RepoOperationDelegate
 import com.manichord.mgit.repodetail.RepoToolbarActions
@@ -231,6 +232,13 @@ class MainActivity : SheimiFragmentActivity() {
                         val commitsFragment = remember(host) { CommitsFragment.newInstance(host.repo, null) }
                         val statusFragment = remember(host) { StatusFragment.newInstance(host.repo) }
 
+                        // Recount the toolbar's numbers whenever the screen comes back (e.g. after
+                        // editing a file in the viewer, or changing the repo from another app)
+                        LifecycleResumeEffect(host) {
+                            host.viewModel.refreshSyncCounts(host.repo)
+                            onPauseOrDispose { }
+                        }
+
                         DisposableEffect(host) {
                             onDispose {
                                 if (currentRepoDetailHost === host) {
@@ -255,8 +263,7 @@ class MainActivity : SheimiFragmentActivity() {
                                     push = { all, force -> host.getRepoDelegate().quickPush(all, force) },
                                     choosePullRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PULL) },
                                     choosePushRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PUSH) },
-                                    commit = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_COMMIT) },
-                                    more = { host.viewModel.setDrawerOpen(true) }
+                                    commit = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_COMMIT) }
                                 ),
                                 filesContent = { HeadlessFragment(supportFragmentManager, filesFragment, "repo-files") { filesFragment.Content() } },
                                 commitsContent = { HeadlessFragment(supportFragmentManager, commitsFragment, "repo-commits") { commitsFragment.Content() } },

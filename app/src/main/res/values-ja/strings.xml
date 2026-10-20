@@ -246,7 +246,6 @@
     <string name="label_diff_working_tree">作業ツリー</string>
     <string name="label_pull">プル</string>
     <string name="label_commit">コミット</string>
-    <string name="label_more_operations">その他の操作</string>
     <string name="label_pull_options">プルのオプション</string>
     <string name="label_push_options">プッシュのオプション</string>
     <string name="menu_force_pull">強制プル</string>
@@ -255,4 +254,13 @@
     <string name="menu_choose_remote">リモートを選択…</string>
     <string name="dialog_force_pull_msg">origin からプルしてこのブランチをそれにリセットします。リモートにないローカルのコミットと変更は失われます。</string>
     <string name="dialog_force_push_msg">origin にプッシュしてそのブランチをあなたのもので上書きします。あなたが持っていないリモートのコミットは失われます。</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="other">プル、リモートに新しいコミットが %d 件</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="other">プッシュ、未プッシュのコミットが %d 件</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="other">コミット、変更されたファイルが %d 件</item>
+    </plurals>
 </resources>
