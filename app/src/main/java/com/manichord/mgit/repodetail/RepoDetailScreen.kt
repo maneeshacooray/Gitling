@@ -2,6 +2,9 @@
 
 package com.manichord.mgit.repodetail
 
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -256,6 +259,7 @@ fun RepoDetailScreen(
                         title = {
                             Text(
                                 text = repo?.diaplayName ?: "Loading...",
+                                style = MaterialTheme.typography.headlineSmall,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -267,26 +271,60 @@ fun RepoDetailScreen(
                         },
                         navigationIcon = navigationIcon,
                         actions = topBarActions,
+                        // Shorter than the default expanded height: the default leaves a tall
+                        // gap under the icon row, which never collapses in a repo whose file
+                        // list fits on screen
+                        expandedHeight = 120.dp,
                         scrollBehavior = scrollBehavior
                     )
                 }
             }
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
+                // Icons beside the labels when every label fits next to its icon in a quarter of
+                // the width; text only otherwise (narrow phones, longer translations), so no
+                // label gets cut off and the tabs stay alike
+                val tabLabelStyle = MaterialTheme.typography.titleSmall
+                val textMeasurer = rememberTextMeasurer()
+                val density = LocalDensity.current
+                val tabWidth = with(density) { LocalWindowInfo.current.containerSize.width.toDp() } / tabs.size
+                val showTabIcons = tabs.all { tab ->
+                    val labelWidth = with(density) { textMeasurer.measure(tab.title, tabLabelStyle).size.width.toDp() }
+                    labelWidth + 18.dp + 6.dp + 8.dp <= tabWidth
+                }
                 PrimaryTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
                     tabs.forEachIndexed { index, tab ->
+                        // Icon beside the label rather than above it: a 48dp row instead of 72dp.
+                        // Built by hand because LeadingIconTab's padding cuts labels off on a phone
                         Tab(
                             selected = pagerState.currentPage == index,
                             onClick = {
                                 scope.launch { pagerState.animateScrollToPage(index) }
-                            },
-                            text = { Text(tab.title) },
-                            icon = { Icon(tab.icon, contentDescription = null) }
-                        )
+                            }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .height(48.dp)
+                                    .padding(horizontal = 4.dp)
+                            ) {
+                                if (showTabIcons) {
+                                    Icon(tab.icon, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text(
+                                    tab.title,
+                                    style = tabLabelStyle,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
                     }
                 }
 
