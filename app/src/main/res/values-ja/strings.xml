@@ -263,4 +263,12 @@
     <plurals name="toolbar_commit_count">
         <item quantity="other">コミット、変更されたファイルが %d 件</item>
     </plurals>
+    <string name="drawer_group_sync">同期</string>
+    <string name="drawer_group_changes">変更</string>
+    <string name="drawer_group_branches">ブランチ</string>
+    <string name="drawer_group_files">ファイル</string>
+    <string name="drawer_group_remotes">リモート</string>
+    <string name="drawer_group_repository">リポジトリ</string>
+    <string name="menu_submodule_update">サブモジュールを更新</string>
+    <string name="menu_delete_repo">リポジトリを削除</string>
 </resources>

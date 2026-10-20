@@ -266,4 +266,12 @@
         <item quantity="one">Commit, %d archivo modificado</item>
         <item quantity="other">Commit, %d archivos modificados</item>
     </plurals>
+    <string name="drawer_group_sync">Sincronizar</string>
+    <string name="drawer_group_changes">Cambios</string>
+    <string name="drawer_group_branches">Ramas</string>
+    <string name="drawer_group_files">Archivos</string>
+    <string name="drawer_group_remotes">Remotos</string>
+    <string name="drawer_group_repository">Repositorio</string>
+    <string name="menu_submodule_update">Actualizar submódulos</string>
+    <string name="menu_delete_repo">Eliminar repositorio</string>
 </resources>

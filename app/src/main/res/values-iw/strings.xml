@@ -257,4 +257,12 @@
     <item quantity="one">קומיט, קובץ אחד שהשתנה</item>
     <item quantity="other">קומיט, %d קבצים שהשתנו</item>
   </plurals>
+  <string name="drawer_group_sync">סנכרון</string>
+  <string name="drawer_group_changes">שינויים</string>
+  <string name="drawer_group_branches">ענפים</string>
+  <string name="drawer_group_files">קבצים</string>
+  <string name="drawer_group_remotes">מאגרים מרוחקים</string>
+  <string name="drawer_group_repository">מאגר</string>
+  <string name="menu_submodule_update">עדכון תת-מודולים</string>
+  <string name="menu_delete_repo">מחיקת המאגר</string>
 </resources>

@@ -264,4 +264,12 @@
     <plurals name="toolbar_commit_count">
         <item quantity="other">提交，%d 个文件已更改</item>
     </plurals>
+    <string name="drawer_group_sync">同步</string>
+    <string name="drawer_group_changes">更改</string>
+    <string name="drawer_group_branches">分支</string>
+    <string name="drawer_group_files">文件</string>
+    <string name="drawer_group_remotes">远程</string>
+    <string name="drawer_group_repository">仓库</string>
+    <string name="menu_submodule_update">更新子模块</string>
+    <string name="menu_delete_repo">删除仓库</string>
 </resources>

@@ -296,4 +296,12 @@
     <plurals name="toolbar_commit_count">
         <item quantity="other">إيداع، ملفات متغيرة: %d</item>
     </plurals>
+    <string name="drawer_group_sync">مزامنة</string>
+    <string name="drawer_group_changes">التغييرات</string>
+    <string name="drawer_group_branches">الفروع</string>
+    <string name="drawer_group_files">الملفات</string>
+    <string name="drawer_group_remotes">المستودعات البعيدة</string>
+    <string name="drawer_group_repository">المستودع</string>
+    <string name="menu_submodule_update">تحديث الوحدات الفرعية</string>
+    <string name="menu_delete_repo">حذف المستودع</string>
 </resources>

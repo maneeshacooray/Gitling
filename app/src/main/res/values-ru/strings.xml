@@ -273,4 +273,12 @@
         <item quantity="many">Коммит, %d изменённых файлов</item>
         <item quantity="other">Коммит, %d изменённого файла</item>
     </plurals>
+    <string name="drawer_group_sync">Синхронизация</string>
+    <string name="drawer_group_changes">Изменения</string>
+    <string name="drawer_group_branches">Ветки</string>
+    <string name="drawer_group_files">Файлы</string>
+    <string name="drawer_group_remotes">Удалённые</string>
+    <string name="drawer_group_repository">Репозиторий</string>
+    <string name="menu_submodule_update">Обновить подмодули</string>
+    <string name="menu_delete_repo">Удалить репозиторий</string>
 </resources>
