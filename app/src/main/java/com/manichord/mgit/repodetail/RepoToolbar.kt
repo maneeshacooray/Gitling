@@ -70,9 +70,10 @@ private enum class ForceConfirm { PULL, PUSH }
  * first, since they can overwrite work.
  *
  * Each button shows how much it has waiting ([counts]): commits to pull, commits to push, changed
- * files to commit. A count only appears when it's above zero. On a narrow screen or with a large
- * text size the counts can make the toolbar wider than the screen; then they're dropped and
- * screen readers still hear them.
+ * files to commit. A count only appears when it's above zero. The Commit button also says
+ * "Commit" when there's room. On a narrow screen or with a large text size the toolbar can be
+ * wider than the screen; then the word goes first, then the counts (screen readers still hear
+ * both).
  */
 @Composable
 fun RepoToolbar(
@@ -90,15 +91,16 @@ fun RepoToolbar(
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) { constraints ->
-        // Measure with counts at their natural width; without them if that doesn't fit
+        // Measure each level at its natural width and keep the first that fits; the last one
+        // (icons only) always takes the screen's width
         val natural = constraints.copy(minWidth = 0, maxWidth = Constraints.Infinity)
-        var placeables: List<Placeable> = subcompose(true) {
-            ToolbarContent(actions, counts, showCounts = true, onForcePull, onForcePush)
-        }.map { it.measure(natural) }
-        if (placeables.maxOf { it.width } > constraints.maxWidth) {
-            placeables = subcompose(false) {
-                ToolbarContent(actions, counts, showCounts = false, onForcePull, onForcePush)
-            }.map { it.measure(constraints.copy(minWidth = 0)) }
+        var placeables: List<Placeable> = emptyList()
+        for ((i, level) in toolbarLevels.withIndex()) {
+            val last = i == toolbarLevels.lastIndex
+            placeables = subcompose(level) {
+                ToolbarContent(actions, counts, level.showCounts, level.showCommitWord, onForcePull, onForcePush)
+            }.map { it.measure(if (last) constraints.copy(minWidth = 0) else natural) }
+            if (placeables.maxOf { it.width } <= constraints.maxWidth) break
         }
         val height = placeables.maxOf { it.height }
         layout(constraints.maxWidth, height) {
@@ -135,6 +137,15 @@ fun RepoToolbar(
 /** Space between Pull, Commit and Push, so the buttons read as three separate actions. */
 private val ToolbarItemGap = 6.dp
 
+/** What the toolbar shows, from the most to the least; it uses the first that fits. */
+private data class ToolbarLevel(val showCounts: Boolean, val showCommitWord: Boolean)
+
+private val toolbarLevels = listOf(
+    ToolbarLevel(showCounts = true, showCommitWord = true),
+    ToolbarLevel(showCounts = true, showCommitWord = false),
+    ToolbarLevel(showCounts = false, showCommitWord = false)
+)
+
 /** A count as shown on a button: big numbers don't need to be exact to say "a lot". */
 private fun countText(count: Int) = if (count > 99) "99+" else count.toString()
 
@@ -143,6 +154,7 @@ private fun ToolbarContent(
     actions: RepoToolbarActions,
     counts: RepoDetailViewModel.SyncCounts?,
     showCounts: Boolean,
+    showCommitWord: Boolean,
     onForcePull: () -> Unit,
     onForcePush: () -> Unit
 ) {
@@ -176,26 +188,33 @@ private fun ToolbarContent(
             } else {
                 stringResource(R.string.label_commit)
             }
-            if (showCounts && changes > 0) {
+            val showChangeCount = showCounts && changes > 0
+            if (showCommitWord || showChangeCount) {
                 Button(
                     onClick = actions.commit,
                     shapes = ButtonDefaults.shapes(),
-                    contentPadding = PaddingValues(start = 14.dp, end = 10.dp),
+                    contentPadding = PaddingValues(start = 14.dp, end = if (showChangeCount) 10.dp else 16.dp),
                     modifier = Modifier.semantics { contentDescription = commitLabel }
                 ) {
                     Icon(Icons.Default.Commit, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
-                    Spacer(Modifier.width(8.dp))
-                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.onPrimary) {
-                        Text(
-                            countText(changes),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            modifier = Modifier
-                                .defaultMinSize(minWidth = 24.dp)
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
+                    if (showCommitWord) {
+                        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                        Text(stringResource(R.string.label_commit), maxLines = 1)
+                    }
+                    if (showChangeCount) {
+                        Spacer(Modifier.width(8.dp))
+                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.onPrimary) {
+                            Text(
+                                countText(changes),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelLarge,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .defaultMinSize(minWidth = 24.dp)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                 }
             } else {
