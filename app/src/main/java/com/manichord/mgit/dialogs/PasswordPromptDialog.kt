@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,7 +82,7 @@ object PasswordPromptDialog {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             close()
                             callback.onClicked(username.text.toString(), password.text.toString(), savePassword)
                         }) {
@@ -87,7 +90,7 @@ object PasswordPromptDialog {
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             close()
                             callback.onCanceled()
                         }) {

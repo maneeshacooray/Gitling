@@ -53,7 +53,7 @@
     <string name="label_rename">Cambiar de nombre</string>
     <string name="label_send_feedback">Enviar Feedback</string>
     <string name="label_import">Importar</string>
-    <string name="label_push">Tirar</string>
+    <string name="label_push">Push</string>
     <string name="label_push_all">Tirar Todo</string>
     <string name="label_create">Creer</string>
     <string name="label_checkout">Checkout</string>
@@ -230,4 +230,48 @@
     <string name="dialog_import_done_modes">En esta copia se ignoran los permisos de archivo y los enlaces simbólicos.</string>
     <string name="dialog_import_done_skipped">Se omitieron algunos archivos fuera de la carpeta del repositorio.</string>
     <string name="toast_import_cancelled">Importación cancelada. No se ha importado nada.</string>
+    <string name="label_add_repository">Añadir repositorio</string>
+    <string name="label_close_menu">Cerrar menú</string>
+    <string name="label_menu_clone">Clonar repositorio</string>
+    <string name="label_menu_new_local">Nuevo repositorio local</string>
+    <string name="label_current_branch">Rama actual</string>
+    <string name="label_all_branches">Todas las ramas</string>
+    <plurals name="repo_count">
+        <item quantity="one">%d repositorio</item>
+        <item quantity="other">%d repositorios</item>
+    </plurals>
+    <string name="label_switch_branch">Cambiar de rama</string>
+    <string name="label_diff">Diff</string>
+    <string name="label_diff_staged">Cambios preparados</string>
+    <string name="label_diff_working_tree">Directorio de trabajo</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_pull_options">Opciones de pull</string>
+    <string name="label_push_options">Opciones de push</string>
+    <string name="menu_force_pull">Pull forzado</string>
+    <string name="menu_force_push">Push forzado</string>
+    <string name="menu_push_all">Hacer push de todas las ramas</string>
+    <string name="menu_choose_remote">Elegir remoto…</string>
+    <string name="dialog_force_pull_msg">Hacer pull de origin y restablecer esta rama a él. Se perderán los commits y cambios locales que no estén en el remoto.</string>
+    <string name="dialog_force_push_msg">Hacer push a origin y sobrescribir su rama con la tuya. Se perderán los commits del remoto que no tengas.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d commit nuevo en el remoto</item>
+        <item quantity="other">Pull, %d commits nuevos en el remoto</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d commit sin enviar</item>
+        <item quantity="other">Push, %d commits sin enviar</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d archivo modificado</item>
+        <item quantity="other">Commit, %d archivos modificados</item>
+    </plurals>
+    <string name="drawer_group_sync">Sincronizar</string>
+    <string name="drawer_group_changes">Cambios</string>
+    <string name="drawer_group_branches">Ramas</string>
+    <string name="drawer_group_files">Archivos</string>
+    <string name="drawer_group_remotes">Remotos</string>
+    <string name="drawer_group_repository">Repositorio</string>
+    <string name="menu_submodule_update">Actualizar submódulos</string>
+    <string name="menu_delete_repo">Eliminar repositorio</string>
 </resources>

@@ -231,4 +231,44 @@
     <string name="dialog_import_done_modes">このコピーではファイルのパーミッションとシンボリックリンクは無視されます。</string>
     <string name="dialog_import_done_skipped">リポジトリのフォルダ外にあった一部のファイルはスキップされました。</string>
     <string name="toast_import_cancelled">インポートをキャンセルしました。何もインポートされていません。</string>
+    <string name="label_add_repository">リポジトリを追加</string>
+    <string name="label_close_menu">メニューを閉じる</string>
+    <string name="label_menu_clone">リポジトリをクローン</string>
+    <string name="label_menu_new_local">新しいローカルリポジトリ</string>
+    <string name="label_current_branch">現在のブランチ</string>
+    <string name="label_all_branches">すべてのブランチ</string>
+    <plurals name="repo_count">
+        <item quantity="other">%d 個のリポジトリ</item>
+    </plurals>
+    <string name="label_switch_branch">ブランチを切り替え</string>
+    <string name="label_diff">差分</string>
+    <string name="label_diff_staged">ステージ済みの変更</string>
+    <string name="label_diff_working_tree">作業ツリー</string>
+    <string name="label_pull">プル</string>
+    <string name="label_commit">コミット</string>
+    <string name="label_pull_options">プルのオプション</string>
+    <string name="label_push_options">プッシュのオプション</string>
+    <string name="menu_force_pull">強制プル</string>
+    <string name="menu_force_push">強制プッシュ</string>
+    <string name="menu_push_all">すべてのブランチをプッシュ</string>
+    <string name="menu_choose_remote">リモートを選択…</string>
+    <string name="dialog_force_pull_msg">origin からプルしてこのブランチをそれにリセットします。リモートにないローカルのコミットと変更は失われます。</string>
+    <string name="dialog_force_push_msg">origin にプッシュしてそのブランチをあなたのもので上書きします。あなたが持っていないリモートのコミットは失われます。</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="other">プル、リモートに新しいコミットが %d 件</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="other">プッシュ、未プッシュのコミットが %d 件</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="other">コミット、変更されたファイルが %d 件</item>
+    </plurals>
+    <string name="drawer_group_sync">同期</string>
+    <string name="drawer_group_changes">変更</string>
+    <string name="drawer_group_branches">ブランチ</string>
+    <string name="drawer_group_files">ファイル</string>
+    <string name="drawer_group_remotes">リモート</string>
+    <string name="drawer_group_repository">リポジトリ</string>
+    <string name="menu_submodule_update">サブモジュールを更新</string>
+    <string name="menu_delete_repo">リポジトリを削除</string>
 </resources>

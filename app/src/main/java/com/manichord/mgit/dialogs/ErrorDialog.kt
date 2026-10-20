@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -65,7 +68,7 @@ class ErrorDialog : SheimiDialogFragment() {
                         title = { Text(title) },
                         text = { Text(message) },
                         confirmButton = {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 if (BuildConfig.DEBUG) {
                                     if (mThrowable != null) {
                                         Timber.e(mThrowable)

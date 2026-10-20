@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package me.sheimi.sgit.activities.explorer
 
+import androidx.compose.material3.ButtonDefaults
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,7 +93,7 @@ class PrivateKeyManageActivity(
                 title = { Text(getString(R.string.dialog_key_delete)) },
                 text = { Text("${getString(R.string.dialog_key_delete_msg)} $file") },
                 confirmButton = {
-                    TextButton(onClick = {
+                    TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                         FsUtils.deleteFile(file)
                         FsUtils.deleteFile(PrivateKeyUtils.getPublicKey(file))
                         showDeleteConfirm = false
@@ -99,7 +102,7 @@ class PrivateKeyManageActivity(
                     }) { Text(getString(R.string.label_delete)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteConfirm = false }) {
+                    TextButton(shapes = ButtonDefaults.shapes(), onClick = { showDeleteConfirm = false }) {
                         Text(getString(R.string.label_cancel))
                     }
                 }

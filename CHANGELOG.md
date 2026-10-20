@@ -5,6 +5,14 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.65 - 2026-10-20
+- A refreshed look built on Material 3 Expressive across the repo list, repo screen, settings and home screen widget.
+- Pull, Commit and Push are now one tap away on the repo screen, with counts of what's waiting to pull, push and commit.
+- The operations menu is grouped into sections and translated, with Delete repository set apart.
+- Fixed cloning, pulling and pushing over SSH with a username and password.
+- Fixed executable files showing as modified after moving repos to or from shared storage.
+- Fixed Diff in the operations menu not opening the Commits tab.
+
 ## 1.0.64 - 2026-10-19
 - Import an existing repository from a folder on your device or a ZIP file, for example to bring repos over from MGit.
 - The console now supports git submodule status, init and update.

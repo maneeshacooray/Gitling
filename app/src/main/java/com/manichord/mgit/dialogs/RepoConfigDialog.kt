@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -51,7 +54,7 @@ object RepoConfigDialog {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { close() }) {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = { close() }) {
                             Text(stringResource(R.string.label_done))
                         }
                     }

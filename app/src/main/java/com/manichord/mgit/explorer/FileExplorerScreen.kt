@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.explorer
 
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -134,12 +137,12 @@ fun FileListContent(
                 )
             },
             confirmButton = {
-                TextButton(onClick = submit) {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = submit) {
                     Text(stringResource(R.string.label_ok))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPathDialog = false }) {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = { showPathDialog = false }) {
                     Text(stringResource(R.string.label_cancel))
                 }
             }

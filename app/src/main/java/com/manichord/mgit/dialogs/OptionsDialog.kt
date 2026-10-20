@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -49,7 +52,7 @@ object OptionsDialog {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { close() }) { Text(cancelText) }
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = { close() }) { Text(cancelText) }
                     }
                 )
             }

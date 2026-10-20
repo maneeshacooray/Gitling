@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.repolist
 
 import androidx.compose.foundation.layout.*
@@ -35,7 +37,6 @@ fun CloneView(
     viewModel: CloneViewModel,
     onCloneClick: () -> Unit,
     onCancelClick: () -> Unit,
-    onImportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // The VM owns both values; they also change from outside the fields (a picked GitHub repo,
@@ -210,13 +211,13 @@ fun CloneView(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedButton(
+            OutlinedButton(shapes = ButtonDefaults.shapes(), 
                 onClick = onCancelClick,
                 modifier = Modifier.weight(1f).height(48.dp)
             ) {
                 Text(stringResource(id = R.string.label_cancel))
             }
-            Button(
+            Button(shapes = ButtonDefaults.shapes(), 
                 onClick = onCloneClick,
                 modifier = Modifier.weight(1f).height(48.dp)
             ) {
@@ -227,15 +228,6 @@ fun CloneView(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(
-            onClick = onImportClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(Icons.Default.FileOpen, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(id = R.string.label_import_repo))
-        }
     }
 }
 
@@ -267,7 +259,7 @@ fun GitHubRepoBrowser(
 
         if (isLoading) {
             Box(Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                LoadingIndicator()
             }
         } else {
             val filteredRepos = repos.filter {

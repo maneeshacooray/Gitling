@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package me.sheimi.sgit.activities
 
+import androidx.compose.material3.LoadingIndicator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,7 +15,6 @@ import android.webkit.WebView
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -91,11 +93,16 @@ class ViewFileActivity : SheimiFragmentActivity() {
         }
 
         val screenTitle = File(fileName).name
+        // The folder inside the repo, e.g. "app/src/main"; the repo name for a file at its root
+        val screenSubtitle = repo?.let { r ->
+            File(FsUtils.getRelativePath(File(fileName), r.dir)).parent ?: r.diaplayName
+        }
 
         setContent {
             AppTheme {
                 ViewFileScreen(
                     title = screenTitle,
+                    subtitle = screenSubtitle,
                     hasCommitsTab = commitsFragment != null,
                     hasBlameTab = repo != null,
                     activityMode = activityMode,
@@ -133,7 +140,7 @@ class ViewFileActivity : SheimiFragmentActivity() {
                                 modifier = Modifier.fillMaxSize()
                             )
                             if (isLoadingFile) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                LoadingIndicator(modifier = Modifier.align(Alignment.Center))
                             }
                         }
                     },

@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -47,7 +50,7 @@ object AddRemoteDialog {
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             try {
                                 repo.setRemote(name.text.toString(), url.text.toString())
                                 repo.updateRemote()
@@ -65,7 +68,7 @@ object AddRemoteDialog {
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { close() }) {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = { close() }) {
                             Text(stringResource(R.string.label_cancel))
                         }
                     }

@@ -37,7 +37,7 @@
     <string name="label_rename">Umbenennen</string>
     <string name="label_send_feedback">Feedback senden</string>
     <string name="label_import">Importieren</string>
-    <string name="label_push">Änderungen hochladen</string>
+    <string name="label_push">Push</string>
     <string name="label_push_all">Alle Änderungen hochladen</string>
     <string name="label_create">Erzeugen</string>
     <string name="label_checkout">Auschecken</string>
@@ -232,4 +232,48 @@
     <string name="dialog_import_done_modes">Dateiberechtigungen und symbolische Links werden in dieser Kopie ignoriert.</string>
     <string name="dialog_import_done_skipped">Einige Dateien außerhalb des Repository-Ordners wurden übersprungen.</string>
     <string name="toast_import_cancelled">Import abgebrochen. Es wurde nichts importiert.</string>
+    <string name="label_add_repository">Repository hinzufügen</string>
+    <string name="label_close_menu">Menü schließen</string>
+    <string name="label_menu_clone">Repository klonen</string>
+    <string name="label_menu_new_local">Neues lokales Repository</string>
+    <string name="label_current_branch">Aktueller Branch</string>
+    <string name="label_all_branches">Alle Branches</string>
+    <plurals name="repo_count">
+        <item quantity="one">%d Repository</item>
+        <item quantity="other">%d Repositorys</item>
+    </plurals>
+    <string name="label_switch_branch">Branch wechseln</string>
+    <string name="label_diff">Diff</string>
+    <string name="label_diff_staged">Vorgemerkte Änderungen</string>
+    <string name="label_diff_working_tree">Arbeitsverzeichnis</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_pull_options">Pull-Optionen</string>
+    <string name="label_push_options">Push-Optionen</string>
+    <string name="menu_force_pull">Force-Pull</string>
+    <string name="menu_force_push">Force-Push</string>
+    <string name="menu_push_all">Alle Branches pushen</string>
+    <string name="menu_choose_remote">Remote wählen…</string>
+    <string name="dialog_force_pull_msg">Von origin pullen und diesen Branch darauf zurücksetzen. Lokale Commits und Änderungen, die nicht auf dem Remote sind, gehen verloren.</string>
+    <string name="dialog_force_push_msg">Zu origin pushen und dessen Branch mit deinem überschreiben. Commits auf dem Remote, die du nicht hast, gehen verloren.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d neuer Commit auf dem Remote</item>
+        <item quantity="other">Pull, %d neue Commits auf dem Remote</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d Commit noch nicht gepusht</item>
+        <item quantity="other">Push, %d Commits noch nicht gepusht</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d geänderte Datei</item>
+        <item quantity="other">Commit, %d geänderte Dateien</item>
+    </plurals>
+    <string name="drawer_group_sync">Synchronisieren</string>
+    <string name="drawer_group_changes">Änderungen</string>
+    <string name="drawer_group_branches">Branches</string>
+    <string name="drawer_group_files">Dateien</string>
+    <string name="drawer_group_remotes">Remotes</string>
+    <string name="drawer_group_repository">Repository</string>
+    <string name="menu_submodule_update">Submodule aktualisieren</string>
+    <string name="menu_delete_repo">Repository löschen</string>
 </resources>

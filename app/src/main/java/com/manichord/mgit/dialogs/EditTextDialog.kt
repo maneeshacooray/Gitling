@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -66,7 +69,7 @@ object EditTextDialog {
                         )
                     },
                     confirmButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             if (text.text.isBlank()) {
                                 showError = true
                             } else {
@@ -78,7 +81,7 @@ object EditTextDialog {
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { close() }) { Text(cancelText) }
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = { close() }) { Text(cancelText) }
                     }
                 )
             }

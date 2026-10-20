@@ -32,7 +32,16 @@ class RepoListViewModel(application: Application) : AndroidViewModel(application
         // Covers users who already had "Make repos visible to other apps" on before the .nomedia
         // marker existed, so they get it without having to toggle the setting.
         val sharedMedia = PreferenceHelper(getApplication()).useSharedMediaStorage()
-        Thread { Repo.syncNoMediaMarker(sharedMedia) }.start()
+        val app = getApplication<Application>()
+        Thread {
+            Repo.syncNoMediaMarker(sharedMedia)
+            // Fixes repos moved between storage roots by older versions (see
+            // Repo.ignoreFileModeAndSymlinks)
+            if (!Profile.getFileModeMigrationDone(app)) {
+                Repo.ignoreFileModeInAllRepos(app)
+                Profile.setFileModeMigrationDone(app)
+            }
+        }.start()
         RepoDbManager.registerDbObserver(RepoContract.RepoEntry.TABLE_NAME, this)
         refreshRepoList()
         _showStorageMigrationNotice.value = Profile.getPendingStorageMigrationNotice(getApplication())

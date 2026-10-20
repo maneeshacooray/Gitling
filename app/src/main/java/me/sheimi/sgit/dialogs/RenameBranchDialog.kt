@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package me.sheimi.sgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -70,7 +73,7 @@ class RenameBranchDialog : DialogFragment() {
                             )
                         },
                         confirmButton = {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 val newName = branchName.text.toString().trim()
                                 if (newName.isEmpty()) {
                                     errorRes = R.string.alert_new_branchname_required
@@ -97,7 +100,7 @@ class RenameBranchDialog : DialogFragment() {
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = { dismiss() }) {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = { dismiss() }) {
                                 Text(stringResource(R.string.label_cancel))
                             }
                         }

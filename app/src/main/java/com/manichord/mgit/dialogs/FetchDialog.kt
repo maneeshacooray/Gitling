@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,13 +71,13 @@ object FetchDialog {
                     },
                     confirmButton = {
                         Row {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 close()
                                 fetch(remotes)
                             }) {
                                 Text(stringResource(R.string.dialog_fetch_all_button))
                             }
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 close()
                                 fetch(remotes.filter { checked.value[it] == true }.toTypedArray())
                             }) {
@@ -83,7 +86,7 @@ object FetchDialog {
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { close() }) {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = { close() }) {
                             Text(stringResource(android.R.string.cancel))
                         }
                     }

@@ -1,5 +1,6 @@
 package me.sheimi.sgit.fragments
 
+import androidx.compose.runtime.Composable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,11 +42,19 @@ class StatusFragment : RepoDetailFragment() {
     private var unstagedFiles by mutableStateOf(emptyList<StatusFileEntry>())
     private var conflictingFiles by mutableStateOf(emptyList<String>())
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    /** Compose state: true once [setUp] has run, so [Content] knows the fragment is ready. */
+    private var isSetUp by mutableStateOf(false)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setUp(savedInstanceState)
+    }
+
+    /** The fragment's non-view setup, done once. The repo screen hosts this fragment headless and
+     * draws [Content] in its own composition (so scrolling reaches its collapsing top bar); the
+     * file viewer still hosts it as a view, through [onCreateView]. */
+    private fun setUp(savedInstanceState: Bundle?) {
+        if (isSetUp) return
         // Safe call, not repoDetailActivity (a non-null-typed Java getter) -- on an Activity
         // relaunch (e.g. certain config changes Android doesn't hand to onConfigurationChanged),
         // FragmentManager restores previously-shown fragments during onStart(), before Compose's
@@ -55,30 +64,48 @@ class StatusFragment : RepoDetailFragment() {
 
         repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
             ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)
-        val repo = repo ?: return ComposeView(requireContext())
+        val repo = repo ?: return
         this.repo = repo
 
         reset()
+        isSetUp = true
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setUp(savedInstanceState)
+        // Added headless (no container): the repo screen draws Content() itself
+        if (container == null) return null
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    StatusScreen(
-                        isLoading = isLoading,
-                        isClean = isClean,
-                        stagedFiles = stagedFiles,
-                        unstagedFiles = unstagedFiles,
-                        conflictingFiles = conflictingFiles,
-                        onStageFile = { path -> stageFile(path) },
-                        onUnstageFile = { path -> unstageFile(path) },
-                        onStageAll = { stageAll() },
-                        onUnstageAll = { unstageAll() },
-                        onViewStagedDiff = { showDiff("HEAD", "dircache") },
-                        onViewUnstagedDiff = { showDiff("dircache", "filetree") }
-                    )
+                    // Qualified: inside ComposeView.apply, a bare Content() is the view's own
+                    // Content(), which recurses
+                    this@StatusFragment.Content()
                 }
             }
         }
+    }
+
+    @Composable
+    fun Content() {
+        if (!isSetUp) return
+        StatusScreen(
+            isLoading = isLoading,
+            isClean = isClean,
+            stagedFiles = stagedFiles,
+            unstagedFiles = unstagedFiles,
+            conflictingFiles = conflictingFiles,
+            onStageFile = { path -> stageFile(path) },
+            onUnstageFile = { path -> unstageFile(path) },
+            onStageAll = { stageAll() },
+            onUnstageAll = { unstageAll() },
+            onViewStagedDiff = { showDiff("HEAD", "dircache") },
+            onViewUnstagedDiff = { showDiff("dircache", "filetree") }
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

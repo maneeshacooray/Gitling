@@ -62,10 +62,22 @@ class CommitDiffActivity(
     var isLoading by mutableStateOf(true)
     private var webView: WebView? = null
 
-    val screenTitle: String = run {
-        var title = Repo.getCommitDisplayName(newCommit)
-        oldCommit?.let { title += " : " + Repo.getCommitDisplayName(it) }
-        mainActivity.getString(R.string.title_activity_commit_diff) + title
+    val screenTitle: String = mainActivity.getString(R.string.label_diff)
+
+    /** What is compared, oldest first: "HEAD → Staged changes", "a1b2c3d → e4f5a6b", or just the
+     * commit when it is compared with its parent. */
+    val screenSubtitle: String = run {
+        val new = displayName(newCommit)
+        oldCommit?.let { "${displayName(it)} \u2192 $new" } ?: new
+    }
+
+    private fun displayName(ref: String): String = when (ref) {
+        // Pseudo refs StatusFragment passes for the index and the working tree
+        "dircache" -> mainActivity.getString(R.string.label_diff_staged)
+        "filetree" -> mainActivity.getString(R.string.label_diff_working_tree)
+        else -> Repo.getCommitDisplayName(ref).let { name ->
+            if (name.length == 40 && name.all { it.isLetterOrDigit() }) name.take(7) else name
+        }
     }
 
     fun setupWebView(view: WebView) {

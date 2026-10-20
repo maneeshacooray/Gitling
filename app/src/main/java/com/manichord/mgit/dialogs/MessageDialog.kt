@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.content.DialogInterface
 import android.view.ViewGroup
 import androidx.compose.material3.AlertDialog
@@ -47,7 +50,7 @@ object MessageDialog {
                     title = { Text(title) },
                     text = { Text(message) },
                     confirmButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             close()
                             positiveListener.onClick(noOpDialogInterface, DialogInterface.BUTTON_POSITIVE)
                         }) {
@@ -55,7 +58,7 @@ object MessageDialog {
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             close()
                             negativeListener.onClick(noOpDialogInterface, DialogInterface.BUTTON_NEGATIVE)
                         }) {
@@ -86,7 +89,7 @@ object MessageDialog {
                     title = { Text(title) },
                     text = { Text(message) },
                     confirmButton = {
-                        TextButton(onClick = {
+                        TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                             close()
                             positiveListener.onClick(noOpDialogInterface, DialogInterface.BUTTON_POSITIVE)
                         }) {

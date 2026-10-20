@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.ssh
 
+import androidx.compose.material3.ButtonDefaults
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -93,7 +96,7 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
                             }
                         },
                         confirmButton = {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 val newFilename = filename.text.toString().trim()
                                 val size = keySize.text.toString().toIntOrNull() ?: 0
                                 when {
@@ -126,7 +129,7 @@ class PrivateKeyGenerate : SheimiDialogFragment() {
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = { dismiss() }) {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = { dismiss() }) {
                                 Text(stringResource(R.string.label_cancel))
                             }
                         }

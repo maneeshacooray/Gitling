@@ -40,6 +40,7 @@ const val TAG_MODE_SSH_KEY: Short = 1
 @Composable
 fun ViewFileScreen(
     title: String,
+    subtitle: String?,
     hasCommitsTab: Boolean,
     hasBlameTab: Boolean,
     activityMode: Short,
@@ -84,6 +85,7 @@ fun ViewFileScreen(
                 var showOverflow by remember { mutableStateOf(false) }
                 TopAppBar(
                     title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    subtitle = { subtitle?.let { Text(it, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

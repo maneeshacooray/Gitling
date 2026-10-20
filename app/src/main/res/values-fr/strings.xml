@@ -231,4 +231,48 @@
     <string name="dialog_import_done_modes">Les permissions de fichiers et les liens symboliques sont ignorés dans cette copie.</string>
     <string name="dialog_import_done_skipped">Certains fichiers hors du dossier du dépôt ont été ignorés.</string>
     <string name="toast_import_cancelled">Importation annulée. Rien n\'a été importé.</string>
+    <string name="label_add_repository">Ajouter un dépôt</string>
+    <string name="label_close_menu">Fermer le menu</string>
+    <string name="label_menu_clone">Cloner un dépôt</string>
+    <string name="label_menu_new_local">Nouveau dépôt local</string>
+    <string name="label_current_branch">Branche actuelle</string>
+    <string name="label_all_branches">Toutes les branches</string>
+    <plurals name="repo_count">
+        <item quantity="one">%d dépôt</item>
+        <item quantity="other">%d dépôts</item>
+    </plurals>
+    <string name="label_switch_branch">Changer de branche</string>
+    <string name="label_diff">Diff</string>
+    <string name="label_diff_staged">Modifications indexées</string>
+    <string name="label_diff_working_tree">Arbre de travail</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Commit</string>
+    <string name="label_pull_options">Options de pull</string>
+    <string name="label_push_options">Options de push</string>
+    <string name="menu_force_pull">Pull forcé</string>
+    <string name="menu_force_push">Push forcé</string>
+    <string name="menu_push_all">Pousser toutes les branches</string>
+    <string name="menu_choose_remote">Choisir le dépôt distant…</string>
+    <string name="dialog_force_pull_msg">Récupérer depuis origin et réinitialiser cette branche dessus. Les commits et modifications locaux absents du dépôt distant seront perdus.</string>
+    <string name="dialog_force_push_msg">Pousser vers origin et écraser sa branche avec la vôtre. Les commits du dépôt distant que vous n\'avez pas seront perdus.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d nouveau commit sur le dépôt distant</item>
+        <item quantity="other">Pull, %d nouveaux commits sur le dépôt distant</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d commit pas encore poussé</item>
+        <item quantity="other">Push, %d commits pas encore poussés</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Commit, %d fichier modifié</item>
+        <item quantity="other">Commit, %d fichiers modifiés</item>
+    </plurals>
+    <string name="drawer_group_sync">Synchronisation</string>
+    <string name="drawer_group_changes">Modifications</string>
+    <string name="drawer_group_branches">Branches</string>
+    <string name="drawer_group_files">Fichiers</string>
+    <string name="drawer_group_remotes">Dépôts distants</string>
+    <string name="drawer_group_repository">Dépôt</string>
+    <string name="menu_submodule_update">Mettre à jour les sous-modules</string>
+    <string name="menu_delete_repo">Supprimer le dépôt</string>
 </resources>

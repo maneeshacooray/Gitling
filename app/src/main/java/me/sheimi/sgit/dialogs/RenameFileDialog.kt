@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package me.sheimi.sgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -69,7 +72,7 @@ class RenameFileDialog : SheimiDialogFragment() {
                             )
                         },
                         confirmButton = {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 val newFilename = filename.text.toString().trim()
                                 val parent = fromFile.parentFile
                                 when {
@@ -92,6 +95,7 @@ class RenameFileDialog : SheimiDialogFragment() {
                                         // navigates back to the repo root rather than staying in
                                         // the current directory, which would be surprising here.
                                         activity.getFilesFragment()?.setCurrentDir(parent)
+                                        activity.viewModel.refreshSyncCounts(activity.repo)
                                         dismiss()
                                     }
                                 }
@@ -100,7 +104,7 @@ class RenameFileDialog : SheimiDialogFragment() {
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = { dismiss() }) {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = { dismiss() }) {
                                 Text(stringResource(R.string.label_cancel))
                             }
                         }

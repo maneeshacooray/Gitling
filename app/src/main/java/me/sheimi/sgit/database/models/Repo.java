@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.util.SparseArray;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.errors.ConfigInvalidException;
+import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
@@ -649,11 +652,13 @@ public class Repo implements Comparable<Repo>, Serializable {
             try {
                 moveRepoDir(oldDir, newDir);
                 moved.add(new File[]{oldDir, newDir});
+                ignoreFileModeAndSymlinks(newDir);
             } catch (IOException e) {
                 Timber.e(e, "Failed to move repo %s from %s to %s", repo.mLocalPath, oldDir, newDir);
                 for (File[] pair : moved) {
                     try {
                         moveRepoDir(pair[1], pair[0]);
+                        ignoreFileModeAndSymlinks(pair[0]);
                     } catch (IOException back) {
                         Timber.e(back, "Failed to move %s back to %s", pair[1], pair[0]);
                     }
@@ -662,6 +667,52 @@ public class Repo implements Comparable<Repo>, Serializable {
             }
         }
         return null;
+    }
+
+    /**
+     * Turns off core.filemode and core.symlinks in the repo at {@code repoDir}. Moving a repo
+     * between the private and shared roots copies it (they're different mounts), and the copy
+     * keeps neither executable bits nor symbolic links; shared storage can't hold them at all. A
+     * repo cloned into private storage gets core.filemode = true there, so after a move every
+     * executable file showed as modified. Off, git ignores the difference and keeps the modes
+     * recorded in the index, which is how repos cloned into shared storage already are. File
+     * modes can still be changed through the index ("Make executable").
+     *
+     * @return true if either setting had to be turned off
+     */
+    public static boolean ignoreFileModeAndSymlinks(File repoDir) {
+        try {
+            FileBasedConfig config = new FileBasedConfig(new File(repoDir, DOT_GIT_DIR + "/config"), FS.DETECTED);
+            config.load();
+            boolean fileMode = config.getBoolean("core", null, "filemode", true);
+            boolean symlinks = config.getBoolean("core", null, "symlinks", true);
+            if (!fileMode && !symlinks) {
+                return false;
+            }
+            config.setBoolean("core", null, "filemode", false);
+            config.setBoolean("core", null, "symlinks", false);
+            config.save();
+            return true;
+        } catch (IOException | ConfigInvalidException e) {
+            Timber.e(e, "Could not update the git config in %s", repoDir);
+            return false;
+        }
+    }
+
+    /** One-time pass applying {@link #ignoreFileModeAndSymlinks} to every repo, for repos moved
+     * between roots before the move did it: those show executable files as modified until it
+     * runs. Does disk I/O, so call it off the main thread. */
+    public static void ignoreFileModeInAllRepos(Context context) {
+        Cursor cursor = RepoDbManager.queryAllRepo();
+        List<Repo> repos = getRepoList(context, cursor);
+        cursor.close();
+        PreferenceHelper prefs = ((MGitApplication) context.getApplicationContext()).getPrefenceHelper();
+        for (Repo repo : repos) {
+            File dir = getDir(prefs, repo.mLocalPath);
+            if (new File(dir, DOT_GIT_DIR).isDirectory() && ignoreFileModeAndSymlinks(dir)) {
+                Timber.i("Turned off core.filemode and core.symlinks in %s", dir);
+            }
+        }
     }
 
     /** Rename when possible, otherwise copy then delete. Unlike commons-io's moveDirectory, a

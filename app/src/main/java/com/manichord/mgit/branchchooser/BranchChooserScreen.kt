@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.branchchooser
 
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +35,7 @@ fun BranchChooserScreen(
 ) {
     val branches by viewModel.branches.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val repo by viewModel.repo.observeAsState()
     val currentFilter by viewModel.filter.observeAsState(BranchChooserViewModel.BranchFilter.ALL)
 
     var showOptionsSheet by remember { mutableStateOf<BranchChooserViewModel.BranchItem?>(null) }
@@ -40,7 +44,8 @@ fun BranchChooserScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.dialog_choose_branch_title), fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.dialog_choose_branch_title)) },
+                subtitle = { repo?.diaplayName?.let { Text(it, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -66,7 +71,7 @@ fun BranchChooserScreen(
 
             Box(modifier = Modifier.fillMaxSize()) {
                 if (isLoading && branches.isEmpty()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    LoadingIndicator(modifier = Modifier.align(Alignment.Center))
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(branches) { item ->

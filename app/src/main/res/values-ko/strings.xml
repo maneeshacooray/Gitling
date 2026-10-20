@@ -49,7 +49,7 @@
     <string name="label_rename">수정</string>
     <string name="label_send_feedback">피드백 전송</string>
     <string name="label_import">불러오기</string>
-    <string name="label_push">선택</string>
+    <string name="label_push">푸시</string>
     <string name="label_push_all">모두 선택</string>
     <string name="label_create">생성</string>
     <string name="label_checkout">Checkout</string>
@@ -214,4 +214,44 @@
     <string name="dialog_import_done_modes">이 복사본에서는 파일 권한과 심볼릭 링크가 무시됩니다.</string>
     <string name="dialog_import_done_skipped">저장소 폴더 밖에 있던 일부 파일은 건너뛰었습니다.</string>
     <string name="toast_import_cancelled">가져오기를 취소했습니다. 아무것도 가져오지 않았습니다.</string>
+    <string name="label_add_repository">저장소 추가</string>
+    <string name="label_close_menu">메뉴 닫기</string>
+    <string name="label_menu_clone">저장소 클론</string>
+    <string name="label_menu_new_local">새 로컬 저장소</string>
+    <string name="label_current_branch">현재 브랜치</string>
+    <string name="label_all_branches">모든 브랜치</string>
+    <plurals name="repo_count">
+        <item quantity="other">저장소 %d개</item>
+    </plurals>
+    <string name="label_switch_branch">브랜치 전환</string>
+    <string name="label_diff">Diff</string>
+    <string name="label_diff_staged">스테이징된 변경사항</string>
+    <string name="label_diff_working_tree">작업 트리</string>
+    <string name="label_pull">풀</string>
+    <string name="label_commit">커밋</string>
+    <string name="label_pull_options">풀 옵션</string>
+    <string name="label_push_options">푸시 옵션</string>
+    <string name="menu_force_pull">강제 풀</string>
+    <string name="menu_force_push">강제 푸시</string>
+    <string name="menu_push_all">모든 브랜치 푸시</string>
+    <string name="menu_choose_remote">원격 선택…</string>
+    <string name="dialog_force_pull_msg">origin에서 풀하고 이 브랜치를 그 상태로 재설정합니다. 원격에 없는 로컬 커밋과 변경사항은 사라집니다.</string>
+    <string name="dialog_force_push_msg">origin에 푸시하고 그 브랜치를 내 것으로 덮어씁니다. 내게 없는 원격 커밋은 사라집니다.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="other">풀, 원격에 새 커밋 %d개</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="other">푸시, 푸시하지 않은 커밋 %d개</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="other">커밋, 변경된 파일 %d개</item>
+    </plurals>
+    <string name="drawer_group_sync">동기화</string>
+    <string name="drawer_group_changes">변경사항</string>
+    <string name="drawer_group_branches">브랜치</string>
+    <string name="drawer_group_files">파일</string>
+    <string name="drawer_group_remotes">원격</string>
+    <string name="drawer_group_repository">저장소</string>
+    <string name="menu_submodule_update">서브모듈 업데이트</string>
+    <string name="menu_delete_repo">저장소 삭제</string>
 </resources>

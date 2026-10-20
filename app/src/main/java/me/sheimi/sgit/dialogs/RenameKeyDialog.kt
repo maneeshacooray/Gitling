@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package me.sheimi.sgit.dialogs
 
+import androidx.compose.material3.ButtonDefaults
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -62,7 +65,7 @@ class RenameKeyDialog : SheimiDialogFragment() {
                             )
                         },
                         confirmButton = {
-                            TextButton(onClick = {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = {
                                 val newFilename = filename.text.toString().trim()
                                 when {
                                     newFilename.isEmpty() -> {
@@ -91,7 +94,7 @@ class RenameKeyDialog : SheimiDialogFragment() {
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = { dismiss() }) {
+                            TextButton(shapes = ButtonDefaults.shapes(), onClick = { dismiss() }) {
                                 Text(stringResource(R.string.label_cancel))
                             }
                         }

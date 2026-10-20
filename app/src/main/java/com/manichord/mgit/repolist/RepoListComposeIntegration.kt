@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.repolist
 
 import androidx.compose.foundation.clickable
@@ -120,9 +122,16 @@ fun RepoListComposeContent(
                 }
             },
             onCloneClick = {
+                cloneViewModel.initLocal.value = false
                 cloneViewModel.refreshCloneLocation()
                 showCloneSheet = true
             },
+            onInitLocalClick = {
+                cloneViewModel.initLocal.value = true
+                cloneViewModel.refreshCloneLocation()
+                showCloneSheet = true
+            },
+            onImportClick = { importRepoViewModel.start() },
             onSettingsClick = {
                 (activity as MainActivity).openUserSettings()
             },
@@ -149,11 +158,6 @@ fun RepoListComposeContent(
                     onCancelClick = {
                         showCloneSheet = false
                         onCancelCloneViewClick()
-                    },
-                    onImportClick = {
-                        showCloneSheet = false
-                        onCancelCloneViewClick()
-                        importRepoViewModel.start()
                     }
                 )
             }
@@ -249,7 +253,7 @@ fun RepoListComposeContent(
                     )
                 },
                 confirmButton = {
-                    TextButton(onClick = { viewModel.dismissStorageMigrationNotice() }) {
+                    TextButton(shapes = ButtonDefaults.shapes(), onClick = { viewModel.dismissStorageMigrationNotice() }) {
                         Text(stringResource(R.string.label_ok))
                     }
                 }
@@ -301,7 +305,7 @@ private fun RepoOptionsDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
         }
     )
 }
@@ -368,10 +372,10 @@ private fun TagEditorDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(selected) }) { Text("OK") }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = { onConfirm(selected) }) { Text("OK") }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
         }
     )
 }
@@ -394,12 +398,12 @@ private fun RenameRepoDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(name.text.toString()) }, enabled = name.text.isNotBlank()) {
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = { onConfirm(name.text.toString()) }, enabled = name.text.isNotBlank()) {
                 Text(stringResource(R.string.label_rename))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
         }
     )
 }
@@ -415,10 +419,10 @@ private fun DeleteRepoDialog(
         title = { Text(stringResource(R.string.dialog_delete_repo_title)) },
         text = { Text(stringResource(R.string.dialog_delete_repo_msg)) },
         confirmButton = {
-            TextButton(onClick = onConfirm) { Text(stringResource(R.string.label_delete)) }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onConfirm) { Text(stringResource(R.string.label_delete)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismissRequest) { Text(stringResource(R.string.label_cancel)) }
         }
     )
 }

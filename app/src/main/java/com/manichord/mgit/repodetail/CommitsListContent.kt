@@ -20,11 +20,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import me.sheimi.sgit.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +58,7 @@ sealed class CommitRowState {
     data class Item(val position: Int, val commit: RevCommit, val selected: Boolean) : CommitRowState()
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CommitsListContent(
     rows: List<CommitRowState>,
@@ -63,23 +77,7 @@ fun CommitsListContent(
 
     Column(modifier = modifier.fillMaxSize()) {
         if (showBranchScopeToggle) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                FilterChip(
-                    selected = !allBranches,
-                    onClick = { onAllBranchesChange(false) },
-                    label = { Text("Current branch") }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                FilterChip(
-                    selected = allBranches,
-                    onClick = { onAllBranchesChange(true) },
-                    label = { Text("All branches") }
-                )
-            }
+            BranchScopeToggle(allBranches = allBranches, onAllBranchesChange = onAllBranchesChange)
         }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(
@@ -92,7 +90,7 @@ fun CommitsListContent(
                             modifier = Modifier.fillMaxWidth().padding(32.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator()
+                            LoadingIndicator()
                         }
                     }
                     is CommitRowState.Item -> {
@@ -212,7 +210,7 @@ private fun CommitRow(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = commit.shortMessage,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMediumEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -293,5 +291,41 @@ private fun RefChip(ref: Ref) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
         )
+    }
+}
+
+/** "Current branch" / "All branches" as one connected button group: the two options are one
+ * choice, and the selected side fills and takes a check mark. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BranchScopeToggle(allBranches: Boolean, onAllBranchesChange: (Boolean) -> Unit) {
+    val options = listOf(R.string.label_current_branch to false, R.string.label_all_branches to true)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    ) {
+        options.forEachIndexed { index, (label, all) ->
+            val checked = allBranches == all
+            ToggleButton(
+                checked = checked,
+                onCheckedChange = { onAllBranchesChange(all) },
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { role = Role.RadioButton },
+                shapes = if (index == 0) {
+                    ButtonGroupDefaults.connectedLeadingButtonShapes()
+                } else {
+                    ButtonGroupDefaults.connectedTrailingButtonShapes()
+                }
+            ) {
+                if (checked) {
+                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(ToggleButtonDefaults.IconSize))
+                    Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                }
+                Text(stringResource(label), maxLines = 1)
+            }
+        }
     }
 }

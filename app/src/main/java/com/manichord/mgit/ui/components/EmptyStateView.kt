@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.ui.components
 
 import androidx.compose.foundation.layout.*
@@ -65,7 +67,7 @@ fun EmptyStateView(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
+        Button(shapes = ButtonDefaults.shapes(), 
             onClick = onActionClick,
             modifier = Modifier.height(56.dp),
             contentPadding = PaddingValues(horizontal = 24.dp)
@@ -78,7 +80,7 @@ fun EmptyStateView(
         if (!isGitHubConnected) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedButton(onClick = onConnectGitHubClick) {
+            OutlinedButton(shapes = ButtonDefaults.shapes(), onClick = onConnectGitHubClick) {
                 Text("Connect with GitHub")
             }
         }

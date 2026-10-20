@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.repodetail
 
 import androidx.compose.foundation.background
@@ -102,7 +104,7 @@ fun GitConsoleScreen(
             if (running) {
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                        LoadingIndicator(modifier = Modifier.size(24.dp))
                         Spacer(Modifier.width(8.dp))
                         Text("running…", fontFamily = FontFamily.Monospace, fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)

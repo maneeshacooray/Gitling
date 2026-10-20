@@ -165,6 +165,17 @@ public class Profile {
         getProfileSharedPreference(context).edit().putBoolean(key, pending).apply();
     }
 
+    /** Set once Repo.ignoreFileModeInAllRepos() has run, so it only runs once. */
+    public static boolean getFileModeMigrationDone(Context context) {
+        String key = context.getString(R.string.pref_key_file_mode_migration_done);
+        return getProfileSharedPreference(context).getBoolean(key, false);
+    }
+
+    public static void setFileModeMigrationDone(Context context) {
+        String key = context.getString(R.string.pref_key_file_mode_migration_done);
+        getProfileSharedPreference(context).edit().putBoolean(key, true).apply();
+    }
+
     public static boolean getGitHubBannerDismissed(Context context) {
         String key = context.getString(R.string.pref_key_github_banner_dismissed);
         return getProfileSharedPreference(context).getBoolean(key, false);

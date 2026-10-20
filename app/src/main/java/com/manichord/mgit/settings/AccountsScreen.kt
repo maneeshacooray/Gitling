@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+
 package com.manichord.mgit.settings
 
 import android.content.Intent
@@ -41,7 +43,7 @@ fun AccountsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Managed Accounts", fontWeight = FontWeight.Bold) },
+                title = { Text("Managed Accounts") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -122,7 +124,7 @@ fun AccountsScreen(
                 Text("Remove \"${account.name}\"? This will not revoke the token on ${account.type.displayName}.")
             },
             confirmButton = {
-                Button(
+                Button(shapes = ButtonDefaults.shapes(), 
                     onClick = {
                         viewModel.deleteAccount(account.id)
                         accountToDelete = null
@@ -131,7 +133,7 @@ fun AccountsScreen(
                 ) { Text("Remove") }
             },
             dismissButton = {
-                TextButton(onClick = { accountToDelete = null }) {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = { accountToDelete = null }) {
                     Text(stringResource(R.string.label_cancel))
                 }
             }
@@ -163,7 +165,7 @@ private fun GitHubAuthStatusBanner(
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (inProgress) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    LoadingIndicator(modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(12.dp))
                 }
                 Text(
@@ -174,7 +176,7 @@ private fun GitHubAuthStatusBanner(
             }
             if (!inProgress && message != null) {
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                     Text("Dismiss")
                 }
             }
@@ -213,7 +215,7 @@ private fun EmptyAccountsState(
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(8.dp))
-        Button(
+        Button(shapes = ButtonDefaults.shapes(), 
             onClick = onLoginWithGitHub,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -221,7 +223,7 @@ private fun EmptyAccountsState(
             Spacer(Modifier.width(8.dp))
             Text("Connect with GitHub")
         }
-        OutlinedButton(
+        OutlinedButton(shapes = ButtonDefaults.shapes(), 
             onClick = onAddManually,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -328,7 +330,7 @@ fun AddAccountDialog(
                         AccountType.GITLAB -> "https://gitlab.com/-/user_settings/personal_access_tokens"
                         else -> "https://bitbucket.org/account/settings/app-passwords/new"
                     }
-                    TextButton(
+                    TextButton(shapes = ButtonDefaults.shapes(), 
                         onClick = {
                             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(tokenUrl)))
                         },
@@ -371,7 +373,7 @@ fun AddAccountDialog(
             }
         },
         confirmButton = {
-            Button(
+            Button(shapes = ButtonDefaults.shapes(), 
                 onClick = {
                     val customUrlMissing = type == AccountType.CUSTOM && baseUrl.text.isBlank()
                     if (name.text.isBlank() || username.text.isBlank() || token.text.isBlank() || customUrlMissing) {
@@ -391,7 +393,7 @@ fun AddAccountDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(shapes = ButtonDefaults.shapes(), onClick = onDismiss) {
                 Text(stringResource(R.string.label_cancel))
             }
         }
