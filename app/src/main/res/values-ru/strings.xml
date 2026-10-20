@@ -245,4 +245,40 @@
     <string name="label_diff">Diff</string>
     <string name="label_diff_staged">Индексированные изменения</string>
     <string name="label_diff_working_tree">Рабочая копия</string>
+    <string name="label_pull">Pull</string>
+    <string name="label_commit">Коммит</string>
+    <string name="label_pull_options">Параметры pull</string>
+    <string name="label_push_options">Параметры push</string>
+    <string name="menu_force_pull">Принудительный pull</string>
+    <string name="menu_force_push">Принудительный push</string>
+    <string name="menu_push_all">Отправить все ветки</string>
+    <string name="menu_choose_remote">Выбрать удалённый…</string>
+    <string name="dialog_force_pull_msg">Получить изменения из origin и сбросить эту ветку к ним. Локальные коммиты и изменения, которых нет на удалённом, будут потеряны.</string>
+    <string name="dialog_force_push_msg">Отправить в origin и перезаписать его ветку вашей. Коммиты на удалённом, которых у вас нет, будут потеряны.</string>
+    <plurals name="toolbar_pull_count">
+        <item quantity="one">Pull, %d новый коммит на удалённом</item>
+        <item quantity="few">Pull, %d новых коммита на удалённом</item>
+        <item quantity="many">Pull, %d новых коммитов на удалённом</item>
+        <item quantity="other">Pull, %d новых коммита на удалённом</item>
+    </plurals>
+    <plurals name="toolbar_push_count">
+        <item quantity="one">Push, %d коммит ещё не отправлен</item>
+        <item quantity="few">Push, %d коммита ещё не отправлены</item>
+        <item quantity="many">Push, %d коммитов ещё не отправлены</item>
+        <item quantity="other">Push, %d коммита ещё не отправлены</item>
+    </plurals>
+    <plurals name="toolbar_commit_count">
+        <item quantity="one">Коммит, %d изменённый файл</item>
+        <item quantity="few">Коммит, %d изменённых файла</item>
+        <item quantity="many">Коммит, %d изменённых файлов</item>
+        <item quantity="other">Коммит, %d изменённого файла</item>
+    </plurals>
+    <string name="drawer_group_sync">Синхронизация</string>
+    <string name="drawer_group_changes">Изменения</string>
+    <string name="drawer_group_branches">Ветки</string>
+    <string name="drawer_group_files">Файлы</string>
+    <string name="drawer_group_remotes">Удалённые</string>
+    <string name="drawer_group_repository">Репозиторий</string>
+    <string name="menu_submodule_update">Обновить подмодули</string>
+    <string name="menu_delete_repo">Удалить репозиторий</string>
 </resources>

@@ -6,6 +6,7 @@ import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 
 import me.sheimi.android.utils.FsUtils;
 import me.sheimi.sgit.activities.RepoDetailActivity;
@@ -36,6 +37,8 @@ import me.sheimi.sgit.repo.tasks.repo.CheckoutFileTask;
 import me.sheimi.sgit.repo.tasks.repo.CheckoutTask;
 import me.sheimi.sgit.repo.tasks.repo.DeleteFileFromRepoTask;
 import me.sheimi.sgit.repo.tasks.repo.MergeTask;
+import me.sheimi.sgit.repo.tasks.repo.PullTask;
+import me.sheimi.sgit.R;
 
 import static me.sheimi.sgit.repo.tasks.repo.DeleteFileFromRepoTask.DeleteOperationType;
 
@@ -70,6 +73,47 @@ public class RepoOperationDelegate {
         mActions.add(new RawConfigAction(mRepo, mActivity));
         mActions.add(new ConfigAction(mRepo, mActivity));
         mActions.add(new SubmoduleUpdateAction(mRepo, mActivity));
+    }
+
+    /** Indexes into mActions for the repo screen's toolbar, which calls these directly. */
+    public static final int ACTION_PULL = 1;
+    public static final int ACTION_PUSH = 2;
+    public static final int ACTION_COMMIT = 4;
+
+    /** The remote the toolbar's one-tap Pull and Push use: "origin", or the only remote. Null when
+     * there is no obvious choice: then the usual dialog (which lists the remotes) is shown, or a
+     * message if the repo has no remotes at all. */
+    private String quickRemote(int fallbackAction) {
+        Set<String> remotes = mRepo.getRemotes();
+        if (remotes == null || remotes.isEmpty()) {
+            mActivity.showToastMessage(R.string.alert_please_add_a_remote);
+            return null;
+        }
+        if (remotes.contains("origin")) {
+            return "origin";
+        }
+        if (remotes.size() == 1) {
+            return remotes.iterator().next();
+        }
+        executeAction(fallbackAction);
+        return null;
+    }
+
+    public void quickPull(boolean forcePull) {
+        String remote = quickRemote(ACTION_PULL);
+        if (remote == null) {
+            return;
+        }
+        new PullTask(mRepo, remote, forcePull,
+                mActivity.new ProgressCallback(R.string.pull_msg_init)).executeTask();
+    }
+
+    public void quickPush(boolean pushAll, boolean forcePush) {
+        String remote = quickRemote(ACTION_PUSH);
+        if (remote == null) {
+            return;
+        }
+        PushAction.push(mRepo, mActivity, remote, pushAll, forcePush);
     }
 
     public void executeAction(int key) {

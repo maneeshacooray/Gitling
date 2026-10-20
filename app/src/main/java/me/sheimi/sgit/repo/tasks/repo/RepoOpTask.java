@@ -1,5 +1,7 @@
 package me.sheimi.sgit.repo.tasks.repo;
 
+import me.sheimi.sgit.activities.RepoDetailActivity;
+import com.manichord.mgit.MainActivity;
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -64,6 +66,16 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         }
         if (isSuccess && mSuccessMsg != 0) {
             BasicFunctions.getActiveActivity().showToastMessage(mSuccessMsg);
+        }        recountSyncCounts();
+    }
+
+    /** Any task can change what the repo screen's toolbar counts (changed files, commits to push
+     * or pull), including file operations that don't refresh the screen themselves. */
+    private void recountSyncCounts() {
+        if (!(BasicFunctions.getActiveActivity() instanceof MainActivity)) return;
+        RepoDetailActivity host = ((MainActivity) BasicFunctions.getActiveActivity()).getCurrentRepoDetailHost();
+        if (host != null && host.getRepo().getID() == mRepo.getID()) {
+            host.getViewModel().refreshSyncCounts(mRepo);
         }
     }
 

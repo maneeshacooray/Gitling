@@ -1,5 +1,9 @@
 package com.manichord.mgit
 
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.manichord.mgit.ui.components.HeadlessFragment
+import me.sheimi.sgit.activities.delegate.RepoOperationDelegate
+import com.manichord.mgit.repodetail.RepoToolbarActions
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.DialogInterface
@@ -228,6 +232,14 @@ class MainActivity : SheimiFragmentActivity() {
                         val commitsFragment = remember(host) { CommitsFragment.newInstance(host.repo, null) }
                         val statusFragment = remember(host) { StatusFragment.newInstance(host.repo) }
 
+                        // Recount the toolbar's numbers when the screen comes back (e.g. after
+                        // editing a file in the viewer, or changing the repo from another app),
+                        // unless they were counted in the last minute and nothing was opened
+                        LifecycleResumeEffect(host) {
+                            host.viewModel.refreshSyncCounts(host.repo, onlyIfStale = true)
+                            onPauseOrDispose { }
+                        }
+
                         DisposableEffect(host) {
                             onDispose {
                                 if (currentRepoDetailHost === host) {
@@ -247,9 +259,16 @@ class MainActivity : SheimiFragmentActivity() {
                                 onOperationClick = { index ->
                                     host.getRepoDelegate().executeAction(index)
                                 },
-                                filesContent = { FragmentHost(supportFragmentManager, filesFragment) },
-                                commitsContent = { FragmentHost(supportFragmentManager, commitsFragment) },
-                                statusContent = { FragmentHost(supportFragmentManager, statusFragment) },
+                                toolbarActions = RepoToolbarActions(
+                                    pull = { force -> host.getRepoDelegate().quickPull(force) },
+                                    push = { all, force -> host.getRepoDelegate().quickPush(all, force) },
+                                    choosePullRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PULL) },
+                                    choosePushRemote = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_PUSH) },
+                                    commit = { host.getRepoDelegate().executeAction(RepoOperationDelegate.ACTION_COMMIT) }
+                                ),
+                                filesContent = { HeadlessFragment(supportFragmentManager, filesFragment, "repo-files") { filesFragment.Content() } },
+                                commitsContent = { HeadlessFragment(supportFragmentManager, commitsFragment, "repo-commits") { commitsFragment.Content() } },
+                                statusContent = { HeadlessFragment(supportFragmentManager, statusFragment, "repo-status") { statusFragment.Content() } },
                                 consoleContent = { GitConsoleScreen(viewModel = host.viewModel, repo = host.repo) },
                                 onFilesSearchQueryChange = { query -> host.searchFiles(query) },
                                 onCommitsSearchQueryChange = { query -> host.searchCommits(query) }

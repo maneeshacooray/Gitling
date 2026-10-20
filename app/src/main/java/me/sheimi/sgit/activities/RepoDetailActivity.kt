@@ -55,6 +55,7 @@ class RepoDetailActivity(
     }
 
     fun reset() {
+        viewModel.refreshSyncCounts(repo)
         mFilesFragment?.reset()
         mCommitsFragment?.reset()
         mStatusFragment?.reset()

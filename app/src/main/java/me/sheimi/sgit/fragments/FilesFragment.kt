@@ -1,5 +1,6 @@
 package me.sheimi.sgit.fragments
 
+import androidx.compose.runtime.Composable
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
@@ -49,11 +50,19 @@ class FilesFragment : RepoDetailFragment() {
     private var searchQuery by mutableStateOf<String?>(null)
     private var files by mutableStateOf<List<File>>(emptyList())
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    /** Compose state: true once [setUp] has run, so [Content] knows the fragment is ready. */
+    private var isSetUp by mutableStateOf(false)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setUp(savedInstanceState)
+    }
+
+    /** The fragment's non-view setup, done once. The repo screen hosts this fragment headless and
+     * draws [Content] in its own composition (so scrolling reaches its collapsing top bar); the
+     * file viewer still hosts it as a view, through [onCreateView]. */
+    private fun setUp(savedInstanceState: Bundle?) {
+        if (isSetUp) return
         // Safe call, not repoDetailActivity (a non-null-typed Java getter) -- on an Activity
         // relaunch (e.g. certain config changes Android doesn't hand to onConfigurationChanged),
         // FragmentManager restores previously-shown fragments during onStart(), before Compose's
@@ -63,68 +72,86 @@ class FilesFragment : RepoDetailFragment() {
 
         repo = (arguments?.getSerializable(Repo.TAG) as? Repo)
             ?: (savedInstanceState?.getSerializable(Repo.TAG) as? Repo)
-        val repo = repo ?: return ComposeView(requireContext())
+        val repo = repo ?: return
         rootDir = repo.dir
 
         savedInstanceState?.getString(CURRENT_DIR)?.let { path ->
             setCurrentDir(File(path))
         }
         reset()
+        isSetUp = true
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setUp(savedInstanceState)
+        // Added headless (no container): the repo screen draws Content() itself
+        if (container == null) return null
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    val dir = currentDir
-                    val query = searchQuery
-                    FileListContent(
-                        currentPath = if (query != null) {
-                            "Search results for \"$query\""
-                        } else {
-                            dir?.let { relativePath(it) } ?: ""
-                        },
-                        files = files,
-                        showUpRow = query == null && (rootDir?.let { dir != null && dir != it } ?: false),
-                        onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
-                        onItemClick = ::onFileClicked,
-                        onItemLongClick = ::onFileLongClicked,
-                        displayPath = if (query != null) ::relativePath else null,
-                        pathEditable = query == null,
-                        onPathSubmit = { input ->
-                            val root = rootDir
-                            if (root != null) {
-                                val target = File(root, input)
-                                val canonicalRoot = root.canonicalFile
-                                val canonicalTarget = target.canonicalFile
-                                val rootPath = canonicalRoot.path.trimEnd(File.separatorChar)
-                                val targetPath = canonicalTarget.path
-                                val isInside = canonicalTarget == canonicalRoot ||
-                                    targetPath.startsWith(rootPath + File.separator)
-                                val relative = if (isInside && canonicalTarget != canonicalRoot) {
-                                    targetPath.substring(rootPath.length + 1)
-                                } else {
-                                    ""
-                                }
-                                val firstSegment = relative.replace('\\', '/').substringBefore('/')
-                                when {
-                                    !canonicalTarget.exists() || !canonicalTarget.isDirectory ->
-                                        showToastMessage(me.sheimi.sgit.R.string.dialog_path_invalid)
-                                    // Shared storage is case-insensitive, so ".GIT" is the same dir
-                                    !isInside || firstSegment.equals(".git", ignoreCase = true) ->
-                                        showToastMessage(me.sheimi.sgit.R.string.dialog_path_out_of_repo)
-                                    else -> {
-                                        searchQuery = null
-                                        // Rebuild from rootDir rather than using the canonical path,
-                                        // so the Up row and path bar still recognise the repo root
-                                        // when rootDir itself goes through a symlink
-                                        setCurrentDir(if (relative.isEmpty()) root else File(root, relative))
-                                    }
-                                }
-                            }
-                        }
-                    )
+                    // Qualified: inside ComposeView.apply, a bare Content() is the view's own
+                    // Content(), which recurses
+                    this@FilesFragment.Content()
                 }
             }
         }
+    }
+
+    @Composable
+    fun Content() {
+        if (!isSetUp) return
+        val dir = currentDir
+        val query = searchQuery
+        FileListContent(
+            currentPath = if (query != null) {
+                "Search results for \"$query\""
+            } else {
+                dir?.let { relativePath(it) } ?: ""
+            },
+            files = files,
+            showUpRow = query == null && (rootDir?.let { dir != null && dir != it } ?: false),
+            onUpClick = { dir?.parentFile?.let { setCurrentDir(it) } },
+            onItemClick = ::onFileClicked,
+            onItemLongClick = ::onFileLongClicked,
+            displayPath = if (query != null) ::relativePath else null,
+            pathEditable = query == null,
+            onPathSubmit = { input ->
+                val root = rootDir
+                if (root != null) {
+                    val target = File(root, input)
+                    val canonicalRoot = root.canonicalFile
+                    val canonicalTarget = target.canonicalFile
+                    val rootPath = canonicalRoot.path.trimEnd(File.separatorChar)
+                    val targetPath = canonicalTarget.path
+                    val isInside = canonicalTarget == canonicalRoot ||
+                        targetPath.startsWith(rootPath + File.separator)
+                    val relative = if (isInside && canonicalTarget != canonicalRoot) {
+                        targetPath.substring(rootPath.length + 1)
+                    } else {
+                        ""
+                    }
+                    val firstSegment = relative.replace('\\', '/').substringBefore('/')
+                    when {
+                        !canonicalTarget.exists() || !canonicalTarget.isDirectory ->
+                            showToastMessage(me.sheimi.sgit.R.string.dialog_path_invalid)
+                        // Shared storage is case-insensitive, so ".GIT" is the same dir
+                        !isInside || firstSegment.equals(".git", ignoreCase = true) ->
+                            showToastMessage(me.sheimi.sgit.R.string.dialog_path_out_of_repo)
+                        else -> {
+                            searchQuery = null
+                            // Rebuild from rootDir rather than using the canonical path,
+                            // so the Up row and path bar still recognise the repo root
+                            // when rootDir itself goes through a symlink
+                            setCurrentDir(if (relative.isEmpty()) root else File(root, relative))
+                        }
+                    }
+                }
+            }
+        )
     }
 
     private fun relativePath(file: File): String {
@@ -171,6 +198,8 @@ class FilesFragment : RepoDetailFragment() {
             setCurrentDir(file)
             return
         }
+        // The viewer or another app may edit it: recount when the repo screen comes back
+        (rawActivity as? MainActivity)?.currentRepoDetailHost?.viewModel?.markSyncCountsStale()
         val mime = FsUtils.getMimeType(file)
         if (FsUtils.isTextMimeType(mime)) {
             val intent = Intent(activity, ViewFileActivity::class.java)
@@ -225,6 +254,12 @@ class FilesFragment : RepoDetailFragment() {
         resetCurrentDir()
     }
 
+    /** File changes made here directly (not through a git task) don't reset the repo screen. */
+    private fun recountSyncCounts() {
+        val host = (rawActivity as? MainActivity)?.currentRepoDetailHost ?: return
+        host.viewModel.refreshSyncCounts(host.repo)
+    }
+
     fun newDir(name: String) {
         val dir = currentDir ?: return
         val file = File(dir, name)
@@ -234,6 +269,7 @@ class FilesFragment : RepoDetailFragment() {
         }
         file.mkdir()
         setCurrentDir(dir)
+        recountSyncCounts()
     }
 
     /** Create a new file within the currently displayed directory */
@@ -247,6 +283,7 @@ class FilesFragment : RepoDetailFragment() {
         }
         file.createNewFile()
         setCurrentDir(dir)
+        recountSyncCounts()
     }
 
     override fun getOnBackClickListener(): OnBackClickListener {

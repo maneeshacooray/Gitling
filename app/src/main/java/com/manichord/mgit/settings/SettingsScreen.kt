@@ -2,6 +2,9 @@
 
 package com.manichord.mgit.settings
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -65,120 +68,124 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+            .padding(bottom = 24.dp)
         ) {
             SettingsCategory(title = stringResource(R.string.pref_category_title_general))
+            SettingsGroup {
+                ListItem(
+                    colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
+                    headlineContent = { Text(stringResource(R.string.preference_repo_location)) },
+                    supportingContent = { Text(repoRoot) },
+                    leadingContent = { Icon(Icons.Default.Folder, null) }
+                )
+                SettingsGroupGap()
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_use_shared_media_storage),
+                    summary = if (movingRepoStorage) {
+                        "Moving repos..."
+                    } else {
+                        stringResource(R.string.preference_use_shared_media_storage_summary)
+                    },
+                    checked = useSharedMediaStorage,
+                    onCheckedChange = { viewModel.setUseSharedMediaStorage(it) },
+                    icon = Icons.Default.FolderShared,
+                    enabled = !movingRepoStorage
+                )
+                SettingsGroupGap()
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_eng_lang),
+                    summary = stringResource(R.string.preference_eng_lang_summary),
+                    checked = useEnglish,
+                    onCheckedChange = { viewModel.setUseEnglish(it) },
+                    icon = Icons.Default.Language
+                )
+                SettingsGroupGap()
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_use_dynamic_color),
+                    summary = stringResource(R.string.preference_use_dynamic_color_summary),
+                    checked = useDynamicColor,
+                    onCheckedChange = { viewModel.setUseDynamicColor(it) },
+                    icon = Icons.Default.Palette
+                )
+                SettingsGroupGap()
+                SettingsFontItem(
+                    selected = fontOption,
+                    onSelect = { viewModel.setFontOption(it) }
+                )
+                SettingsGroupGap()
+                SettingsClickableItem(
+                    title = stringResource(R.string.preference_add_widget),
+                    summary = stringResource(R.string.preference_add_widget_summary),
+                    icon = Icons.Default.Widgets,
+                    onClick = onAddWidgetClick
+                )
+            }
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.preference_repo_location)) },
-                supportingContent = { Text(repoRoot) },
-                leadingContent = { Icon(Icons.Default.Folder, null) }
-            )
-
-            SettingsSwitchItem(
-                title = stringResource(R.string.preference_use_shared_media_storage),
-                summary = if (movingRepoStorage) {
-                    "Moving repos..."
-                } else {
-                    stringResource(R.string.preference_use_shared_media_storage_summary)
-                },
-                checked = useSharedMediaStorage,
-                onCheckedChange = { viewModel.setUseSharedMediaStorage(it) },
-                icon = Icons.Default.FolderShared,
-                enabled = !movingRepoStorage
-            )
-
-            SettingsSwitchItem(
-                title = stringResource(R.string.preference_eng_lang),
-                summary = stringResource(R.string.preference_eng_lang_summary),
-                checked = useEnglish,
-                onCheckedChange = { viewModel.setUseEnglish(it) },
-                icon = Icons.Default.Language
-            )
-
-            SettingsSwitchItem(
-                title = stringResource(R.string.preference_use_dynamic_color),
-                summary = stringResource(R.string.preference_use_dynamic_color_summary),
-                checked = useDynamicColor,
-                onCheckedChange = { viewModel.setUseDynamicColor(it) },
-                icon = Icons.Default.Palette
-            )
-
-            SettingsFontItem(
-                selected = fontOption,
-                onSelect = { viewModel.setFontOption(it) }
-            )
-
-            SettingsClickableItem(
-                title = stringResource(R.string.preference_add_widget),
-                summary = stringResource(R.string.preference_add_widget_summary),
-                icon = Icons.Default.Widgets,
-                onClick = onAddWidgetClick
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsCategory(title = stringResource(R.string.pref_category_title_git_profile))
+            SettingsGroup {
+                SettingsClickableItem(
+                    title = "Managed Accounts",
+                    summary = "Save tokens for GitHub, GitLab, etc.",
+                    icon = Icons.Default.AccountCircle,
+                    onClick = onManageAccountsClick
+                )
+                SettingsGroupGap()
+                SettingsEditTextItem(
+                    title = stringResource(R.string.preference_git_user_name),
+                    value = gitUserName,
+                    onValueChange = { viewModel.setGitUserName(it) },
+                    icon = Icons.Default.Person
+                )
+                SettingsGroupGap()
+                SettingsEditTextItem(
+                    title = stringResource(R.string.preference_git_user_email),
+                    value = gitUserEmail,
+                    onValueChange = { viewModel.setGitUserEmail(it) },
+                    icon = Icons.Default.Email
+                )
+            }
 
-            SettingsClickableItem(
-                title = "Managed Accounts",
-                summary = "Save tokens for GitHub, GitLab, etc.",
-                icon = Icons.Default.AccountCircle,
-                onClick = onManageAccountsClick
-            )
-
-            SettingsEditTextItem(
-                title = stringResource(R.string.preference_git_user_name),
-                value = gitUserName,
-                onValueChange = { viewModel.setGitUserName(it) },
-                icon = Icons.Default.Person
-            )
-
-            SettingsEditTextItem(
-                title = stringResource(R.string.preference_git_user_email),
-                value = gitUserEmail,
-                onValueChange = { viewModel.setGitUserEmail(it) },
-                icon = Icons.Default.Email
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsCategory(title = stringResource(R.string.pref_category_title_security))
+            SettingsGroup {
+                SettingsClickableItem(
+                    title = stringResource(R.string.preference_manage_ssh_keys),
+                    summary = stringResource(R.string.preference_manage_ssh_keys_summary),
+                    icon = Icons.Default.Key,
+                    onClick = onManageSshKeysClick
+                )
+                SettingsGroupGap()
+                SettingsSwitchItem(
+                    title = stringResource(R.string.preference_use_gravatar),
+                    summary = stringResource(R.string.preference_use_gravatar_summary),
+                    checked = useGravatar,
+                    onCheckedChange = { viewModel.setUseGravatar(it) },
+                    icon = Icons.Default.Face
+                )
+            }
 
-            SettingsClickableItem(
-                title = stringResource(R.string.preference_manage_ssh_keys),
-                summary = stringResource(R.string.preference_manage_ssh_keys_summary),
-                icon = Icons.Default.Key,
-                onClick = onManageSshKeysClick
-            )
-
-            SettingsSwitchItem(
-                title = stringResource(R.string.preference_use_gravatar),
-                summary = stringResource(R.string.preference_use_gravatar_summary),
-                checked = useGravatar,
-                onCheckedChange = { viewModel.setUseGravatar(it) },
-                icon = Icons.Default.Face
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SettingsCategory(title = stringResource(R.string.pref_category_title_about))
-
-            SettingsClickableItem(
-                title = stringResource(R.string.preference_send_feedback),
-                summary = stringResource(R.string.preference_send_feedback_summary),
-                icon = Icons.Default.Feedback,
-                onClick = onFeedbackClick
-            )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.preference_app_version)) },
-                supportingContent = { Text(BuildConfig.VERSION_NAME) },
-                leadingContent = { Icon(Icons.Default.Info, null) }
-            )
-
-            SettingsUpdateCheckItem(
-                checking = checkingForUpdate,
-                result = updateCheckResult,
-                onCheckClick = { viewModel.checkForUpdate() },
-                onViewReleaseClick = onViewReleaseClick
-            )
+            SettingsGroup {
+                SettingsClickableItem(
+                    title = stringResource(R.string.preference_send_feedback),
+                    summary = stringResource(R.string.preference_send_feedback_summary),
+                    icon = Icons.Default.Feedback,
+                    onClick = onFeedbackClick
+                )
+                SettingsGroupGap()
+                ListItem(
+                    colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
+                    headlineContent = { Text(stringResource(R.string.preference_app_version)) },
+                    supportingContent = { Text(BuildConfig.VERSION_NAME) },
+                    leadingContent = { Icon(Icons.Default.Info, null) }
+                )
+                SettingsGroupGap()
+                SettingsUpdateCheckItem(
+                    checking = checkingForUpdate,
+                    result = updateCheckResult,
+                    onCheckClick = { viewModel.checkForUpdate() },
+                    onViewReleaseClick = onViewReleaseClick
+                )
+            }
         }
     }
 }
@@ -197,6 +204,7 @@ fun SettingsCategory(title: String) {
 @Composable
 fun SettingsClickableItem(title: String, summary: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
     ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
         headlineContent = { Text(title) },
         supportingContent = { Text(summary) },
         leadingContent = { Icon(icon, null) },
@@ -214,6 +222,7 @@ fun SettingsSwitchItem(
     enabled: Boolean = true
 ) {
     ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
         headlineContent = { Text(title) },
         supportingContent = { Text(summary) },
         leadingContent = { Icon(icon, null) },
@@ -232,6 +241,7 @@ fun SettingsUpdateCheckItem(
     onViewReleaseClick: (String) -> Unit
 ) {
     ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
         headlineContent = { Text("Check for Updates") },
         supportingContent = {
             Text(
@@ -262,6 +272,8 @@ fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
 
     ListItem(
+
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
         headlineContent = { Text(stringResource(R.string.preference_app_font)) },
         supportingContent = { Text(selected.displayName) },
         leadingContent = { Icon(Icons.Default.TextFields, null) },
@@ -310,6 +322,8 @@ fun SettingsEditTextItem(title: String, value: String, onValueChange: (String) -
     val tempValue = rememberTextFieldState(value)
 
     ListItem(
+
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
         headlineContent = { Text(title) },
         supportingContent = { Text(value.ifEmpty { "Not set" }) },
         leadingContent = { Icon(icon, null) },
@@ -346,3 +360,33 @@ fun SettingsEditTextItem(title: String, value: String, onValueChange: (String) -
         )
     }
 }
+
+/** One section's items in a rounded container, as Android 16's own Settings groups them. */
+@Composable
+fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        // Items stay transparent so the group's color shows through
+        CompositionLocalProvider(LocalSettingsItemColors provides ListItemDefaults.colors(containerColor = Color.Transparent)) {
+            Column(content = content)
+        }
+    }
+}
+
+/** The thin line between items in a group: the screen background showing through. */
+@Composable
+fun SettingsGroupGap() {
+    Spacer(
+        Modifier
+            .fillMaxWidth()
+            .height(2.dp)
+            .background(MaterialTheme.colorScheme.surface)
+    )
+}
+
+val LocalSettingsItemColors = staticCompositionLocalOf<ListItemColors?> { null }
