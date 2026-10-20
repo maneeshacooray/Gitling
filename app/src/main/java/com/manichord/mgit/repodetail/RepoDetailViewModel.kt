@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.sheimi.sgit.database.models.Repo
+import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.BranchTrackingStatus
 import timber.log.Timber
 
@@ -45,15 +46,19 @@ class RepoDetailViewModel : ViewModel() {
         val repoId = repo.id
         viewModelScope.launch(Dispatchers.IO) {
             val counts = try {
-                val git = repo.git
-                val repository = git.repository
-                val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
-                val status = git.status().call()
-                SyncCounts(
-                    behind = tracking?.behindCount,
-                    ahead = tracking?.aheadCount,
-                    changes = (status.uncommittedChanges + status.untracked).size
-                )
+                // Its own Git instance, not repo.git: that one's Repository is shared with the
+                // tasks and screens running at the same time, and reading its config from here
+                // while they use it sometimes came back without the branch's upstream
+                Git.open(repo.dir).use { git ->
+                    val repository = git.repository
+                    val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
+                    val status = git.status().call()
+                    SyncCounts(
+                        behind = tracking?.behindCount,
+                        ahead = tracking?.aheadCount,
+                        changes = (status.uncommittedChanges + status.untracked).size
+                    )
+                }
             } catch (e: Exception) {
                 Timber.w(e, "Couldn't count sync state")
                 null
