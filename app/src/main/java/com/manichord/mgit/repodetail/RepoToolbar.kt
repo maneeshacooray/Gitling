@@ -132,6 +132,9 @@ fun RepoToolbar(
     }
 }
 
+/** Space between Pull, Commit and Push, so the buttons read as three separate actions. */
+private val ToolbarItemGap = 6.dp
+
 /** A count as shown on a button: big numbers don't need to be exact to say "a lot". */
 private fun countText(count: Int) = if (count > 99) "99+" else count.toString()
 
@@ -166,6 +169,8 @@ private fun ToolbarContent(
                     stringResource(R.string.menu_choose_remote) to actions.choosePullRemote
                 )
             )
+            // The toolbar adds no space of its own between items with the tighter padding above
+            Spacer(Modifier.width(ToolbarItemGap))
             val commitLabel = if (changes > 0) {
                 pluralStringResource(R.plurals.toolbar_commit_count, changes, changes)
             } else {
@@ -198,6 +203,7 @@ private fun ToolbarContent(
                     Icon(Icons.Default.Commit, contentDescription = commitLabel)
                 }
             }
+            Spacer(Modifier.width(ToolbarItemGap))
             SplitAction(
                 icon = Icons.Default.CloudUpload,
                 label = if (ahead > 0) {
