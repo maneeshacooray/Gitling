@@ -221,6 +221,8 @@
     <string name="error_file_not_found">الملف غير موجود!</string>
     <string name="preference_eng_lang">اللغة الإنجليزية</string>
     <string name="preference_eng_lang_summary">استخدام الإنجليزية بدلاً من اللغة الافتراضية</string>
+    <string name="preference_choose_language">اختيار اللغة</string>
+    <string name="preference_language_system_default">لغة النظام الافتراضية</string>
     <string name="pref_key_use_english" translatable="false">use.english</string>
     <string name="toast_submodule_update_success">تم تحديث الوحدات الفرعية</string>
     <string name="file_op_add_to_stage">إضافة إلى المرحلة</string>

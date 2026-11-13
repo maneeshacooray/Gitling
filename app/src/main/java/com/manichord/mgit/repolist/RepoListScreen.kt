@@ -100,67 +100,86 @@ fun RepoListScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (isSearchActive) {
-                TopAppBar(
-                    title = {
-                        val focusRequester = searchFocusRequester
-                        LaunchedEffect(Unit) { focusRequester.requestFocus() }
-                        TextField(
-                            state = searchState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .focusRequester(focusRequester),
-                            placeholder = { Text("Search repositories") },
-                            lineLimits = TextFieldLineLimits.SingleLine,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                                unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                                focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                                unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+            Box {
+                if (isSearchActive) {
+                    TopAppBar(
+                        title = {
+                            val focusRequester = searchFocusRequester
+                            LaunchedEffect(Unit) { focusRequester.requestFocus() }
+                            TextField(
+                                state = searchState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester),
+                                placeholder = { Text("Search repositories") },
+                                lineLimits = TextFieldLineLimits.SingleLine,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                                )
                             )
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            isSearchActive = false
-                            searchState.clearText()
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close search")
-                        }
-                    },
-                    actions = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchState.clearText() }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                isSearchActive = false
+                                searchState.clearText()
+                            }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close search")
                             }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                        },
+                        actions = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchState.clearText() }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                                }
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            titleContentColor = MaterialTheme.colorScheme.onSurface
+                        )
                     )
-                )
-            } else {
-                // Expressive flexible bar: large title with the repo count, collapsing to one
-                // line as the list scrolls
-                LargeFlexibleTopAppBar(
-                    title = { Text(stringResource(R.string.app_name)) },
-                    subtitle = {
-                        if (repoList.isNotEmpty()) {
-                            Text(pluralStringResource(R.plurals.repo_count, repoList.size, repoList.size))
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
-                        }
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+                } else {
+                    // Expressive flexible bar: large title with the repo count, collapsing to one
+                    // line as the list scrolls
+                    LargeFlexibleTopAppBar(
+                        title = { Text(stringResource(R.string.app_name)) },
+                        subtitle = {
+                            if (repoList.isNotEmpty()) {
+                                Text(pluralStringResource(R.plurals.repo_count, repoList.size, repoList.size))
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { isSearchActive = true }) {
+                                Icon(Icons.Default.Search, contentDescription = "Search")
+                            }
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            }
+                        },
+                        scrollBehavior = scrollBehavior
+                    )
+                }
+                AnimatedVisibility(
+                    visible = addMenuExpanded,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.matchParentSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClickLabel = stringResource(R.string.label_close_menu)
+                            ) { addMenuExpanded = false }
+                    )
+                }
             }
         },
         floatingActionButton = {
