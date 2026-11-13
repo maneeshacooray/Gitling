@@ -400,25 +400,28 @@ fun SettingsGroup(items: List<@Composable () -> Unit>) {
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         items.forEachIndexed { index, item ->
-            val restingShape = settingsItemShape(index, items.size)
+            val outerCorner = 24.dp
+            val innerCorner = 4.dp
+            val restingTop = if (index == 0 || items.size == 1) outerCorner else innerCorner
+            val restingBottom = if (index == items.size - 1) outerCorner else innerCorner
             var pressed by remember { mutableStateOf(false) }
             val topStart by animateDpAsState(
-                targetValue = if (pressed) 24.dp else restingShape.topStart,
+                targetValue = if (pressed) outerCorner else restingTop,
                 animationSpec = tween(120),
                 label = "topStart"
             )
             val topEnd by animateDpAsState(
-                targetValue = if (pressed) 24.dp else restingShape.topEnd,
+                targetValue = if (pressed) outerCorner else restingTop,
                 animationSpec = tween(120),
                 label = "topEnd"
             )
             val bottomEnd by animateDpAsState(
-                targetValue = if (pressed) 24.dp else restingShape.bottomEnd,
+                targetValue = if (pressed) outerCorner else restingBottom,
                 animationSpec = tween(120),
                 label = "bottomEnd"
             )
             val bottomStart by animateDpAsState(
-                targetValue = if (pressed) 24.dp else restingShape.bottomStart,
+                targetValue = if (pressed) outerCorner else restingBottom,
                 animationSpec = tween(120),
                 label = "bottomStart"
             )
@@ -450,15 +453,6 @@ fun SettingsGroup(items: List<@Composable () -> Unit>) {
             }
         }
     }
-}
-
-private fun settingsItemShape(index: Int, count: Int): RoundedCornerShape {
-    val outer = 24.dp
-    val inner = 4.dp
-    if (count <= 1) return RoundedCornerShape(outer)
-    val top = if (index == 0) outer else inner
-    val bottom = if (index == count - 1) outer else inner
-    return RoundedCornerShape(top, top, bottom, bottom)
 }
 
 val LocalSettingsItemColors = staticCompositionLocalOf<ListItemColors?> { null }
