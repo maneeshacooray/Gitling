@@ -224,6 +224,9 @@
     <string name="preference_eng_lang">English Language</string>
     <string name="preference_eng_lang_summary">Use English instead of the default language</string>
     <string name="pref_key_use_english" translatable="false">use.english</string>
+    <string name="preference_choose_language">Choose Language</string>
+    <string name="preference_language_system_default">System default</string>
+    <string name="pref_key_app_language" translatable="false">app_language</string>
     <string name="toast_submodule_update_success">Submodules updated</string>
     <string name="file_op_add_to_stage">Add to stage</string>
     <string name="file_op_checkout">Checkout (Reset Changes)</string>

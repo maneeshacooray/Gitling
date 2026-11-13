@@ -173,6 +173,8 @@
     <string name="dialog_edit_key_password_title">Key Password</string>
     <string name="preference_eng_lang">영어</string>
     <string name="preference_eng_lang_summary">기본 언어 대신 영어 사용</string>
+    <string name="preference_choose_language">언어 선택</string>
+    <string name="preference_language_system_default">시스템 기본값</string>
     <string name="error_no_worktree">This is a bare repository!</string>
     <string name="error_invalid_index">The Git index is invalid!</string>
     <string name="error_file_not_found">File not found!</string>

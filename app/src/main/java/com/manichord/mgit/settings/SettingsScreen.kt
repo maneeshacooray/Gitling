@@ -2,6 +2,9 @@
 
 package com.manichord.mgit.settings
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -23,14 +26,19 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.os.ConfigurationCompat
 import com.manichord.mgit.ui.theme.FontOption
 import com.manichord.mgit.update.UpdateCheckResult
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.R
 import me.sheimi.sgit.database.models.Repo
+import java.text.Collator
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +54,8 @@ fun SettingsScreen(
     val repoRoot by viewModel.repoRoot.observeAsState(Repo.getDefaultRepoRootDir().absolutePath)
     val useSharedMediaStorage by viewModel.useSharedMediaStorage.observeAsState(false)
     val movingRepoStorage by viewModel.movingRepoStorage.observeAsState(false)
-    val useEnglish by viewModel.useEnglish.observeAsState(false)
+    val appLanguage by viewModel.appLanguage.observeAsState("")
+    val activity = LocalContext.current.findActivity()
     val gitUserName by viewModel.gitUserName.observeAsState("")
     val gitUserEmail by viewModel.gitUserEmail.observeAsState("")
     val useGravatar by viewModel.useGravatar.observeAsState(true)
@@ -100,12 +109,14 @@ fun SettingsScreen(
                         )
                     },
                     {
-                        SettingsSwitchItem(
-                            title = stringResource(R.string.preference_eng_lang),
-                            summary = stringResource(R.string.preference_eng_lang_summary),
-                            checked = useEnglish,
-                            onCheckedChange = { viewModel.setUseEnglish(it) },
-                            icon = Icons.Default.Language
+                        SettingsLanguageItem(
+                            language = appLanguage,
+                            onSelect = { tag ->
+                                if (tag != appLanguage) {
+                                    viewModel.setAppLanguage(tag)
+                                    activity?.recreate()
+                                }
+                            }
                         )
                     },
                     {
@@ -346,6 +357,90 @@ fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
     }
 }
 
+private data class AppLanguage(val tag: String, val label: String)
+
+private val supportedLanguageTags = listOf("ar", "de", "en", "es", "fr", "iw", "ja", "ko", "ru", "zh-CN")
+
+@Composable
+private fun rememberAppLanguages(): List<AppLanguage> {
+    val configuration = LocalConfiguration.current
+    val locale = ConfigurationCompat.getLocales(configuration).get(0) ?: Locale.getDefault()
+    return remember(locale) {
+        val collator = Collator.getInstance(locale)
+        supportedLanguageTags
+            .map { tag -> AppLanguage(tag, Locale.forLanguageTag(tag).getDisplayName(locale)) }
+            .sortedWith(compareBy(collator) { it.label })
+    }
+}
+
+@Composable
+fun SettingsLanguageItem(language: String, onSelect: (String) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+    val languages = rememberAppLanguages()
+    val currentLabel = if (language.isEmpty()) {
+        stringResource(R.string.preference_language_system_default)
+    } else {
+        languages.firstOrNull { it.tag == language }?.label ?: language
+    }
+
+    ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
+        headlineContent = { Text(stringResource(R.string.preference_choose_language)) },
+        supportingContent = { Text(currentLabel) },
+        leadingContent = { Icon(Icons.Default.Language, null) },
+        modifier = Modifier.clickable { showDialog = true }
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.preference_choose_language)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    LanguageOption(
+                        label = stringResource(R.string.preference_language_system_default),
+                        selected = language.isEmpty(),
+                        onClick = {
+                            showDialog = false
+                            onSelect("")
+                        }
+                    )
+                    languages.forEach { option ->
+                        LanguageOption(
+                            label = option.label,
+                            selected = language == option.tag,
+                            onClick = {
+                                showDialog = false
+                                onSelect(option.tag)
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.label_cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun LanguageOption(label: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp)
+    ) {
+        RadioButton(selected = selected, onClick = onClick)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(label)
+    }
+}
+
 @Composable
 fun SettingsEditTextItem(title: String, value: String, onValueChange: (String) -> Unit, icon: androidx.compose.ui.graphics.vector.ImageVector) {
     var showDialog by remember { mutableStateOf(false) }
@@ -453,6 +548,15 @@ fun SettingsGroup(items: List<@Composable () -> Unit>) {
             }
         }
     }
+}
+
+private fun Context.findActivity(): Activity? {
+    var current: Context = this
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return current as? Activity
 }
 
 val LocalSettingsItemColors = staticCompositionLocalOf<ListItemColors?> { null }
