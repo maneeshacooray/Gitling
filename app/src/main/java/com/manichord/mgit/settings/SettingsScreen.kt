@@ -3,8 +3,12 @@
 package com.manichord.mgit.settings
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -18,7 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -396,10 +400,49 @@ fun SettingsGroup(items: List<@Composable () -> Unit>) {
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         items.forEachIndexed { index, item ->
+            val restingShape = settingsItemShape(index, items.size)
+            var pressed by remember { mutableStateOf(false) }
+            val topStart by animateDpAsState(
+                targetValue = if (pressed) 24.dp else restingShape.topStart,
+                animationSpec = tween(120),
+                label = "topStart"
+            )
+            val topEnd by animateDpAsState(
+                targetValue = if (pressed) 24.dp else restingShape.topEnd,
+                animationSpec = tween(120),
+                label = "topEnd"
+            )
+            val bottomEnd by animateDpAsState(
+                targetValue = if (pressed) 24.dp else restingShape.bottomEnd,
+                animationSpec = tween(120),
+                label = "bottomEnd"
+            )
+            val bottomStart by animateDpAsState(
+                targetValue = if (pressed) 24.dp else restingShape.bottomStart,
+                animationSpec = tween(120),
+                label = "bottomStart"
+            )
             Surface(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = settingsItemShape(index, items.size),
-                modifier = Modifier.fillMaxWidth()
+                shape = RoundedCornerShape(topStart, topEnd, bottomEnd, bottomStart),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            pressed = true
+                            try {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    if (event.changes.none { it.pressed }) break
+                                    val change = event.changes.firstOrNull { it.id == down.id } ?: event.changes.first()
+                                    if ((change.position - down.position).getDistance() > viewConfiguration.touchSlop) break
+                                }
+                            } finally {
+                                pressed = false
+                            }
+                        }
+                    }
             ) {
                 CompositionLocalProvider(LocalSettingsItemColors provides ListItemDefaults.colors(containerColor = Color.Transparent)) {
                     Column { item() }
@@ -409,7 +452,7 @@ fun SettingsGroup(items: List<@Composable () -> Unit>) {
     }
 }
 
-private fun settingsItemShape(index: Int, count: Int): Shape {
+private fun settingsItemShape(index: Int, count: Int): RoundedCornerShape {
     val outer = 24.dp
     val inner = 4.dp
     if (count <= 1) return RoundedCornerShape(outer)
