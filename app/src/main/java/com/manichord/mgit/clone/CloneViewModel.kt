@@ -23,6 +23,7 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
     val localRepoName : MutableLiveData<String> = MutableLiveData()
     val cloneLocation : MutableLiveData<String> = MutableLiveData()
     var cloneRecursively : Boolean = false
+    var shallowClone : Boolean = false
     val initLocal : MutableLiveData<Boolean> = MutableLiveData()
 
     var remoteUrlError : MutableLiveData<String?> = MutableLiveData()
@@ -126,7 +127,8 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
                 repo.saveCredentials()
             }
 
-            val task = CloneTask(repo, cloneRecursively, "", null)
+            val depth = if (shallowClone) CloneTask.SHALLOW_DEPTH else 0
+            val task = CloneTask(repo, cloneRecursively, "", null, depth)
             task.executeTask()
             remoteUrl = ""
             show(false)
