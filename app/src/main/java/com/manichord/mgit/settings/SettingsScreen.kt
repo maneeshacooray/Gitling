@@ -359,7 +359,7 @@ fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
 
 private data class AppLanguage(val tag: String, val label: String)
 
-private val supportedLanguageTags = listOf("ar", "de", "en", "es", "fr", "iw", "ja", "ko", "ru", "zh-CN")
+private val supportedLanguageTags = listOf("de", "en", "es", "fr", "ja", "ko", "ru", "zh-CN")
 
 @Composable
 private fun rememberAppLanguages(): List<AppLanguage> {
