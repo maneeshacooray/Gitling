@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -108,7 +109,14 @@ class RepoDetailViewModel : ViewModel() {
                 changes = (status.uncommittedChanges + status.untracked).size
             )
         }
-    } catch (e: Exception) {
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        // Throwable, not Exception: a git status on a very large repo loads the whole pack index
+        // and can throw OutOfMemoryError (a java.lang.Error, not an Exception) even with the
+        // largeHeap. Counting is best-effort, so give up to a null count rather than letting the
+        // OOM escape the coroutine and crash the app. CancellationException is rethrown above so
+        // coroutine cancellation still works.
         Timber.w(e, "Couldn't count sync state")
         null
     }
