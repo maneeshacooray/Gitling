@@ -51,6 +51,21 @@ public class CloneTask extends RepoRemoteOpTask {
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        // Show the in-progress indicator the instant the clone starts. JGit's first progress
+        // callback only arrives after connecting and negotiation, which on a large or slow repo
+        // can take several seconds, and without a status the repo card looks idle (as if nothing
+        // is happening) the whole time, including while a too-large repo is heading for its
+        // out-of-memory. A non-empty status makes the card show the loading indicator right away;
+        // the real progress text replaces it once JGit starts reporting.
+        SheimiFragmentActivity activity = BasicFunctions.getActiveActivity();
+        if (activity != null) {
+            mRepo.updateStatus(activity.getString(R.string.cloning));
+        }
+    }
+
+    @Override
     protected Boolean doInBackground(Void... v) {
         boolean result = cloneRepo();
         if (!result) {
