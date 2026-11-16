@@ -37,11 +37,38 @@ class SshCredentialsProvider extends CredentialsProvider {
         for (CredentialItem item : items) {
             if (isKeyPassphrase(item)) {
                 filled |= keys.get(uri, item);
+            } else if (item instanceof CredentialItem.StringType) {
+                // A keyboard-interactive prompt: jsch delivers the server's own prompt text (e.g.
+                // "Password:", or a PAM prompt) as a StringType. UsernamePasswordCredentialsProvider
+                // only answers a StringType whose text is exactly "Password: ", so servers that
+                // offer the password over keyboard-interactive and phrase the prompt differently
+                // (rsync.net, many PAM setups) got no answer and the clone failed with "Auth fail
+                // for methods ...,keyboard-interactive" even after the password was entered (#118).
+                // Answer such a prompt with the entered password.
+                filled |= fillFromPassword(uri, (CredentialItem.StringType) item);
             } else if (command != null && command.supports(item)) {
                 filled |= command.get(uri, item);
             }
         }
         return filled;
+    }
+
+    /** Answers a keyboard-interactive prompt with the password the user entered (held by the git
+     * command's own credentials provider). */
+    private boolean fillFromPassword(URIish uri, CredentialItem.StringType item) {
+        if (command == null) {
+            return false;
+        }
+        CredentialItem.Password password = new CredentialItem.Password();
+        try {
+            if (command.get(uri, password) && password.getValue() != null) {
+                item.setValue(new String(password.getValue()));
+                return true;
+            }
+            return false;
+        } finally {
+            password.clear();
+        }
     }
 
     /** JSch asks for a key's passphrase with the prompt "Passphrase for <key file>". */
