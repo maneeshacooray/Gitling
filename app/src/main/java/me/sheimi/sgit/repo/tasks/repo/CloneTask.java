@@ -14,6 +14,8 @@ import org.eclipse.jgit.lib.ProgressMonitor;
 import java.io.File;
 import java.util.Locale;
 
+import me.sheimi.android.activities.SheimiFragmentActivity;
+import me.sheimi.android.utils.BasicFunctions;
 import me.sheimi.android.utils.Profile;
 import me.sheimi.sgit.R;
 import me.sheimi.sgit.database.RepoContract;
@@ -23,15 +25,29 @@ import timber.log.Timber;
 
 public class CloneTask extends RepoRemoteOpTask {
 
+    /** Depth for a shallow clone: just the latest commit on each branch. */
+    public static final int SHALLOW_DEPTH = 1;
+
     private final AsyncTaskCallback mCallback;
     private final boolean mCloneRecursive;
     private final String mCloneStatusName;
+    /** 0 for a full clone, > 0 for a shallow clone of that depth. */
+    private final int mDepth;
+    /** Set when a full clone ran out of memory, so the user can be offered a shallow retry
+     * instead of just a generic error (see {@link #onPostExecute}). */
+    private boolean mOfferShallowRetry;
 
     public CloneTask(Repo repo, boolean cloneRecursive, String statusName, AsyncTaskCallback callback) {
+        this(repo, cloneRecursive, statusName, callback, 0);
+    }
+
+    public CloneTask(Repo repo, boolean cloneRecursive, String statusName, AsyncTaskCallback callback,
+            int depth) {
         super(repo);
         mCloneRecursive = cloneRecursive;
         mCloneStatusName = statusName;
         mCallback = callback;
+        mDepth = depth;
     }
 
     @Override
@@ -47,6 +63,13 @@ public class CloneTask extends RepoRemoteOpTask {
     }
 
     protected void onPostExecute(Boolean isSuccess) {
+        if (!isSuccess && mOfferShallowRetry && !isTaskCanceled()) {
+            // A full clone ran out of memory. Instead of the base class's generic error, offer to
+            // retry as a shallow clone, which downloads far fewer objects and usually fits.
+            mRepo.removeTask(this);
+            promptShallowRetry();
+            return;
+        }
         super.onPostExecute(isSuccess);
         if (isTaskCanceled()) {
             return;
@@ -57,6 +80,18 @@ public class CloneTask extends RepoRemoteOpTask {
         }
     }
 
+    private void promptShallowRetry() {
+        SheimiFragmentActivity activity =
+                (SheimiFragmentActivity) BasicFunctions.getActiveActivity();
+        if (activity == null) {
+            return;
+        }
+        activity.showMessageDialog(R.string.dialog_clone_too_large_title,
+                activity.getString(R.string.dialog_clone_too_large_msg),
+                R.string.label_clone_shallow,
+                (dialog, which) -> newTaskWithDepth(SHALLOW_DEPTH).executeTask());
+    }
+
     public boolean cloneRepo() {
         File localRepo = mRepo.getDir();
         CloneCommand cloneCommand = Git.cloneRepository()
@@ -65,6 +100,10 @@ public class CloneTask extends RepoRemoteOpTask {
                 .setTransportConfigCallback(new SgitTransportCallback())
                 .setDirectory(localRepo)
                 .setCloneSubmodules(mCloneRecursive);
+
+        if (mDepth > 0) {
+            cloneCommand.setDepth(mDepth);
+        }
 
         setCredentials(cloneCommand);
 
@@ -92,7 +131,14 @@ public class CloneTask extends RepoRemoteOpTask {
             }
             return false;
         } catch (OutOfMemoryError e) {
-            setException(e, R.string.error_out_of_memory);
+            // A full clone can exhaust memory on a large repo. Offer a shallow retry rather than
+            // a dead-end error; a shallow clone that still OOMs falls back to the plain message.
+            if (mDepth <= 0) {
+                mOfferShallowRetry = true;
+            } else {
+                setException(e, R.string.error_out_of_memory);
+            }
+            Profile.setLastCloneFailed(mRepo);
             return false;
         } catch (Throwable e) {
             setException(e);
@@ -109,14 +155,19 @@ public class CloneTask extends RepoRemoteOpTask {
 
     @Override
     public RepoRemoteOpTask getNewTask() {
-        // need to call create repo again as when clone fails due auth error, the repo
+        // An auth retry keeps whatever depth this clone used.
+        return newTaskWithDepth(mDepth);
+    }
+
+    private CloneTask newTaskWithDepth(int depth) {
+        // need to call create repo again as when clone fails (auth error or OOM), the repo
         // initially created gets deleted
         String userName = mRepo.getUsername();
         String password = mRepo.getPassword();
         mRepo = Repo.createRepo(mRepo.getLocalPath(), mRepo.getRemoteURL(), mCloneStatusName);
         mRepo.setUsername(userName);
         mRepo.setPassword(password);
-        return new CloneTask(mRepo, mCloneRecursive, mCloneStatusName, mCallback);
+        return new CloneTask(mRepo, mCloneRecursive, mCloneStatusName, mCallback, depth);
     }
 
     @Override

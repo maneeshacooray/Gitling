@@ -120,6 +120,10 @@
     <string name="dialog_create_branch_title">Create new branch</string>
     <string name="dialog_create_branch_hint">Branch Name</string>
     <string name="dialog_clone_recursive">Clone recursively</string>
+    <string name="dialog_clone_shallow">Shallow clone (latest history only)</string>
+    <string name="dialog_clone_too_large_title">Repository too large</string>
+    <string name="dialog_clone_too_large_msg">This repository is too large to clone in full on this device. Clone just the latest history (a shallow clone) instead?</string>
+    <string name="label_clone_shallow">Shallow clone</string>
     <string name="dialog_show_unstaged_diff">Unstaged diff</string>
     <string name="dialog_show_staged_diff">Staged diff</string>
     <string name="dialog_show_invalid_remote">Invalid remote report</string>
