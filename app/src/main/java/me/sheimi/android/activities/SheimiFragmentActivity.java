@@ -86,7 +86,12 @@ public class SheimiFragmentActivity extends AppCompatActivity {
         final DisplayMetrics dm = r.getDisplayMetrics();
         final Configuration c = r.getConfiguration();
         if (c.locale == null || !c.locale.equals(locale)) {
-            c.locale = locale;
+            // setLocale (not the deprecated c.locale field) also updates the configuration's
+            // layout direction from the locale, so an RTL language (Arabic, Hebrew) actually
+            // mirrors the layout instead of only switching the strings. setLayoutDirection is
+            // called explicitly as well to make that intent clear.
+            c.setLocale(locale);
+            c.setLayoutDirection(locale);
             r.updateConfiguration(c, dm);
         }
     }

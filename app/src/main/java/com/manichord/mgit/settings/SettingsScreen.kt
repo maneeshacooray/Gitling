@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -70,7 +71,7 @@ fun SettingsScreen(
                 title = { Text(stringResource(R.string.action_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -359,7 +360,8 @@ fun SettingsFontItem(selected: FontOption, onSelect: (FontOption) -> Unit) {
 
 private data class AppLanguage(val tag: String, val label: String)
 
-private val supportedLanguageTags = listOf("de", "en", "es", "fr", "ja", "ko", "ru", "zh-CN")
+private val supportedLanguageTags =
+    listOf("ar", "de", "en", "es", "fr", "iw", "ja", "ko", "ru", "zh-CN")
 
 @Composable
 private fun rememberAppLanguages(): List<AppLanguage> {

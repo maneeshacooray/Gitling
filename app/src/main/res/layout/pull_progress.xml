@@ -31,7 +31,7 @@
                 android:id="@+id/leftHint"
                 android:textSize="@dimen/file_list_header_hint_size"
                 android:textColor="@color/general_gray_text_color"
-                android:gravity="left"/>
+                android:gravity="start"/>
 
         <TextView
                 style="@style/items_with_same_width"
@@ -40,7 +40,7 @@
                 android:id="@+id/rightHint"
                 android:textSize="@dimen/file_list_header_hint_size"
                 android:textColor="@color/general_gray_text_color"
-                android:gravity="right"/>
+                android:gravity="end"/>
 
     </LinearLayout>
 </LinearLayout>
