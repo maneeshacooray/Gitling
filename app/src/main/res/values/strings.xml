@@ -16,6 +16,8 @@
     <string name="action_manage_private_key">Private Keys</string>
     <string name="action_generate_private_key">Generate Key</string>
     <string name="action_import_private_key">Import Key</string>
+    <string name="success_import_key">Key imported</string>
+    <string name="error_import_key_failed">Couldn\'t import key</string>
     <string name="action_mode_show_private_key">Show private key</string>
     <string name="action_mode_show_public_key">Show public key</string>
     <string name="action_mode_edit_key_password">Edit key password</string>
