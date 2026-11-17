@@ -12,7 +12,7 @@
             android:layout_height="@dimen/commit_list_item_icon_size"
             android:id="@+id/commitIcon"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             app:srcCompat="@drawable/ic_default_author"
             android:padding="@dimen/commit_list_item_icon_padding"/>
 
@@ -21,8 +21,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/commitIcon"
-            android:layout_alignParentRight="true"
+            android:layout_toEndOf="@id/commitIcon"
+            android:layout_alignParentEnd="true"
             android:padding="@dimen/general_padding"
             android:dividerPadding="@dimen/general_padding">
 
@@ -61,7 +61,7 @@
                     android:id="@+id/commitTime"
                     android:textSize="@dimen/commit_list_item_time_size"
                     android:textColor="@color/general_gray_text_color"
-                    android:layout_marginLeft="@dimen/general_horizontal_margin"/>
+                    android:layout_marginStart="@dimen/general_horizontal_margin"/>
         </LinearLayout>
     </LinearLayout>
 
