@@ -16,7 +16,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -185,7 +185,7 @@ fun GitConsoleScreen(
                 onClick = { submit(inputText) },
                 enabled = inputText.isNotBlank() && !running
             ) {
-                Icon(Icons.Default.Send, contentDescription = "Run")
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Run")
             }
         }
     }

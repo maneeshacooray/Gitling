@@ -5,6 +5,14 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.66 - 2026-11-17
+- Choose the app's language in Settings, separately from your device language.
+- Right-to-left layout support: the app now mirrors fully in Arabic and Hebrew, and both are back in the language list.
+- Clone large repositories faster with a shallow clone option, and see progress from the moment a clone starts.
+- Import SSH keys using your device's file picker.
+- Sign in to SSH servers that prompt for your password interactively (keyboard-interactive).
+- Fixed a crash on very large repositories when counting what's waiting to sync.
+
 ## 1.0.65 - 2026-10-20
 - A refreshed look built on Material 3 Expressive across the repo list, repo screen, settings and home screen widget.
 - Pull, Commit and Push are now one tap away on the repo screen, with counts of what's waiting to pull, push and commit.

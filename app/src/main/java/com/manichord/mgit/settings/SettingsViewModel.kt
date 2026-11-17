@@ -89,8 +89,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         activity.runOnUiThread { activity.showMessageDialog(R.string.dialog_error_title, message) }
     }
 
-    private val _useEnglish = MutableLiveData(prefsHelper.useEnglish())
-    val useEnglish: LiveData<Boolean> = _useEnglish
+    private val _appLanguage = MutableLiveData(prefsHelper.getAppLanguage())
+    val appLanguage: LiveData<String> = _appLanguage
 
     private val _gitUserName = MutableLiveData(prefsHelper.getUserName() ?: "")
     val gitUserName: LiveData<String> = _gitUserName
@@ -167,9 +167,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         _accounts.value = accountManager.getAccounts()
     }
 
-    fun setUseEnglish(use: Boolean) {
-        prefsHelper.setUseEnglish(use)
-        _useEnglish.value = use
+    fun setAppLanguage(languageTag: String) {
+        prefsHelper.setAppLanguage(languageTag)
+        _appLanguage.value = languageTag
     }
 
     fun setGitUserName(name: String) {

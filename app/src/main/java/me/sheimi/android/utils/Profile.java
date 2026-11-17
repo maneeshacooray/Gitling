@@ -90,9 +90,14 @@ public class Profile {
         return styled;
     }
 
-    public static boolean useEnglishLocale(Context context) {
+    public static String getAppLanguage(Context context) {
+        String appLanguagePrefKey = context.getString(R.string.pref_key_app_language);
+        SharedPreferences prefs = getProfileSharedPreference(context);
+        if (prefs.contains(appLanguagePrefKey)) {
+            return prefs.getString(appLanguagePrefKey, "");
+        }
         String useEnglishPrefKey = context.getString(R.string.pref_key_use_english);
-        return getProfileSharedPreference(context).getBoolean(useEnglishPrefKey, false);
+        return prefs.getBoolean(useEnglishPrefKey, false) ? "en" : "";
     }
 
     public static boolean useDynamicColor(Context context) {

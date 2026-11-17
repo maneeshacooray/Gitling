@@ -53,12 +53,16 @@ public class PreferenceHelper {
         Timber.d("Privacy policy accepted version:" + PRIVACY_ACCEPTED_VERSION);
     }
 
-    public boolean useEnglish() {
-        return getBoolean(mContext.getString(R.string.pref_key_use_english));
+    public String getAppLanguage() {
+        String languageKey = mContext.getString(R.string.pref_key_app_language);
+        if (getSharedPrefs().contains(languageKey)) {
+            return getString(languageKey);
+        }
+        return getBoolean(mContext.getString(R.string.pref_key_use_english)) ? "en" : "";
     }
 
-    public void setUseEnglish(boolean use) {
-        edit(mContext.getString(R.string.pref_key_use_english), use);
+    public void setAppLanguage(String languageTag) {
+        edit(mContext.getString(R.string.pref_key_app_language), languageTag);
     }
 
     public boolean useDynamicColor() {

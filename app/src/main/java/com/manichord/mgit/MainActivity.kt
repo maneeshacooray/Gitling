@@ -55,7 +55,6 @@ import me.sheimi.sgit.MGitApplication
 import me.sheimi.sgit.R
 import me.sheimi.sgit.activities.CommitDiffActivity
 import me.sheimi.sgit.activities.RepoDetailActivity
-import me.sheimi.sgit.activities.explorer.ExploreFileActivity
 import me.sheimi.sgit.activities.explorer.PrivateKeyManageActivity
 import me.sheimi.sgit.database.RepoDbManager
 import me.sheimi.sgit.database.models.Repo
@@ -152,9 +151,22 @@ class MainActivity : SheimiFragmentActivity() {
         saveDiffLauncher.launch(intent)
     }
 
-    /** Set just before navigating to "exploreFile"; invoked with the picked file's path, then
-     * cleared, by that route's host before popping back. */
-    private var pendingExploreFileOnPicked: ((String) -> Unit)? = null
+    /** SAF picker for importing a private key. The app's own file browser can't see files in
+     * shared storage under scoped storage (it has no All Files Access, deliberately, for F-Droid),
+     * so it only ever showed folders -- the system picker is the one that can actually reach the
+     * user's key file. Routed through MainActivity like saveDiffLauncher since
+     * PrivateKeyManageActivity is a NavHost host, not a ComponentActivity that can own a launcher. */
+    private val importKeyLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        val host = currentPrivateKeyManageHost ?: return@registerForActivityResult
+        if (uri != null) host.importKeyFromUri(uri)
+    }
+
+    fun launchImportKey() {
+        // Private keys have no reliable MIME type, so allow any file through.
+        importKeyLauncher.launch(arrayOf("*/*"))
+    }
 
     /** The live privateKeyManage screen's state/dispatch object, if that route is currently
      * showing -- read by EditKeyPasswordDialog/RenameKeyDialog/PrivateKeyGenerate
@@ -338,49 +350,6 @@ class MainActivity : SheimiFragmentActivity() {
                         }
                     }
                 }
-                composable("exploreFile") {
-                    val onPicked = pendingExploreFileOnPicked
-                    if (onPicked == null) {
-                        navController.popBackStack()
-                    } else {
-                        val host = remember(onPicked) {
-                            ExploreFileActivity(this@MainActivity) { path ->
-                                onPicked(path)
-                                navController.popBackStack()
-                            }
-                        }
-
-                        // Cleared on dispose rather than inline in the click callback above --
-                        // clearing it there let a stale recomposition (mid pop-transition) read
-                        // pendingExploreFileOnPicked as null and call popBackStack() a second
-                        // time, which corrupted NavHost's back stack state badly enough to blank
-                        // the whole screen with no exception logged anywhere.
-                        DisposableEffect(host) {
-                            onDispose { pendingExploreFileOnPicked = null }
-                        }
-
-                        BackHandler {
-                            if (!host.goUpOrFalse()) navController.popBackStack()
-                        }
-
-                        AppTheme {
-                            Box {
-                                FileExplorerScreen(
-                                    title = host.screenTitle,
-                                    currentPath = host.currentDir.path,
-                                    files = host.filesState,
-                                    showUpRow = !host.isAtRoot,
-                                    onUpClick = { host.goUpOrFalse() },
-                                    onBackClick = { navController.popBackStack() },
-                                    onItemClick = { host.onFileClick(it) },
-                                    onItemLongClick = { host.onFileLongClick(it) },
-                                    selectedFile = host.selectedFile
-                                )
-                                host.Overlay()
-                            }
-                        }
-                    }
-                }
                 composable("privateKeyManage") {
                     val host = remember {
                         PrivateKeyManageActivity(this@MainActivity).also { currentPrivateKeyManageHost = it }
@@ -480,11 +449,6 @@ class MainActivity : SheimiFragmentActivity() {
     fun openCommitDiff(oldCommit: String?, newCommit: String, showDescription: Boolean, repo: Repo?) {
         pendingCommitDiffArgs = CommitDiffArgs(oldCommit, newCommit, showDescription, repo)
         navController.navigate("commitDiff")
-    }
-
-    fun openExploreFile(onPicked: (String) -> Unit) {
-        pendingExploreFileOnPicked = onPicked
-        navController.navigate("exploreFile")
     }
 
     fun openPrivateKeyManage() {

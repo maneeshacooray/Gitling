@@ -25,6 +25,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import android.net.Uri
+import android.provider.OpenableColumns
 import com.manichord.mgit.MainActivity
 import com.manichord.mgit.ssh.PrivateKeyGenerate
 import me.sheimi.android.utils.FsUtils
@@ -33,6 +35,7 @@ import me.sheimi.sgit.activities.ViewFileActivity
 import me.sheimi.sgit.dialogs.EditKeyPasswordDialog
 import me.sheimi.sgit.dialogs.RenameKeyDialog
 import me.sheimi.sgit.ssh.PrivateKeyUtils
+import timber.log.Timber
 import java.io.File
 
 class PrivateKeyManageActivity(
@@ -45,12 +48,28 @@ class PrivateKeyManageActivity(
 ) {
     private var showDeleteConfirm by mutableStateOf(false)
 
-    fun importKey(path: String) {
-        val keyFile = File(path)
-        val newKey = File(currentDir, keyFile.name)
-        FsUtils.copyFile(keyFile, newKey)
+    /** Copies the key the user picked through the system file picker (a content Uri, since the
+     * app can't reach shared storage by path) into the private-key folder, keeping its name. */
+    fun importKeyFromUri(uri: Uri) {
+        val name = queryDisplayName(uri) ?: "imported_key"
+        val newKey = File(currentDir, name)
+        try {
+            mainActivity.contentResolver.openInputStream(uri)?.use { input ->
+                newKey.outputStream().use { output -> input.copyTo(output) }
+            } ?: throw java.io.IOException("Could not open $uri")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to import private key")
+            mainActivity.showToastMessage(R.string.error_import_key_failed)
+            return
+        }
+        mainActivity.showToastMessage(R.string.success_import_key)
         refreshList()
     }
+
+    private fun queryDisplayName(uri: Uri): String? =
+        mainActivity.contentResolver
+            .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
 
     override fun onFileClick(file: File) {
         if (file.isDirectory) {
@@ -70,7 +89,7 @@ class PrivateKeyManageActivity(
     @Composable
     override fun TopBarActions() {
         IconButton(onClick = {
-            mainActivity.openExploreFile { path -> importKey(path) }
+            mainActivity.launchImportKey()
         }) {
             Icon(Icons.Default.SaveAlt, contentDescription = getString(R.string.action_import_private_key))
         }

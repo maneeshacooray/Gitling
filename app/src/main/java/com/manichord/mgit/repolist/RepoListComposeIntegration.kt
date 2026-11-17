@@ -13,7 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -286,7 +286,7 @@ private fun RepoOptionsDialog(
                 )
                 ListItem(
                     headlineContent = { Text("Tags") },
-                    leadingContent = { Icon(Icons.Default.Label, contentDescription = null) },
+                    leadingContent = { Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null) },
                     colors = transparentListItemColors,
                     modifier = Modifier.clickable(onClick = onTagsClick)
                 )

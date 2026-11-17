@@ -46,6 +46,7 @@ fun CloneView(
     val localRepoNameState = rememberTextFieldStateFor(localRepoName)
     val initLocal by viewModel.initLocal.observeAsState(false)
     var cloneRecursively by remember { mutableStateOf(viewModel.cloneRecursively) }
+    var shallowClone by remember { mutableStateOf(viewModel.shallowClone) }
 
     val remoteUrlError by viewModel.remoteUrlError.observeAsState()
     val localRepoNameError by viewModel.localRepoNameError.observeAsState()
@@ -198,6 +199,16 @@ fun CloneView(
                         )
                         Text(
                             text = stringResource(id = R.string.dialog_clone_recursive),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = shallowClone,
+                            onCheckedChange = { shallowClone = it; viewModel.shallowClone = it }
+                        )
+                        Text(
+                            text = stringResource(id = R.string.dialog_clone_shallow),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

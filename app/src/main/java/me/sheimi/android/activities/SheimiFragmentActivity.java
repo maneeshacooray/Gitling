@@ -51,15 +51,17 @@ public class SheimiFragmentActivity extends AppCompatActivity {
 
     private boolean mLastUseDynamicColor;
     private String mLastAppFont;
+    private String mLastAppLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BasicFunctions.setActiveActivity(this);
         setTheme(getThemeResource());
-        updateLocale(Profile.useEnglishLocale(getApplicationContext()));
+        updateLocale(Profile.getAppLanguage(getApplicationContext()));
         mLastUseDynamicColor = Profile.useDynamicColor(getApplicationContext());
         mLastAppFont = Profile.getAppFont(getApplicationContext());
+        mLastAppLanguage = Profile.getAppLanguage(getApplicationContext());
 
         getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
             @Override
@@ -73,18 +75,23 @@ public class SheimiFragmentActivity extends AppCompatActivity {
         return Profile.getThemeResource(getApplicationContext());
     }
 
-    private void updateLocale(boolean useEnglishLocale) {
+    private void updateLocale(String languageTag) {
         final Locale locale;
-        if (useEnglishLocale) {
-            locale = Locale.ENGLISH;
-        } else {
+        if (languageTag == null || languageTag.isEmpty()) {
             locale = Locale.getDefault();
+        } else {
+            locale = Locale.forLanguageTag(languageTag);
         }
         final Resources r = getResources();
         final DisplayMetrics dm = r.getDisplayMetrics();
         final Configuration c = r.getConfiguration();
         if (c.locale == null || !c.locale.equals(locale)) {
-            c.locale = locale;
+            // setLocale (not the deprecated c.locale field) also updates the configuration's
+            // layout direction from the locale, so an RTL language (Arabic, Hebrew) actually
+            // mirrors the layout instead of only switching the strings. setLayoutDirection is
+            // called explicitly as well to make that intent clear.
+            c.setLocale(locale);
+            c.setLayoutDirection(locale);
             r.updateConfiguration(c, dm);
         }
     }
@@ -101,7 +108,9 @@ public class SheimiFragmentActivity extends AppCompatActivity {
         // is the standard fix: cheap, and only triggers when something actually changed.
         boolean useDynamicColor = Profile.useDynamicColor(getApplicationContext());
         String appFont = Profile.getAppFont(getApplicationContext());
-        if (useDynamicColor != mLastUseDynamicColor || !java.util.Objects.equals(appFont, mLastAppFont)) {
+        String appLanguage = Profile.getAppLanguage(getApplicationContext());
+        if (useDynamicColor != mLastUseDynamicColor || !java.util.Objects.equals(appFont, mLastAppFont)
+                || !java.util.Objects.equals(appLanguage, mLastAppLanguage)) {
             recreate();
         }
     }

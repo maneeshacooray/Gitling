@@ -13,6 +13,18 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 69,
+            versionName = "1.0.66",
+            highlights = listOf(
+                "Choose the app's language in Settings, separately from your device language",
+                "Right-to-left layout support: the app now mirrors fully in Arabic and Hebrew, and both are back in the language list",
+                "Clone large repositories faster with a shallow clone option, and see progress from the moment a clone starts",
+                "Import SSH keys using your device's file picker",
+                "Sign in to SSH servers that prompt for your password interactively (keyboard-interactive)",
+                "Fixed a crash on very large repositories when counting what's waiting to sync"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 68,
             versionName = "1.0.65",
             highlights = listOf(
