@@ -43,7 +43,7 @@ public final class RepoContract {
                 COLUMN_NAME_PINNED, COLUMN_NAME_TAGS };
     }
 
-    public static final String REPO_ENTRY_CREATE = "CREATE TABLE "
+    public static final String REPO_ENTRY_CREATE = "CREATE TABLE IF NOT EXISTS "
             + RepoEntry.TABLE_NAME + " (" + RepoEntry._ID + PRIMARY_KEY_TYPE
             + COMMA_SEP + RepoEntry.COLUMN_NAME_LOCAL_PATH + TEXT_TYPE
             + COMMA_SEP + RepoEntry.COLUMN_NAME_REMOTE_URL + TEXT_TYPE
