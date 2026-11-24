@@ -84,6 +84,18 @@ public class PreferenceHelper {
         edit(mContext.getString(R.string.pref_key_use_shared_media_storage), use);
     }
 
+    /** False (default): repos live on primary (internal) storage. True: repos live in Gitling's
+     * own app folder on a removable volume (SD card), for users short on internal space. Combines
+     * with useSharedMediaStorage() to pick the exact root -- see Repo.getDefaultRepoRootDir() and
+     * FsUtils.getSdCardDir(). Permission-free either way. */
+    public boolean useSdCardStorage() {
+        return getBoolean(mContext.getString(R.string.pref_key_use_sd_card_storage));
+    }
+
+    public void setUseSdCardStorage(boolean use) {
+        edit(mContext.getString(R.string.pref_key_use_sd_card_storage), use);
+    }
+
     public String getAppFont() {
         return getString(mContext.getString(R.string.pref_key_app_font));
     }

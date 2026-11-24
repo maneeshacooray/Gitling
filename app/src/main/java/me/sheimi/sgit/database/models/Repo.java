@@ -592,7 +592,17 @@ public class Repo implements Comparable<Repo>, Serializable {
      * restricted to one of these two directories. */
     public static File getDefaultRepoRootDir() {
         PreferenceHelper prefs = ((MGitApplication) MGitApplication.getContext()).getPrefenceHelper();
-        return prefs.useSharedMediaStorage()
+        boolean shared = prefs.useSharedMediaStorage();
+        if (prefs.useSdCardStorage()) {
+            File sdDir = FsUtils.getSdCardDir(REPO_DIR, true, shared);
+            if (sdDir != null) {
+                return sdDir;
+            }
+            // SD card is selected but not currently present (card removed). Fall back to primary
+            // storage so nothing crashes and repos already there stay reachable; repos on the
+            // absent card reappear once it is reinserted.
+        }
+        return shared
                 ? FsUtils.getMediaDir(REPO_DIR, true)
                 : FsUtils.getExternalDir(REPO_DIR, true);
     }
@@ -604,7 +614,11 @@ public class Repo implements Comparable<Repo>, Serializable {
      * sharedMedia} is true, removed when false (without creating the media dir just to check).
      * Does disk I/O, so call it off the main thread. */
     public static void syncNoMediaMarker(boolean sharedMedia) {
-        File marker = new File(FsUtils.getMediaDir(REPO_DIR, sharedMedia), NOMEDIA_FILE);
+        // When shared, the current default root is a media dir (primary or SD card), so put the
+        // marker there. When not shared, only the primary media dir needs checking for an old
+        // marker to remove (don't create it just to look).
+        File root = sharedMedia ? getDefaultRepoRootDir() : FsUtils.getMediaDir(REPO_DIR, false);
+        File marker = new File(root, NOMEDIA_FILE);
         try {
             if (sharedMedia) {
                 if (!marker.exists() && !marker.createNewFile()) {

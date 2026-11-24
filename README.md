@@ -83,7 +83,7 @@ Gitling doesn't include an internal text editor -- to edit files, you'll need an
 
 1. Tap the `+` button to add a new repository
 2. Enter the remote URL (see formats below)
-3. Enter a local repository name -- this is **not** the full path; Gitling stores all repositories under a common root directory (changeable in Settings)
+3. Enter a local repository name -- this is **not** the full path; Gitling stores all repositories under a common root directory in its own app storage. In Settings you can choose between this device and an SD card (if present), and whether repos are kept private or made visible to other apps; arbitrary custom paths are not supported.
 4. Tap `Clone`
 5. If required, you'll be prompted for credentials -- or connect your GitHub account once in Settings to skip this for GitHub remotes
 

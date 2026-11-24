@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import androidx.core.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
@@ -126,6 +127,70 @@ public class FsUtils {
             mDir.mkdirs();
         }
         return mDir;
+    }
+
+    /** The app's own repo dir on a removable volume (SD card), or null if no removable volume is
+     * currently present. Uses {@code getExternalFilesDirs()} / {@code getExternalMediaDirs()},
+     * whose entries past index 0 are this app's folders on secondary volumes. Like the primary
+     * app dirs, these need no storage permission and no SAF, so unlike the old custom-root feature
+     * (removed for F-Droid, see Repo.migrateAwayFromCustomRoot) this stays within what F-Droid
+     * allows. {@code shared == true} picks the Android/media variant (reachable by other apps, like
+     * getMediaDir()); false picks the private Android/data one. */
+    public static File getSdCardDir(String dirname, boolean isCreate, boolean shared) {
+        Context context = contextForDirs();
+        File[] dirs = shared ? context.getExternalMediaDirs() : context.getExternalFilesDirs(null);
+        if (dirs == null) {
+            return null;
+        }
+        // Index 0 is primary (internal) storage; any later non-null entry is a secondary volume.
+        for (int i = 1; i < dirs.length; i++) {
+            File base = dirs[i];
+            if (base == null) {
+                continue;
+            }
+            try {
+                if (!Environment.isExternalStorageRemovable(base)) {
+                    continue;
+                }
+            } catch (IllegalArgumentException e) {
+                // Volume went away between the array snapshot and this check.
+                continue;
+            }
+            File mDir = new File(base, dirname);
+            if (!mDir.exists() && isCreate) {
+                mDir.mkdirs();
+            }
+            return mDir;
+        }
+        return null;
+    }
+
+    /** Whether a removable volume Gitling can store repos on is currently present. */
+    public static boolean hasSdCard() {
+        Context context = contextForDirs();
+        File[] dirs = context.getExternalFilesDirs(null);
+        if (dirs == null) {
+            return false;
+        }
+        for (int i = 1; i < dirs.length; i++) {
+            File base = dirs[i];
+            if (base == null) {
+                continue;
+            }
+            try {
+                if (Environment.isExternalStorageRemovable(base)) {
+                    return true;
+                }
+            } catch (IllegalArgumentException e) {
+                // ignore and keep looking
+            }
+        }
+        return false;
+    }
+
+    private static Context contextForDirs() {
+        SheimiFragmentActivity activeActivity = BasicFunctions.getActiveActivity();
+        return activeActivity != null ? activeActivity : MGitApplication.getContext();
     }
 
     /** Matches the message java.io.FileNotFoundException carries on Android when the underlying
