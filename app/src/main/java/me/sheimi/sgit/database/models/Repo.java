@@ -724,15 +724,13 @@ public class Repo implements Comparable<Repo>, Serializable {
             return;
         }
         try {
-            org.apache.commons.io.FileUtils.copyDirectory(oldDir, newDir);
+            FsUtils.copyDirectoryThrows(oldDir, newDir);
         } catch (IOException e) {
-            org.apache.commons.io.FileUtils.deleteQuietly(newDir);
+            FsUtils.deleteDirectory(newDir);
             throw e;
         }
-        try {
-            org.apache.commons.io.FileUtils.deleteDirectory(oldDir);
-        } catch (IOException e) {
-            Timber.e(e, "Moved %s but could not delete the original", oldDir);
+        if (!FsUtils.deleteDirectory(oldDir)) {
+            Timber.e("Moved %s but could not delete the original", oldDir);
         }
     }
 

@@ -289,7 +289,6 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.jsch)
-    implementation(libs.commons.io)
     implementation(libs.jgit.core)
     implementation(libs.jgit.ssh.jsch) {
         exclude(group = "com.jcraft", module = "jsch")

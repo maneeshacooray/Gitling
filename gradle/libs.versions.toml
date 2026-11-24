@@ -15,7 +15,6 @@ androidx-vectordrawable = "1.2.0"
 google-material = "1.13.0"
 timber = "5.0.1"
 jsch = "0.2.22"
-commons-io = "2.18.0"
 jgit = "7.3.0.202506031305-r"
 image-loader = "1.9.5"
 secure-preferences = "0.1.7"
@@ -70,7 +69,6 @@ bcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "b
 
 # Utils
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
 universal-image-loader = { group = "com.nostra13.universalimageloader", name = "universal-image-loader", version.ref = "image-loader" }
 secure-preferences = { group = "com.scottyab", name = "secure-preferences-lib", version.ref = "secure-preferences" }
 
