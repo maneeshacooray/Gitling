@@ -11,6 +11,7 @@ import com.manichord.mgit.update.UpdateCheckResult
 import com.manichord.mgit.update.UpdateChecker
 import me.sheimi.android.activities.SheimiFragmentActivity
 import me.sheimi.android.utils.BasicFunctions
+import me.sheimi.android.utils.FsUtils
 import me.sheimi.android.utils.Profile
 import me.sheimi.sgit.BuildConfig
 import me.sheimi.sgit.MGitApplication
@@ -30,22 +31,46 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val _useSharedMediaStorage = MutableLiveData(prefsHelper.useSharedMediaStorage())
     val useSharedMediaStorage: LiveData<Boolean> = _useSharedMediaStorage
 
+    private val _useSdCardStorage = MutableLiveData(prefsHelper.useSdCardStorage())
+    val useSdCardStorage: LiveData<Boolean> = _useSdCardStorage
+
     private val _movingRepoStorage = MutableLiveData(false)
     val movingRepoStorage: LiveData<Boolean> = _movingRepoStorage
 
-    /** Moves every bare-named repo's directory to the other default root, then flips the
-     * preference -- both roots are always accessible to Gitling regardless of the current
-     * setting (see Repo.getDefaultRepoRootDir()), so this is a real move, not a "some repos
-     * become unreachable" migration. Runs off the main thread since it's real disk I/O
-     * proportional to repo size/count.
+    /** Whether a removable volume is currently present, so the UI only offers the SD-card option
+     * when there's actually one to use. */
+    val sdCardAvailable: Boolean get() = FsUtils.hasSdCard()
+
+    /** Flips the "make repos visible to other apps" preference and moves repos to match. */
+    fun setUseSharedMediaStorage(use: Boolean) = relocateRepos(
+        apply = { prefsHelper.setUseSharedMediaStorage(use) },
+        revert = { prefsHelper.setUseSharedMediaStorage(!use) },
+        onSuccess = { _useSharedMediaStorage.postValue(use) }
+    )
+
+    /** Flips the "store repos on SD card" preference and moves repos to match. */
+    fun setUseSdCardStorage(use: Boolean) = relocateRepos(
+        apply = { prefsHelper.setUseSdCardStorage(use) },
+        revert = { prefsHelper.setUseSdCardStorage(!use) },
+        onSuccess = { _useSdCardStorage.postValue(use) }
+    )
+
+    /** Applies a storage-location preference change and moves every bare-named repo's directory
+     * from the old default root to the new one, then reports success -- every default root is
+     * always accessible to Gitling regardless of the current setting (see
+     * Repo.getDefaultRepoRootDir()), so this is a real move, not a "some repos become unreachable"
+     * migration. Runs off the main thread since it's real disk I/O proportional to repo size/count.
      *
      * Files Android won't let Gitling read (see BlockedFileRepair) can't be copied, so they're
      * looked for before anything moves: the user is offered the same access fix as staging such
-     * a file, and the move runs again once afterwards. If the move still fails, it's undone
-     * (see Repo.moveReposBetweenDefaultRoots) and the setting is left as it was. */
-    fun setUseSharedMediaStorage(use: Boolean) = moveRepoStorage(use, isRetry = false)
-
-    private fun moveRepoStorage(use: Boolean, isRetry: Boolean) {
+     * a file, and the move runs again once afterwards. If the move still fails, the preference is
+     * reverted and the repos are moved back (see Repo.moveReposBetweenDefaultRoots). */
+    private fun relocateRepos(
+        apply: () -> Unit,
+        revert: () -> Unit,
+        onSuccess: () -> Unit,
+        isRetry: Boolean = false
+    ) {
         val app = getApplication<MGitApplication>()
         val oldRoot = Repo.getDefaultRepoRootDir()
         _movingRepoStorage.postValue(true)
@@ -60,26 +85,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 activity.requestMediaFileAccess(oldRoot, blocked[0],
                     object : SheimiFragmentActivity.OnPermissionResult {
-                        override fun onGranted() = moveRepoStorage(use, isRetry = true)
+                        override fun onGranted() = relocateRepos(apply, revert, onSuccess, isRetry = true)
 
                         override fun onDenied() = showMoveError(
                             app.getString(R.string.error_move_repos_blocked, blocked[0].name))
                     })
                 return@Thread
             }
-            prefsHelper.setUseSharedMediaStorage(use)
+            apply()
             val newRoot = Repo.getDefaultRepoRootDir()
             val error = Repo.moveReposBetweenDefaultRoots(app, oldRoot, newRoot)
             if (error != null) {
-                prefsHelper.setUseSharedMediaStorage(!use)
+                revert()
                 _movingRepoStorage.postValue(false)
                 showMoveError(app.getString(R.string.error_move_repos_failed,
                     error.localizedMessage ?: error.javaClass.simpleName))
                 return@Thread
             }
-            Repo.syncNoMediaMarker(use)
+            Repo.syncNoMediaMarker(prefsHelper.useSharedMediaStorage())
             _movingRepoStorage.postValue(false)
-            _useSharedMediaStorage.postValue(use)
+            onSuccess()
             _repoRoot.postValue(newRoot.absolutePath)
         }.start()
     }

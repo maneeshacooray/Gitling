@@ -160,7 +160,12 @@
 
     <!-- Preferences -->
 
-    <string name="preference_repo_location">Root storage location for repos</string>
+    <string name="preference_repo_location">Where repositories are stored</string>
+    <string name="preference_repo_location_dialog_title">Store repositories on</string>
+    <string name="preference_repo_location_moving">Moving repositories…</string>
+    <string name="storage_location_device">This device</string>
+    <string name="storage_location_sdcard">SD card</string>
+    <string name="pref_key_use_sd_card_storage" translatable="false">repo_storage_sdcard</string>
     <string name="pref_category_title_general">General</string>
     <string name="pref_key_repo_root_location" translatable="false">repo_root_path</string>
     <string name="action_select_root_dir">Select as Root folder</string>

@@ -54,6 +54,8 @@ fun SettingsScreen(
 ) {
     val repoRoot by viewModel.repoRoot.observeAsState(Repo.getDefaultRepoRootDir().absolutePath)
     val useSharedMediaStorage by viewModel.useSharedMediaStorage.observeAsState(false)
+    val useSdCardStorage by viewModel.useSdCardStorage.observeAsState(false)
+    val sdCardAvailable = remember { viewModel.sdCardAvailable }
     val movingRepoStorage by viewModel.movingRepoStorage.observeAsState(false)
     val appLanguage by viewModel.appLanguage.observeAsState("")
     val activity = LocalContext.current.findActivity()
@@ -88,11 +90,12 @@ fun SettingsScreen(
             SettingsGroup(
                 listOf(
                     {
-                        ListItem(
-                            colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
-                            headlineContent = { Text(stringResource(R.string.preference_repo_location)) },
-                            supportingContent = { Text(repoRoot) },
-                            leadingContent = { Icon(Icons.Default.Folder, null) }
+                        SettingsStorageLocationItem(
+                            repoRoot = repoRoot,
+                            onSdCard = useSdCardStorage,
+                            sdCardAvailable = sdCardAvailable,
+                            moving = movingRepoStorage,
+                            onSelect = { sd -> viewModel.setUseSdCardStorage(sd) }
                         )
                     },
                     {
@@ -414,6 +417,66 @@ fun SettingsLanguageItem(language: String, onSelect: (String) -> Unit) {
                             onClick = {
                                 showDialog = false
                                 onSelect(option.tag)
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.label_cancel))
+                }
+            }
+        )
+    }
+}
+
+/** Shows where repos are stored and, when a removable volume is present (or repos are already on
+ * one), lets the user move them between this device and the SD card. When there's no card and
+ * repos are on this device, it's a plain informational row -- which is also what resolves #125,
+ * where the old always-static row looked tappable but did nothing. */
+@Composable
+private fun SettingsStorageLocationItem(
+    repoRoot: String,
+    onSdCard: Boolean,
+    sdCardAvailable: Boolean,
+    moving: Boolean,
+    onSelect: (Boolean) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val canChoose = (sdCardAvailable || onSdCard) && !moving
+
+    ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
+        headlineContent = { Text(stringResource(R.string.preference_repo_location)) },
+        supportingContent = {
+            Text(if (moving) stringResource(R.string.preference_repo_location_moving) else repoRoot)
+        },
+        leadingContent = { Icon(Icons.Default.Folder, null) },
+        modifier = if (canChoose) Modifier.clickable { showDialog = true } else Modifier
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.preference_repo_location_dialog_title)) },
+            text = {
+                Column {
+                    LanguageOption(
+                        label = stringResource(R.string.storage_location_device),
+                        selected = !onSdCard,
+                        onClick = {
+                            showDialog = false
+                            if (onSdCard) onSelect(false)
+                        }
+                    )
+                    if (sdCardAvailable || onSdCard) {
+                        LanguageOption(
+                            label = stringResource(R.string.storage_location_sdcard),
+                            selected = onSdCard,
+                            onClick = {
+                                showDialog = false
+                                if (!onSdCard) onSelect(true)
                             }
                         )
                     }
