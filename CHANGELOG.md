@@ -5,6 +5,14 @@ in-app "What's New" history (`app/src/main/java/com/manichord/mgit/whatsnew/What
 and the per-release notes under `fastlane/metadata/android/en-US/changelogs/`; update this file
 as part of cutting each release (see `docs/agents/release-process.md`).
 
+## 1.0.67 - 2026-11-27
+- Connect to servers with self-signed or untrusted HTTPS certificates, after confirming you trust them.
+- Clearer message when cloning a SHA-256 repository, instead of a confusing error.
+- Fixed a crash on first launch when setting up the repository database.
+- Fixed a crash when cloning very large repositories.
+- Fixed an out-of-memory crash when opening very large repositories.
+- Fixed a crash on Android 6 and 7 caused by an unsupported file API.
+
 ## 1.0.66 - 2026-11-17
 - Choose the app's language in Settings, separately from your device language.
 - Right-to-left layout support: the app now mirrors fully in Arabic and Hebrew, and both are back in the language list.
