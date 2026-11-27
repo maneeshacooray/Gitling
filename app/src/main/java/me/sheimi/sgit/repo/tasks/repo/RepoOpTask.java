@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import com.manichord.mgit.auth.RepoCredentials;
 import me.sheimi.android.activities.SheimiFragmentActivity.OnPasswordEntered;
@@ -141,6 +142,35 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
             String msg = c.getMessage();
             if (msg != null && msg.toLowerCase(Locale.ROOT).contains("ssl")) {
                 return true;
+            }
+            if (c.getCause() == c) {
+                break;
+            }
+        }
+        return false;
+    }
+
+    /** A 64-hex-character run, i.e. a SHA-256 object id. JGit only ever produces 40-hex SHA-1 ids,
+     * so one appearing in an error message is a strong sign the remote is a SHA-256 repository. */
+    private static final Pattern SHA256_OBJECT_ID = Pattern.compile("\\b[0-9a-f]{64}\\b");
+
+    /** True if {@code t}'s cause chain looks like JGit failing to read a ref advertisement because
+     * of an object format it does not support (SHA-256). JGit surfaces this differently depending on
+     * the protocol version the server negotiates: a pkt-line "Short read of block" on protocol v2,
+     * or an "Invalid ref advertisement line" / "Invalid id" carrying a 64-hex object id on v0. None
+     * of these are unique to SHA-256, so callers should confirm the remote's object format before
+     * acting on it (see eclipse-jgit/jgit#73, #126). */
+    protected static boolean isLikelyObjectFormatError(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            String msg = c.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase(Locale.ROOT);
+                if (lower.contains("short read of block")
+                        || lower.contains("invalid ref advertisement line")
+                        || lower.contains("invalid id")
+                        || SHA256_OBJECT_ID.matcher(msg).find()) {
+                    return true;
+                }
             }
             if (c.getCause() == c) {
                 break;
