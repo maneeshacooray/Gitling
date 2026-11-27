@@ -2,6 +2,7 @@
 <resources>
 
     <string name="error_invalid_remote">Invalid remote</string>
+    <string name="error_sha256_unsupported">This repository uses the SHA-256 object format, which is not supported yet. Support depends on the underlying JGit library adding it.</string>
     <string name="error_transport">Transport error</string>
     <string name="error_clone_failed">Clone failed</string>
     <string name="error_pull_failed_not_on_branch">Pull failed: not on branch</string>

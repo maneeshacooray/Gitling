@@ -133,7 +133,7 @@ public class MGitHttpConnection implements HttpConnection {
     }
 
     /** Accepts any certificate chain. Only ever used for a host the user explicitly trusted. */
-    private static final class TrustAllManager implements X509TrustManager {
+    static final class TrustAllManager implements X509TrustManager {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }

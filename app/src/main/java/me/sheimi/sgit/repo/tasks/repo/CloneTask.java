@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
+import com.manichord.mgit.transport.RemoteObjectFormat;
 import com.manichord.mgit.transport.SslTrustStore;
 import me.sheimi.android.activities.SheimiFragmentActivity;
 import me.sheimi.android.utils.BasicFunctions;
@@ -174,13 +175,21 @@ public class CloneTask extends RepoRemoteOpTask {
             Profile.setLastCloneFailed(mRepo);
             return false;
         } catch (TransportException e) {
-            setException(e);
             Profile.setLastCloneFailed(mRepo);
             if (!mTrustSsl && isSslTrustError(e)) {
                 // Self-signed or otherwise untrusted certificate. Offer a "trust this server"
                 // retry (see onPostExecute) rather than the generic auth/error path (#56).
+                setException(e);
                 mOfferSslTrustRetry = true;
+            } else if (isLikelyObjectFormatError(e)
+                    && RemoteObjectFormat.isSha256Remote(mRepo.getRemoteURL())) {
+                // JGit can't read SHA-256 repos yet and fails parsing the ref advertisement with a
+                // cryptic error ("Short read of block", or "Invalid ref advertisement line" with a
+                // 64-hex id). Confirmed via the remote's advertisement, show a clear message instead
+                // (#126; eclipse-jgit/jgit#73).
+                setError(R.string.error_sha256_unsupported);
             } else {
+                setException(e);
                 handleAuthError(this);
             }
             return false;
