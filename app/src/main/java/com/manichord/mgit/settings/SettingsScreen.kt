@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.os.ConfigurationCompat
+import com.manichord.mgit.transport.SslTrustStore
 import com.manichord.mgit.ui.theme.FontOption
 import com.manichord.mgit.update.UpdateCheckResult
 import me.sheimi.sgit.BuildConfig
@@ -188,6 +189,9 @@ fun SettingsScreen(
                         )
                     },
                     {
+                        SettingsTrustedServersItem()
+                    },
+                    {
                         SettingsSwitchItem(
                             title = stringResource(R.string.preference_use_gravatar),
                             summary = stringResource(R.string.preference_use_gravatar_summary),
@@ -273,6 +277,65 @@ fun SettingsSwitchItem(
         },
         modifier = Modifier.clickable(enabled = enabled) { onCheckedChange(!checked) }
     )
+}
+
+/**
+ * Lists the HTTPS servers the user chose to trust despite an unverified certificate (#56), so the
+ * decision can be reviewed and revoked. Removing a host restores normal certificate verification
+ * for it on the next git operation.
+ */
+@Composable
+fun SettingsTrustedServersItem() {
+    var showDialog by remember { mutableStateOf(false) }
+    var hosts by remember { mutableStateOf(SslTrustStore.trustedHosts().toList()) }
+
+    ListItem(
+        colors = LocalSettingsItemColors.current ?: ListItemDefaults.colors(),
+        headlineContent = { Text(stringResource(R.string.preference_trusted_servers)) },
+        supportingContent = { Text(stringResource(R.string.preference_trusted_servers_summary)) },
+        leadingContent = { Icon(Icons.Default.Https, null) },
+        modifier = Modifier.clickable {
+            hosts = SslTrustStore.trustedHosts().toList()
+            showDialog = true
+        }
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.preference_trusted_servers)) },
+            text = {
+                if (hosts.isEmpty()) {
+                    Text(stringResource(R.string.preference_trusted_servers_none))
+                } else {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        hosts.forEach { host ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(host, modifier = Modifier.weight(1f))
+                                IconButton(onClick = {
+                                    SslTrustStore.untrust(host)
+                                    hosts = SslTrustStore.trustedHosts().toList()
+                                }) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.label_delete)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(shapes = ButtonDefaults.shapes(), onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.label_done))
+                }
+            }
+        )
+    }
 }
 
 @Composable

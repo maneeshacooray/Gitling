@@ -7,10 +7,14 @@ import android.os.Build;
 import androidx.core.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
-import org.apache.commons.io.FileUtils;
-
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -223,17 +227,12 @@ public class FsUtils {
             file.delete();
             return;
         }
-        try {
-            FileUtils.deleteDirectory(file);
-        } catch (IOException e) {
-            //TODO 
-            e.printStackTrace();
-        }
+        deleteDirectory(file);
     }
 
     public static void copyFile(File from, File to) {
         try {
-            FileUtils.copyFile(from, to);
+            copyFileThrows(from, to);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -243,9 +242,87 @@ public class FsUtils {
         if (!from.exists())
             return;
         try {
-            FileUtils.copyDirectory(from, to);
+            copyDirectoryThrows(from, to);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Plain java.io file operations.
+    //
+    // These replace org.apache.commons.io.FileUtils, whose copy/delete/read
+    // methods route through java.nio.file (Path, Files, CopyOption) in
+    // commons-io 2.7+. java.nio.file only exists on API 26+, so on Android
+    // 6/7 (API 23 to 25, a large share of the low-end install base) every one
+    // of those calls threw NoClassDefFoundError: the private-key migration
+    // crashed the app on launch, and file viewing, clone, and repo moves hit
+    // the same wall. java.io works on every supported API level.
+    // ---------------------------------------------------------------------
+
+    /** Recursively copy a file or directory tree. Throws on the first failure. */
+    public static void copyDirectoryThrows(File from, File to) throws IOException {
+        if (from.isDirectory()) {
+            if (!to.exists() && !to.mkdirs() && !to.isDirectory()) {
+                throw new IOException("Cannot create directory " + to);
+            }
+            File[] children = from.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    copyDirectoryThrows(child, new File(to, child.getName()));
+                }
+            }
+        } else {
+            copyFileThrows(from, to);
+        }
+    }
+
+    /** Copy a single file, creating parent directories as needed. */
+    public static void copyFileThrows(File from, File to) throws IOException {
+        File parent = to.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+        try (InputStream in = new FileInputStream(from);
+             OutputStream out = new FileOutputStream(to)) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+        }
+        to.setLastModified(from.lastModified());
+    }
+
+    /** Recursively delete a file or directory. Returns true if nothing remains
+     * afterwards. Never throws, so it also covers commons-io's deleteQuietly. */
+    public static boolean deleteDirectory(File fileOrDir) {
+        if (fileOrDir == null || !fileOrDir.exists()) {
+            return true;
+        }
+        boolean ok = true;
+        if (fileOrDir.isDirectory()) {
+            File[] children = fileOrDir.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    ok &= deleteDirectory(child);
+                }
+            }
+        }
+        return fileOrDir.delete() && ok;
+    }
+
+    /** Read a whole file as a UTF-8 string. On Android the default charset is
+     * always UTF-8, so this matches commons-io's deprecated readFileToString(File). */
+    public static String readFileToString(File file) throws IOException {
+        try (InputStream in = new FileInputStream(file)) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                bos.write(buffer, 0, read);
+            }
+            return bos.toString(StandardCharsets.UTF_8.name());
         }
     }
 

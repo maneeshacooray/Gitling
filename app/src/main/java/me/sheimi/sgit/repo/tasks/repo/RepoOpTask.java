@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import com.manichord.mgit.auth.RepoCredentials;
 import me.sheimi.android.activities.SheimiFragmentActivity.OnPasswordEntered;
@@ -20,6 +21,14 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
     protected Repo mRepo;
     protected boolean mIsTaskAdded;
     private int mSuccessMsg = 0;
+
+    /** Set on the retry after the user agreed to trust an untrusted/self-signed server certificate
+     * (see {@link #isSslTrustError}). The actual trust is persisted per host in
+     * {@link com.manichord.mgit.transport.SslTrustStore} and applied by
+     * {@link com.manichord.mgit.transport.MGitHttpConnection}; this flag only marks the operation as
+     * the post-trust retry so the user is not prompted again in a loop. Off by default, so normal
+     * operations verify certificates as usual. */
+    protected boolean mTrustSsl = false;
 
     public RepoOpTask(Repo repo) {
         this(repo, true);
@@ -117,6 +126,57 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         } else {
             Timber.d("no CredentialsProvider when no username/password provided");
         }
+    }
+
+    /** True if {@code t}'s cause chain is a TLS/certificate validation failure, i.e. the server's
+     * certificate could not be trusted (self-signed, unknown CA, or otherwise unvalidated). Used to
+     * offer the user a "trust this server" retry instead of a dead-end error (#56). Matched by type
+     * name and message so it does not depend on importing provider-internal exception classes. */
+    protected static boolean isSslTrustError(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            String cls = c.getClass().getName();
+            if (cls.contains("SSL") || cls.contains("CertPathValidator")
+                    || cls.contains("CertificateException")) {
+                return true;
+            }
+            String msg = c.getMessage();
+            if (msg != null && msg.toLowerCase(Locale.ROOT).contains("ssl")) {
+                return true;
+            }
+            if (c.getCause() == c) {
+                break;
+            }
+        }
+        return false;
+    }
+
+    /** A 64-hex-character run, i.e. a SHA-256 object id. JGit only ever produces 40-hex SHA-1 ids,
+     * so one appearing in an error message is a strong sign the remote is a SHA-256 repository. */
+    private static final Pattern SHA256_OBJECT_ID = Pattern.compile("\\b[0-9a-f]{64}\\b");
+
+    /** True if {@code t}'s cause chain looks like JGit failing to read a ref advertisement because
+     * of an object format it does not support (SHA-256). JGit surfaces this differently depending on
+     * the protocol version the server negotiates: a pkt-line "Short read of block" on protocol v2,
+     * or an "Invalid ref advertisement line" / "Invalid id" carrying a 64-hex object id on v0. None
+     * of these are unique to SHA-256, so callers should confirm the remote's object format before
+     * acting on it (see eclipse-jgit/jgit#73, #126). */
+    protected static boolean isLikelyObjectFormatError(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            String msg = c.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase(Locale.ROOT);
+                if (lower.contains("short read of block")
+                        || lower.contains("invalid ref advertisement line")
+                        || lower.contains("invalid id")
+                        || SHA256_OBJECT_ID.matcher(msg).find()) {
+                    return true;
+                }
+            }
+            if (c.getCause() == c) {
+                break;
+            }
+        }
+        return false;
     }
 
     protected void handleAuthError(OnPasswordEntered onPassEntered) {

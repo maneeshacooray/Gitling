@@ -56,6 +56,7 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,9 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import timber.log.Timber;
 
 import org.eclipse.jgit.transport.http.HttpConnection;
 
@@ -86,6 +90,7 @@ public class MGitHttpConnection implements HttpConnection {
             throws MalformedURLException,
             IOException {
         this.wrappedUrlConnection = (HttpURLConnection) url.openConnection();
+        trustIfUserApprovedHost(url);
     }
 
     /**
@@ -98,6 +103,49 @@ public class MGitHttpConnection implements HttpConnection {
             throws MalformedURLException, IOException {
         this.wrappedUrlConnection = (HttpURLConnection) url
                 .openConnection(proxy);
+        trustIfUserApprovedHost(url);
+    }
+
+    /**
+     * If this is an HTTPS connection to a host the user has explicitly chosen to trust despite an
+     * untrusted certificate (see {@link SslTrustStore}), install a trust-all SSL context and
+     * hostname verifier up front, so the first handshake succeeds. Doing it here (rather than via
+     * JGit's post-failure SSL retry) avoids replaying the request on an already-used
+     * HttpURLConnection, which this wrapper does not support, and transparently covers clone,
+     * fetch, pull and push to that host (#56).
+     */
+    private void trustIfUserApprovedHost(URL url) {
+        if (!(wrappedUrlConnection instanceof HttpsURLConnection)) {
+            return;
+        }
+        if (url == null || !SslTrustStore.isTrusted(url.getHost())) {
+            return;
+        }
+        try {
+            TrustManager[] trustAll = {new TrustAllManager()};
+            configure(null, trustAll, new SecureRandom());
+            setHostnameVerifier((hostname, session) -> true);
+        } catch (Exception e) {
+            // Leave verification on if the trust-all context cannot be built; the operation then
+            // fails as it would have anyway, rather than silently.
+            Timber.w(e, "Could not apply user-approved SSL trust for %s", url.getHost());
+        }
+    }
+
+    /** Accepts any certificate chain. Only ever used for a host the user explicitly trusted. */
+    static final class TrustAllManager implements X509TrustManager {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
     }
 
     public int getResponseCode() throws IOException {

@@ -126,6 +126,12 @@
     <string name="dialog_clone_too_large_title">Repository too large</string>
     <string name="dialog_clone_too_large_msg">This repository is too large to clone in full on this device. Clone just the latest history (a shallow clone) instead?</string>
     <string name="label_clone_shallow">Shallow clone</string>
+    <string name="dialog_ssl_untrusted_title">Certificate not trusted</string>
+    <string name="dialog_ssl_untrusted_msg">This server\'s certificate could not be verified. It may be self-signed or issued by an authority your device does not trust. Trust this server from now on and continue? This is less secure, so only do it for a server you control.</string>
+    <string name="label_trust_server">Trust and continue</string>
+    <string name="preference_trusted_servers">Trusted servers</string>
+    <string name="preference_trusted_servers_summary">Review servers trusted despite certificate warnings</string>
+    <string name="preference_trusted_servers_none">No servers have been trusted.</string>
     <string name="dialog_show_unstaged_diff">Unstaged diff</string>
     <string name="dialog_show_staged_diff">Staged diff</string>
     <string name="dialog_show_invalid_remote">Invalid remote report</string>

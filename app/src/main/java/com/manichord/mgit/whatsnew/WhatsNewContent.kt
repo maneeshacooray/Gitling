@@ -13,6 +13,18 @@ data class WhatsNewEntry(
 object WhatsNewContent {
     val entries = listOf(
         WhatsNewEntry(
+            versionCode = 70,
+            versionName = "1.0.67",
+            highlights = listOf(
+                "Connect to servers with self-signed or untrusted HTTPS certificates, after confirming you trust them",
+                "Clearer message when cloning a SHA-256 repository, instead of a confusing error",
+                "Fixed a crash on first launch when setting up the repository database",
+                "Fixed a crash when cloning very large repositories",
+                "Fixed an out-of-memory crash when opening very large repositories",
+                "Fixed a crash on Android 6 and 7 caused by an unsupported file API"
+            )
+        ),
+        WhatsNewEntry(
             versionCode = 69,
             versionName = "1.0.66",
             highlights = listOf(

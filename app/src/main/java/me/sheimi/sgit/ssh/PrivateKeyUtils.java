@@ -1,10 +1,8 @@
 package me.sheimi.sgit.ssh;
 
 import me.sheimi.android.utils.FsUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import com.jcraft.jsch.JSch;
@@ -46,8 +44,8 @@ public class PrivateKeyUtils {
         File oldDir = FsUtils.getExternalDir("ssh");
         if (oldDir.exists()) {
             try {
-                FileUtils.copyDirectory(oldDir, getPrivateKeyFolder());
-                FileUtils.deleteDirectory(oldDir);
+                FsUtils.copyDirectoryThrows(oldDir, getPrivateKeyFolder());
+                FsUtils.deleteDirectory(oldDir);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

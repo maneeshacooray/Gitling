@@ -37,7 +37,6 @@ import me.sheimi.sgit.database.models.Repo
 import me.sheimi.sgit.dialogs.ChooseLanguageDialog
 import me.sheimi.sgit.fragments.CommitsFragment
 import me.sheimi.sgit.repo.tasks.repo.GetBlameTask
-import org.apache.commons.io.FileUtils
 import timber.log.Timber
 import java.io.File
 
@@ -220,7 +219,7 @@ class ViewFileActivity : SheimiFragmentActivity() {
         fun loadCode() {
             Thread {
                 try {
-                    code = FileUtils.readFileToString(file)
+                    code = FsUtils.readFileToString(file)
                 } catch (e: java.io.IOException) {
                     showUserError(e, R.string.error_can_not_open_file)
                 }

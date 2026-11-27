@@ -10,10 +10,14 @@ import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.NotSupportedException;
 import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.transport.URIish;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
+import com.manichord.mgit.transport.RemoteObjectFormat;
+import com.manichord.mgit.transport.SslTrustStore;
 import me.sheimi.android.activities.SheimiFragmentActivity;
 import me.sheimi.android.utils.BasicFunctions;
 import me.sheimi.android.utils.Profile;
@@ -36,18 +40,27 @@ public class CloneTask extends RepoRemoteOpTask {
     /** Set when a full clone ran out of memory, so the user can be offered a shallow retry
      * instead of just a generic error (see {@link #onPostExecute}). */
     private boolean mOfferShallowRetry;
+    /** Set when the clone failed because the server's certificate could not be trusted, so the user
+     * can be offered a "trust this server" retry instead of a dead-end SSL error (#56). */
+    private boolean mOfferSslTrustRetry;
 
     public CloneTask(Repo repo, boolean cloneRecursive, String statusName, AsyncTaskCallback callback) {
-        this(repo, cloneRecursive, statusName, callback, 0);
+        this(repo, cloneRecursive, statusName, callback, 0, false);
     }
 
     public CloneTask(Repo repo, boolean cloneRecursive, String statusName, AsyncTaskCallback callback,
             int depth) {
+        this(repo, cloneRecursive, statusName, callback, depth, false);
+    }
+
+    public CloneTask(Repo repo, boolean cloneRecursive, String statusName, AsyncTaskCallback callback,
+            int depth, boolean trustSsl) {
         super(repo);
         mCloneRecursive = cloneRecursive;
         mCloneStatusName = statusName;
         mCallback = callback;
         mDepth = depth;
+        mTrustSsl = trustSsl;
     }
 
     @Override
@@ -78,6 +91,13 @@ public class CloneTask extends RepoRemoteOpTask {
     }
 
     protected void onPostExecute(Boolean isSuccess) {
+        if (!isSuccess && mOfferSslTrustRetry && !isTaskCanceled()) {
+            // The server's certificate could not be verified (self-signed / untrusted CA). Instead
+            // of a dead-end SSL error, offer to trust this server and retry.
+            mRepo.removeTask(this);
+            promptSslTrustRetry();
+            return;
+        }
         if (!isSuccess && mOfferShallowRetry && !isTaskCanceled()) {
             // A full clone ran out of memory. Instead of the base class's generic error, offer to
             // retry as a shallow clone, which downloads far fewer objects and usually fits.
@@ -107,6 +127,31 @@ public class CloneTask extends RepoRemoteOpTask {
                 (dialog, which) -> newTaskWithDepth(SHALLOW_DEPTH).executeTask());
     }
 
+    private void promptSslTrustRetry() {
+        SheimiFragmentActivity activity =
+                (SheimiFragmentActivity) BasicFunctions.getActiveActivity();
+        if (activity == null) {
+            return;
+        }
+        activity.showMessageDialog(R.string.dialog_ssl_untrusted_title,
+                activity.getString(R.string.dialog_ssl_untrusted_msg),
+                R.string.label_trust_server,
+                (dialog, which) -> {
+                    trustRemoteHost();
+                    newTaskTrustingSsl().executeTask();
+                });
+    }
+
+    /** Remember the remote's host as user-trusted, so the retry (and later fetch/pull/push) skip
+     * certificate verification for it. */
+    private void trustRemoteHost() {
+        try {
+            SslTrustStore.trust(new URIish(mRepo.getRemoteURL()).getHost());
+        } catch (URISyntaxException e) {
+            Timber.w(e, "Could not parse remote URL to trust its host");
+        }
+    }
+
     public boolean cloneRepo() {
         File localRepo = mRepo.getDir();
         CloneCommand cloneCommand = Git.cloneRepository()
@@ -130,9 +175,23 @@ public class CloneTask extends RepoRemoteOpTask {
             Profile.setLastCloneFailed(mRepo);
             return false;
         } catch (TransportException e) {
-            setException(e);
             Profile.setLastCloneFailed(mRepo);
-            handleAuthError(this);
+            if (!mTrustSsl && isSslTrustError(e)) {
+                // Self-signed or otherwise untrusted certificate. Offer a "trust this server"
+                // retry (see onPostExecute) rather than the generic auth/error path (#56).
+                setException(e);
+                mOfferSslTrustRetry = true;
+            } else if (isLikelyObjectFormatError(e)
+                    && RemoteObjectFormat.isSha256Remote(mRepo.getRemoteURL())) {
+                // JGit can't read SHA-256 repos yet and fails parsing the ref advertisement with a
+                // cryptic error ("Short read of block", or "Invalid ref advertisement line" with a
+                // 64-hex id). Confirmed via the remote's advertisement, show a clear message instead
+                // (#126; eclipse-jgit/jgit#73).
+                setError(R.string.error_sha256_unsupported);
+            } else {
+                setException(e);
+                handleAuthError(this);
+            }
             return false;
         } catch (GitAPIException e) {
             setException(e, R.string.error_clone_failed);
@@ -175,14 +234,23 @@ public class CloneTask extends RepoRemoteOpTask {
     }
 
     private CloneTask newTaskWithDepth(int depth) {
-        // need to call create repo again as when clone fails (auth error or OOM), the repo
+        return newTask(depth, mTrustSsl);
+    }
+
+    /** Retry keeping this clone's depth but now trusting the server's certificate (#56). */
+    private CloneTask newTaskTrustingSsl() {
+        return newTask(mDepth, true);
+    }
+
+    private CloneTask newTask(int depth, boolean trustSsl) {
+        // need to call create repo again as when clone fails (auth error, OOM, or SSL), the repo
         // initially created gets deleted
         String userName = mRepo.getUsername();
         String password = mRepo.getPassword();
         mRepo = Repo.createRepo(mRepo.getLocalPath(), mRepo.getRemoteURL(), mCloneStatusName);
         mRepo.setUsername(userName);
         mRepo.setPassword(password);
-        return new CloneTask(mRepo, mCloneRecursive, mCloneStatusName, mCallback, depth);
+        return new CloneTask(mRepo, mCloneRecursive, mCloneStatusName, mCallback, depth, trustSsl);
     }
 
     @Override

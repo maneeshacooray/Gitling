@@ -32,7 +32,11 @@ public class RepoDbManager {
         mReadableDatabase = mDbHelper.getReadableDatabase();
     }
 
-    private static RepoDbManager getInstance() {
+    // Synchronized so two threads can't each build a manager (and thus two SQLiteOpenHelpers
+    // opening the same repo.db) at once. On a fresh install RepoListViewModel kicks off a
+    // background migration thread and refreshRepoList() concurrently; without this guard both
+    // raced into RepoDbHelper.onCreate and the loser crashed with "table repo already exists".
+    private static synchronized RepoDbManager getInstance() {
         if (mInstance == null) {
             // Falls back to the Application context rather than always assuming an Activity is
             // active -- the home-screen widget can trigger a query before the app's UI has ever

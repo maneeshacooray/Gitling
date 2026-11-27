@@ -23,6 +23,12 @@ plugins {
 // Java-8-compatible. The stack layout is identical for both opcodes (object
 // reference is already first on the stack), so no extra bytecode is emitted.
 // StreamCompat lives in me.sheimi.sgit.compat.
+//
+// The same visitor also redirects JGit's InflaterCache.get()/release() static
+// calls to InflaterCompat (issue #118). JGit pools inflaters and reset()s them on
+// release; on Android a closed InflaterInputStream has already ended its inflater,
+// so a pooled inflater can be closed and reused, throwing "Inflater has been
+// closed" and aborting large clones at checkout. InflaterCompat never pools.
 // ---------------------------------------------------------------------------
 
 import com.android.build.api.instrumentation.AsmClassVisitorFactory
@@ -107,6 +113,35 @@ abstract class JGitCompatClassVisitorFactory :
                         }
                     }
                 }
+                // Redirect InflaterCache.get()/release() to InflaterCompat so JGit
+                // never reuses a pooled inflater (issue #118; see header note above).
+                // Every caller is in org.eclipse.jgit.*, already in this visitor's scope.
+                if (opcode == Opcodes.INVOKESTATIC &&
+                    owner == "org/eclipse/jgit/lib/InflaterCache"
+                ) {
+                    when {
+                        name == "get" && descriptor == "()Ljava/util/zip/Inflater;" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/InflaterCompat",
+                                "get",
+                                "()Ljava/util/zip/Inflater;",
+                                false
+                            )
+                            return
+                        }
+                        name == "release" && descriptor == "(Ljava/util/zip/Inflater;)V" -> {
+                            super.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "me/sheimi/sgit/compat/InflaterCompat",
+                                "release",
+                                "(Ljava/util/zip/Inflater;)V",
+                                false
+                            )
+                            return
+                        }
+                    }
+                }
                 super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
             }
         }
@@ -147,8 +182,8 @@ android {
         applicationId = "com.maneeshacooray.gitling"
         minSdk = 23
         targetSdk = 37
-        versionCode = 69
-        versionName = "1.0.66"
+        versionCode = 70
+        versionName = "1.0.67"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
@@ -289,7 +324,6 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.jsch)
-    implementation(libs.commons.io)
     implementation(libs.jgit.core)
     implementation(libs.jgit.ssh.jsch) {
         exclude(group = "com.jcraft", module = "jsch")

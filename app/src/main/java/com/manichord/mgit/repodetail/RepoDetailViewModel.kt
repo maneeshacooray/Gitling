@@ -14,6 +14,7 @@ import me.sheimi.sgit.database.models.Repo
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.BranchTrackingStatus
 import timber.log.Timber
+import java.io.File
 
 class RepoDetailViewModel : ViewModel() {
 
@@ -101,6 +102,7 @@ class RepoDetailViewModel : ViewModel() {
         // it sometimes came back without the branch's upstream
         Git.open(repo.dir).use { git ->
             val repository = git.repository
+            if (packIndexTooLargeToCount(repository.directory)) return@use null
             val tracking = repository.branch?.let { BranchTrackingStatus.of(repository, it) }
             val status = git.status().call()
             SyncCounts(
@@ -119,6 +121,32 @@ class RepoDetailViewModel : ViewModel() {
         // coroutine cancellation still works.
         Timber.w(e, "Couldn't count sync state")
         null
+    }
+
+    /**
+     * Whether this repo's pack index is too large to safely load for a `git status` on this device.
+     *
+     * A `StatusCommand` makes JGit read the whole pack index into the heap and keep it there
+     * (measured at roughly 28 bytes per object), and loading it needs about twice that transiently.
+     * On a repo with many millions of objects that exceeds even the largeHeap limit and crashes the
+     * app with an OutOfMemoryError deep in PackIndexV2 (#135), and this count runs automatically
+     * whenever the repo screen is shown and after every git operation. When the index is that big we
+     * skip the count (the toolbar simply shows no counts) rather than risk the crash. The budget is a
+     * quarter of the max heap, so the ~2x transient load still leaves half the heap for the rest of
+     * the app. Lowering JGit's WindowCache does not help here: the index is loaded by Pack, not the
+     * window cache.
+     */
+    private fun packIndexTooLargeToCount(gitDir: File?): Boolean {
+        val packDir = gitDir?.let { File(it, "objects/pack") } ?: return false
+        val idxBytes = packDir.listFiles { f -> f.name.endsWith(".idx") }
+            ?.sumOf { it.length() } ?: 0L
+        val budget = Runtime.getRuntime().maxMemory() / 4
+        if (idxBytes > budget) {
+            Timber.w("Skipping sync count: pack index %d bytes exceeds safe budget %d (#135)",
+                idxBytes, budget)
+            return true
+        }
+        return false
     }
 
     fun setSelectedTab(index: Int) {
