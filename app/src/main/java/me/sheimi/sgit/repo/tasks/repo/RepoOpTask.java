@@ -21,6 +21,14 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
     protected boolean mIsTaskAdded;
     private int mSuccessMsg = 0;
 
+    /** Set on the retry after the user agreed to trust an untrusted/self-signed server certificate
+     * (see {@link #isSslTrustError}). The actual trust is persisted per host in
+     * {@link com.manichord.mgit.transport.SslTrustStore} and applied by
+     * {@link com.manichord.mgit.transport.MGitHttpConnection}; this flag only marks the operation as
+     * the post-trust retry so the user is not prompted again in a loop. Off by default, so normal
+     * operations verify certificates as usual. */
+    protected boolean mTrustSsl = false;
+
     public RepoOpTask(Repo repo) {
         this(repo, true);
     }
@@ -117,6 +125,28 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
         } else {
             Timber.d("no CredentialsProvider when no username/password provided");
         }
+    }
+
+    /** True if {@code t}'s cause chain is a TLS/certificate validation failure, i.e. the server's
+     * certificate could not be trusted (self-signed, unknown CA, or otherwise unvalidated). Used to
+     * offer the user a "trust this server" retry instead of a dead-end error (#56). Matched by type
+     * name and message so it does not depend on importing provider-internal exception classes. */
+    protected static boolean isSslTrustError(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            String cls = c.getClass().getName();
+            if (cls.contains("SSL") || cls.contains("CertPathValidator")
+                    || cls.contains("CertificateException")) {
+                return true;
+            }
+            String msg = c.getMessage();
+            if (msg != null && msg.toLowerCase(Locale.ROOT).contains("ssl")) {
+                return true;
+            }
+            if (c.getCause() == c) {
+                break;
+            }
+        }
+        return false;
     }
 
     protected void handleAuthError(OnPasswordEntered onPassEntered) {
